@@ -1,0 +1,10 @@
+{
+  "name": "synapse-poc",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "bignumber.js": "^4.0.2",
+    "ipfs": "^0.25.1",
+    "web3": "^1.0.0-beta.15"
+  }
+}
