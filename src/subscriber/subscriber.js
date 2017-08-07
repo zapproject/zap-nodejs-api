@@ -65,12 +65,10 @@ class SynapseInternalSubscription {
 }
 
 class SynapseSubscriber {
-    constructor(marketAddress, configFile="~/.synapsesubscriber") {
+    constructor(marketAddress, configFile="~/.synapsesubscriber", callback = undefined) {
         this.marketInstance = SynapseMarket.at(marketAddress);
 
-        this.checkForRegister(configFile, () => {
-            // TODO
-        });
+        this.checkForRegister(configFile, callback);
     }
 
     // Check whether or not we need to register, if so register
@@ -86,9 +84,17 @@ class SynapseSubscriber {
             this.keypair.setPrivateKey(data.private_key, 'hex');
 
             // Load the subscriptions into internal objects
-            this.subscriptions = data.subscriptions.map(data => SynapseInternalSubscription.fromObject(data));
+            this.subscriptions = data.subscriptions.map(data => {
+                const obj = SynapseInternalSubscription.fromObject(data);
 
-            callback();
+                // If a callback was passed, initiate the stream with that
+                if ( callback ) {
+                    obj.data(callback);
+                }
+
+                return obj;
+            });
+
             return;
         }
 
@@ -103,14 +109,14 @@ class SynapseSubscriber {
         }));
 
         this.subscriptions = [];
-
-        callback();
     }
 
     // Create a new subscription
     newSubsription(group, callback) {
         // Conver group to bytes32 string
         group = '0x' + (new Buffer(group)).toString('hex');
+
+        console.log("Looking for a provider of data");
 
         // Send the request
         this.marketInstance.requestSynapseProvider(group, {
@@ -119,6 +125,8 @@ class SynapseSubscriber {
             if ( err ) {
                 throw err;
             }
+
+            console.log("Sent the request");
 
             // Watch for SynapseProviderFound events
             const event = this.marketInstance.SynapseProviderFound();
@@ -133,6 +141,9 @@ class SynapseSubscriber {
                     return;
                 }
 
+                console.log("Found a provider of data");
+
+
                 // Get the index of the provider
                 const provider_index = result2.index;
 
@@ -143,6 +154,7 @@ class SynapseSubscriber {
 
     // Start a subscription with a provider index
     newSubscriptionWithIndex(provider_index, group, callback) {
+        console.log("Starting subscription with index", provider_index);
         // Get the information of the provider
         const providers_address = this.marketInstance.getProviderAddress(group, provider_index);
         const providers_public = this.marketInstance.getProviderPublic(group, provider_index);
@@ -170,6 +182,8 @@ class SynapseSubscriber {
             if ( err ) {
                 throw err;
             }
+
+            console.log("Data feed initiated");
 
             // Create the subscription object
             const subscription = new SynapseInternalSubscription(public_key, secrethex, noncehex, uuid.toString('base64'));
