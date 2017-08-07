@@ -7,7 +7,7 @@ const SynapseMarket = web3.eth.contract("../../build/src_market_contracts_Market
 
 // Establish an IPFS connection with pubsub enabled
 const ipfs = new IPFS({
-    repo: 'ipfs/synapse-test/1',
+    repo: 'ipfs/synapse-provider-test/1',
     EXPERIMENTAL: {
         pubsub: true
     }
@@ -66,16 +66,15 @@ class SynapseInternalSubscription {
     }
 }
 
-class SynaspeProvider {
+class SynapseProvider {
     constructor(marketAddress, group, wei_rate, configFile = "~/.synapseprovider") {
-        this.group = group;
+        this.group = new Buffer(group).toString('hex');
         this.marketInstance = SynapseMarket.at(marketAddress);
 
         this.checkForRegister(configFile, group, wei_rate, () => {
             this.listenForEvent();
             this.listenForBlocks();
             this.listenForTerms();
-            this.loadSubscriptions();
         });
     }
 
@@ -101,24 +100,23 @@ class SynaspeProvider {
         // Don't overflow a solidity bytes32
         if ( group.length > 32 ) {
             throw new Error("Group size is greater than 32 in length!");
-            return;
         }
 
         this.keypair = crypto.createECDH('secp224k1');
-        const public_key = "0x" + keypair.generateKeys('hex', 'compressed');
+        const public_key = "0x" + this.keypair.generateKeys('hex', 'compressed');
 
         // Make the request
-        this.marketInstance.requestSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate, {
+        this.marketInstance.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate, {
             gas: 300000 // TODO - not this
         }, (err, result) => {
             if ( err ) {
-                throw error;
+                throw err;
             }
 
             console.log("Successfully registered");
 
             fs.writeFileSync("~/.synapseprovider", JSON.stringify({
-                private_key: keypair.getPrivateKey('hex'),
+                private_key: this.keypair.getPrivateKey('hex'),
                 subscriptions: []
             }));
 
@@ -152,7 +150,7 @@ class SynaspeProvider {
         const filter = web3.eth.filter('latest');
 
         filter.watch((err, result) => {
-            const block = web3.eth.getBlock(res, true);
+            const block = web3.eth.getBlock(result, true);
             const blocknum = block.number;
 
             // Filter out any old subscriptions
@@ -220,7 +218,7 @@ class SynaspeProvider {
 
         // Add it to the decipher stream and decrypt to String
         const uuid = cipher.update(cipher_text)
-                   + cipher.final('utf8');
+                   + cipher.final('base64');
 
         console.log("Starting subscription with", data.subscriber, "on", uuid);
 
@@ -248,7 +246,7 @@ class SynaspeProvider {
         fs.writeFileSync(JSON.stringify({
             private_key: this.keypair.getPrivateKey(),
             subscribers: this.subscriptions.map(subscriber => subscriber.toObject())
-        }))
+        }));
     }
 
     // End a subscription

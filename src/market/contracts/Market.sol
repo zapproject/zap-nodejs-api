@@ -15,6 +15,12 @@ contract SynapseMarket {
         SynapseTermSubscriber
     }
 
+    // Called when a data provider is found
+    event SynapseProviderFound(
+        uint256 index // Index in the addresses array of where the provider is
+    );
+
+    // Called when a data purchase is initiated
     event SynapseDataPurchase(
         address provider,       // Etheruem address of the provider
         address subscriber,     // Ethereum address of the subscriber
@@ -24,10 +30,11 @@ contract SynapseMarket {
         bytes32 nonce           // Nonce for the encryption routine
     );
 
+    // Called when a data subscription is ended by either provider or terminator
     event SynapseDataSubscriptionEnd(
-        address provider,
-        address subsriber,
-        SynapseSubscriptionTerminator terminator
+        address provider,   // Provider from the subscription
+        address subsriber,  // Subscriber from the subscription
+        SynapseSubscriptionTerminator terminator // Which terminated the contract
     );
 
     // Each subscription is represented as the following
@@ -87,7 +94,7 @@ contract SynapseMarket {
     }
 
     // If someone requsts a provider, find one and give them one
-    function requestSynapseProvider(bytes32 group) returns (address, uint256) {
+    function requestSynapseProvider(bytes32 group) {
         // Find the provider group
         SynapseProviderGroup storage providerGroup = providerGroups[group];
 
@@ -95,16 +102,13 @@ contract SynapseMarket {
         require(providerGroup.provider_addresses.length != 0);
 
         // Get a provider
-        address provider_address = providerGroup.provider_addresses[providerGroup.index++];
-        SynapseProvider storage provider = providerGroup.providers[provider_address];
+        uint256 index = providerGroup.index++;
 
-        // Make sure the index rolls around
-        if ( providerGroup.index >= providerGroup.provider_addresses.length ) {
-            providerGroup.index = 0;
-        }
+        // Roll around the length of the provider group to make sure no overflows
+        providerGroup.index = providerGroup.index % providerGroup.provider_addresses.length;
 
         // Return the relevant information
-        return (provider_address, provider.public_key);
+        SynapseProviderFound(index);
     }
 
     // Initiate a data feed with a given provider and emit necessary events
@@ -221,5 +225,83 @@ contract SynapseMarket {
         }
 
         return true;
+    }
+
+    // Get the amount of providers in a group
+    function getProviderCount(bytes32 group)
+                              constant
+                              returns (uint256) {
+        return providerGroups[group].provider_addresses.length;
+    }
+
+    // Get provider N's wei rate
+    function getProviderRate(bytes32 group,
+                             uint256 index)
+                             constant
+                             returns (uint256) {
+        // Get the provider group
+        SynapseProviderGroup storage providerGroup = providerGroups[group];
+
+        // Make sure we're not going out of bounds
+        require ( index < providerGroup.provider_addresses.length );
+
+        // Get the address of the provider
+        address providerAddress = providerGroup.provider_addresses[index];
+
+        // Get the wei rate
+        return providerGroup.providers[providerAddress].wei_rate;
+    }
+
+    // Get provider N's address
+    function getProviderAddress(bytes32 group,
+                                uint256 index)
+                                constant
+                                returns (address) {
+        // Get the provider group
+        SynapseProviderGroup storage providerGroup = providerGroups[group];
+
+        // Make sure we're not going out of bounds
+        require ( index < providerGroup.provider_addresses.length );
+
+        // Get the address of the provider
+        address providerAddress = providerGroup.provider_addresses[index];
+
+        return providerAddress;
+    }
+
+    // Get provider N's public key
+    function getProviderPublic(bytes32 group,
+                               uint256 index)
+                               constant
+                               returns (uint256) {
+        // Get the provider group
+        SynapseProviderGroup storage providerGroup = providerGroups[group];
+
+        // Make sure we're not going out of bounds
+        require ( index < providerGroup.provider_addresses.length );
+
+        // Get the address of the provider
+        address providerAddress = providerGroup.provider_addresses[index];
+
+        // Get the public key
+        return providerGroup.providers[providerAddress].public_key;
+    }
+
+    // Get provider N's rating
+    function getProviderRating(bytes32 group,
+                               uint256 index)
+                               constant
+                               returns (int256) {
+        // Get the provider group
+        SynapseProviderGroup storage providerGroup = providerGroups[group];
+
+        // Make sure we're not going out of bounds
+        require ( index < providerGroup.provider_addresses.length );
+
+        // Get the address of the provider
+        address providerAddress = providerGroup.provider_addresses[index];
+
+        // Get the public key
+        return providerGroup.providers[providerAddress].reputation;
     }
 }
