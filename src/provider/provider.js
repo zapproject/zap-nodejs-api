@@ -7,6 +7,7 @@ const SynapseMarket = web3.eth.contract("../../build/src_market_contracts_Market
 
 // Establish an IPFS connection with pubsub enabled
 const ipfs = new IPFS({
+    repo: 'ipfs/synapse-test/1',
     EXPERIMENTAL: {
         pubsub: true
     }
