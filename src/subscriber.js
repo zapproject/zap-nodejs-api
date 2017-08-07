@@ -1,68 +1,11 @@
 const crypto = require('crypto');
 const fs = require('fs');
-const IPFS = require('ipfs');
 const Web3 = require('web3');
 
 const SynapseMarket = web3.eth.contract("../../build/src_market_contracts_Market_sol_SynapseMarket.abi");
-
-// Establish an IPFS connection with pubsub enabled
-const ipfs = new IPFS({
-    repo: 'ipfs/synapse-subscriber-test/1',
-    EXPERIMENTAL: {
-        pubsub: true
-    }
-});
+const SynapseSubscription = require('./subscription.js');
 
 const web3 = new Web3();
-
-class SynapseInternalSubscription {
-    constructor(provider, secret, nonce, endblock, uuid) {
-        this.provider = provider;
-        this.secret = secret;
-        this.nonce = nonce;
-
-        // Create a cipher with the secret and nonce as buffers, not hex strings.
-        this.cipher = crypto.createCipheriv('aes-256-ctr', new Buffer(secret, 16),
-                                                           new Buffer(nonce, 16));
-
-        this.endblock = endblock;
-        this.uuid = uuid;
-    }
-
-    // Subscribe to the data from this feed
-    data(callback) {
-        // Subscribe to the data
-        ipfs.pubsub.subscribe(this.uuid, (err, data) => {
-            // Decrypt the data
-            const decrypted = this.cipher.update(data['data'])
-                                         .final();
-
-            callback(decrypted);
-        });
-    }
-
-    // Serialize object for saving
-    toObject() {
-        return {
-            provider: this.provider,
-            secret: this.secret,
-            nonce: this.nonce,
-            endblock: this.endblock,
-            uuid: this.uuid
-        };
-    }
-
-    // Establish from serialized object for loading
-    static fromObject(data) {
-        return new SynapseInternalSubscription(
-            data.provider,
-            data.secret,
-            data.nonce,
-            data.endblock,
-            data.uuid
-        );
-    }
-}
 
 class SynapseSubscriber {
     constructor(marketAddress, configFile="~/.synapsesubscriber", callback = undefined) {
@@ -85,7 +28,7 @@ class SynapseSubscriber {
 
             // Load the subscriptions into internal objects
             this.subscriptions = data.subscriptions.map(data => {
-                const obj = SynapseInternalSubscription.fromObject(data);
+                const obj = SynapseSubscription.fromObject(data);
 
                 // If a callback was passed, initiate the stream with that
                 if ( callback ) {
@@ -186,7 +129,7 @@ class SynapseSubscriber {
             console.log("Data feed initiated");
 
             // Create the subscription object
-            const subscription = new SynapseInternalSubscription(public_key, secrethex, noncehex, uuid.toString('base64'));
+            const subscription = new SynapseSubscription(public_key, secrethex, noncehex, uuid.toString('base64'));
             subscription.data(callback);
         });
     }

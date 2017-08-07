@@ -1,70 +1,14 @@
 const Web3 = require('web3');
-const IPFS = require('ipfs');
 const fs = require('fs');
 const crypto = require('crypto');
 
 const SynapseMarket = web3.eth.contract("../../build/src_market_contracts_Market_sol_SynapseMarket.abi");
+const SynapseSubscription = require('./subscription.js');
 
-// Establish an IPFS connection with pubsub enabled
-const ipfs = new IPFS({
-    repo: 'ipfs/synapse-provider-test/1',
-    EXPERIMENTAL: {
-        pubsub: true
-    }
-});
 
 const web3 = new Web3();
 
-class SynapseInternalSubscription {
-    constructor(subscriber, secret, nonce, endblock, uuid) {
-        this.subscriber = subscriber;
-        this.secret = secret;
-        this.nonce = nonce;
 
-        // Create a cipher with the secret and nonce as buffers, not hex strings.
-        this.cipher = crypto.createCipheriv('aes-256-ctr', new Buffer(secret, 16),
-                                                           new Buffer(nonce, 16));
-
-        this.endblock = endblock;
-        this.uuid = uuid;
-    }
-
-    // Publish data for this feed
-    publish(data) {
-        // Encrypt the stringified data and output to a Buffer
-        const pubdata = this.cipher.update(JSON.stringify(data))
-                                   .final();
-
-        // Publish to IPFS channel of UUID
-        ipfs.pubsub.publish(this.uuid, pubdata, (err) => {
-            if ( err ) {
-                throw err;
-            }
-        });
-    }
-
-    // Serialize object for saving
-    toObject() {
-        return {
-            subscriber: this.subscriber,
-            secret: this.secret,
-            nonce: this.nonce,
-            endblock: this.endblock,
-            uuid: this.uuid
-        };
-    }
-
-    // Establish from serialized object for loading
-    static fromObject(data) {
-        return new SynapseInternalSubscription(
-            data.subscriber,
-            data.secret,
-            data.nonce,
-            data.endblock,
-            data.uuid
-        );
-    }
-}
 
 class SynapseProvider {
     constructor(marketAddress, group, wei_rate, configFile = "~/.synapseprovider") {
@@ -91,7 +35,7 @@ class SynapseProvider {
             this.keypair.setPrivateKey(data.private_key, 'hex');
 
             // Load the subscriptions into internal objects
-            this.subscriptions = data.subscriptions.map(data => SynapseInternalSubscription.fromObject(data));
+            this.subscriptions = data.subscriptions.map(data => SynapseSubscription.fromObject(data));
 
             callback();
             return;
@@ -223,7 +167,7 @@ class SynapseProvider {
         console.log("Starting subscription with", data.subscriber, "on", uuid);
 
         // Create an internal subscription object and begin it
-        this.subscriptions.push(new SynapseInternalSubscription(
+        this.subscriptions.push(new SynapseSubscription(
             data.subscriber,
             secrethex,
             noncehex,
