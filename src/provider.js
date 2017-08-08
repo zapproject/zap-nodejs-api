@@ -5,10 +5,7 @@ const crypto = require('crypto');
 const SynapseMarket = web3.eth.contract("../../build/src_market_contracts_Market_sol_SynapseMarket.abi");
 const SynapseSubscription = require('./subscription.js');
 
-
 const web3 = new Web3();
-
-
 
 class SynapseProvider {
     constructor(marketAddress, group, wei_rate, configFile = "~/.synapseprovider") {
