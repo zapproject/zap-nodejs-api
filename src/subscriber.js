@@ -22,7 +22,7 @@ class SynapseSubscriber {
 
             this.private_key = data.private_key;
 
-            // Generate a secp256k1 keypair
+            // Generate a secp224k1 keypair
             this.keypair = crypto.createECDH('secp224k1');
             this.keypair.setPrivateKey(data.private_key, 'hex');
 
