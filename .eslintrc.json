@@ -25,6 +25,6 @@
                 "ignoreRestSiblings": false
             }
         ],
-        "no-console": "warn"
+        "no-console": ["warn", { "allow": ["log", "warn", "error"] }]
     }
 }
