@@ -78,7 +78,7 @@ function compileContracts(source_files) {
     const output = solc.compile({
         sources: sources
     }, 1);
-
+    console.log(ouput);
     const result = {};
 
     // Parse all compiled contracts
