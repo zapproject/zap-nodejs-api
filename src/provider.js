@@ -128,7 +128,7 @@ class SynapseProvider {
             console.log("Subscription has been terminated by ", result.args.subscriber);
 
             // Filter out the dead subscription
-            this.subscriptions = this.subscriptions.filter(subscription => subscription.subscriber == result.args.subscriber);
+            this.subscriptions = this.subscriptions.filter(subscription => subscription.address == result.args.subscriber);
         });
     }
 

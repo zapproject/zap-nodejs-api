@@ -3,15 +3,15 @@ const IPFS = require('ipfs');
 
 // Establish an IPFS connection with pubsub enabled
 const ipfs = new IPFS({
-    repo: 'ipfs/synapse-subscriber-test/1',
+    repo: 'ipfs/synapse-test/1',
     EXPERIMENTAL: {
         pubsub: true
     }
 });
 
 class SynapseSubscription {
-    constructor(subscriber, secret, nonce, endblock, uuid) {
-        this.subscriber = subscriber;
+    constructor(address, secret, nonce, endblock, uuid) {
+        this.address = address;
         this.secret = secret;
         this.nonce = nonce;
 
@@ -52,7 +52,7 @@ class SynapseSubscription {
     // Serialize object for saving
     toObject() {
         return {
-            subscriber: this.subscriber,
+            address: this.address,
             secret: this.secret,
             nonce: this.nonce,
             endblock: this.endblock,
@@ -63,7 +63,7 @@ class SynapseSubscription {
     // Establish from serialized object for loading
     static fromObject(data) {
         return new SynapseSubscription(
-            data.subscriber,
+            data.address,
             data.secret,
             data.nonce,
             data.endblock,
