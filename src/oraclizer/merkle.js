@@ -62,7 +62,3 @@ class MerkleTree {
 }
 
 module.exports = MerkleTree;
-
-// A B C D E F
-// [A] [B] [C] [D] [E] [F]
-//
