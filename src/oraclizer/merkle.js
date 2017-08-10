@@ -19,6 +19,12 @@ class MerkleTree {
     }
 
     // Construct a merkle tree from the current data
+    // The output will be as follows:
+    // {
+    //     root: buffer of the root hash
+    //     layers: an array of each layer of the merkle tree, where each layer
+    //     is an array of hash values
+    // }
     constructTree(items = undefined, layers = []) {
         // If theres no more items left to be hashed, the root has been produced
         if ( items.length == 1 ) {
