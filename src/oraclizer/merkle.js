@@ -6,6 +6,8 @@ function sha256(item) {
     return hash.digest();
 }
 
+const MERKLE_EMPTY_NODE = { hash: sha256("") };
+
 // Wrapper class for a merkle tree
 class MerkleTree {
     constructor() {
@@ -19,19 +21,12 @@ class MerkleTree {
     }
 
     // Construct a merkle tree from the current data
-    // The output will be as follows:
-    // {
-    //     root: buffer of the root hash
-    //     layers: an array of each layer of the merkle tree, where each layer
-    //     is an array of hash values
-    // }
-    constructTree(items = undefined, layers = []) {
+    constructTree(items = undefined) {
         // If theres no more items left to be hashed, the root has been produced
-        if ( items.length == 1 ) {
-            return {
-                root: items[0],
-                layers: layers[0]
-            };
+        if ( items && items.length == 1 ) {
+            const layer = items[0];
+            layer.hash = layer.hash.toString('hex');
+            return layer;
         }
 
         // If we haven't recursed yet, do the initial hashing of the data
@@ -54,22 +49,25 @@ class MerkleTree {
         // While theres any data left in the current layer
         while ( items.length > 0 ) {
             // Pop 2 items, defaulting to empty string if we OBO
-            const a = items.shift() || "";
-            const b = items.shift() || "";
+            const a = items.shift() || MERKLE_EMPTY_NODE;
+            const b = items.shift() || MERKLE_EMPTY_NODE;
 
-            // Push the hash of the two onto the layer
-            layer.push({
+            // Construct the merkle node
+            const obj = {
                 hash: sha256(a.hash + b.hash),
                 a: a,
                 b: b
-            });
+            };
+
+            a.hash = a.hash.toString('hex');
+            b.hash = b.hash.toString('hex');
+
+            // Push the hash of the two onto the layer
+            layer.push(obj);
         }
 
-        // Add the finishd layer to the layers list
-        layers.push(layer);
-
         // Recurse with the new data
-        return this.constructTree(layer, layers);
+        return this.constructTree(layer);
     }
 }
 
