@@ -30,7 +30,7 @@ class MerkleTree {
         if ( items.length == 1 ) {
             return {
                 root: items[0],
-                layers: layers
+                layers: layers[0]
             };
         }
 
@@ -42,7 +42,9 @@ class MerkleTree {
 
             // Hash each one into items
             for ( const item of tmp ) {
-                items.push(sha256(item));
+                items.push({
+                    hash: sha256(item)
+                });
             }
         }
 
@@ -56,7 +58,11 @@ class MerkleTree {
             const b = items.shift() || "";
 
             // Push the hash of the two onto the layer
-            layer.push(sha256(a + b));
+            layer.push({
+                hash: sha256(a.hash + b.hash),
+                a: a,
+                b: b
+            });
         }
 
         // Add the finishd layer to the layers list
