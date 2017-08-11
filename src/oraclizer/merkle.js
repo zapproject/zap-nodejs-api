@@ -52,6 +52,9 @@ class MerkleTree {
             const a = items.shift() || MERKLE_EMPTY_NODE;
             const b = items.shift() || MERKLE_EMPTY_NODE;
 
+            a.hash = a.hash.toString('hex');
+            b.hash = b.hash.toString('hex');
+
             // Construct the merkle node
             const obj = {
                 hash: sha256(a.hash + b.hash),
@@ -59,15 +62,33 @@ class MerkleTree {
                 b: b
             };
 
-            a.hash = a.hash.toString('hex');
-            b.hash = b.hash.toString('hex');
-
             // Push the hash of the two onto the layer
             layer.push(obj);
         }
 
         // Recurse with the new data
         return this.constructTree(layer);
+    }
+
+    // Verify a merkle tree
+    verifyTree(tree) {
+        // We're at a leaf, theres nothing to verify, so it's good.
+        if ( tree.a == undefined || tree.b == undefined ) {
+            return true;
+        }
+
+        // Verify the merkle tree
+        if ( tree.hash != sha256(tree.a.hash + tree.b.hash).toString('hex') ) {
+            return false;
+        }
+
+        // Verify it's sub-nodes
+        if ( !this.verifyTree(tree.a) || !this.verifyTree(tree.b) ) {
+            return false;
+        }
+
+        // If it's ok!
+        return true;
     }
 }
 
