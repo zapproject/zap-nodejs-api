@@ -6,8 +6,6 @@ function sha256(item) {
     return hash.digest();
 }
 
-const MERKLE_EMPTY_NODE = { hash: sha256("") };
-
 // Wrapper class for a merkle tree
 class MerkleTree {
     constructor() {
@@ -49,8 +47,8 @@ class MerkleTree {
         // While theres any data left in the current layer
         while ( items.length > 0 ) {
             // Pop 2 items, defaulting to empty string if we OBO
-            const a = items.shift() || MERKLE_EMPTY_NODE;
-            const b = items.shift() || MERKLE_EMPTY_NODE;
+            const a = items.shift();
+            const b = items.shift() || { hash: sha256("") };
 
             a.hash = a.hash.toString('hex');
             b.hash = b.hash.toString('hex');
