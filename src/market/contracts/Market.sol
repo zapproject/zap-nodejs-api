@@ -1,9 +1,11 @@
 pragma solidity ^0.4.14;
+import "../token/contracts/SynToken.sol";
 
 // Contract representing the Synase market place
 contract SynapseMarket {
     address adminAddress;
-
+    SynToken public syn;
+    
     enum SynapseDataTypes {
         SynapseDataHistory, // Historical data
         SynapseDataStream,  // Real time data feed
@@ -35,6 +37,10 @@ contract SynapseMarket {
         address provider,   // Provider from the subscription
         address subsriber,  // Subscriber from the subscription
         SynapseSubscriptionTerminator terminator // Which terminated the contract
+    );
+    
+    event TransferFailed( 
+      address sender
     );
 
     // Each subscription is represented as the following
@@ -116,7 +122,9 @@ contract SynapseMarket {
                                  address provider_address, // Provider address
                                  uint256 public_key,       // Public key of the purchaser
                                  bytes32 encrypted_uuid,   // Encrypted UUID with the provider's public key
-                                 bytes32 nonce)            // Nonce for the encryption routine
+                                 bytes32 nonce,
+                                 uint256 payment
+                                 )            // Nonce for the encryption routine
                                  payable {
         // Find the provider group
         SynapseProviderGroup storage providerGroup = providerGroups[group];
@@ -130,10 +138,19 @@ contract SynapseMarket {
         // Make sure hes not trying to do more than one subscription at a time
         require( provider.subscriptions[msg.sender].amount == 0 );
 
-        // Calculate amount of blocks based on amount sent, rounding down
-        uint256 blockcount = msg.value / provider.wei_rate;
-        require(blockcount > 0);
+        //Make sure syn balance > 0
+        require( syn.balanceOf(msg.sender) >= payment );
 
+        // Calculate amount of blocks based on amount sent, rounding down
+        //uint256 blockcount = msg.value / provider.wei_rate;
+        uint256 blockcount = payment / provider.wei_rate;
+        require(blockcount > 0);
+        
+        if(!syn.transferFrom(msg.sender, this, payment)){
+            // Emit the event
+            TransferFailed(msg.sender);
+            throw;
+        }            
         // Add the subscription to the prvider
         provider.subscriptions[msg.sender] = SynapseSubscription({
             amount: msg.value,
@@ -173,7 +190,7 @@ contract SynapseMarket {
             // Calculated the earned way as a percentage of the original wei, and the amount returned as the difference
             uint256 earnedWei = (block.number * subscription.amount) / subscription.preblockend;
             uint256 returnedWei = subscription.amount - earnedWei;
-
+            
             // Kill the subscription
             subscription.amount = 0;
 
@@ -218,9 +235,10 @@ contract SynapseMarket {
         availablePayouts[msg.sender] = 0;
 
         // Send the funds to his wallet
-        if ( !msg.sender.send(amount) ) {
+        if ( !syn.transferFrom(this, msg.sender, amount) ) {
             // Give him back the funds if it fails to send
-            availablePayouts[msg.sender] = amount;
+            availablePayouts[msg.sender] += amount;
+            TransferFailed(msg.sender);
             return false;
         }
 
