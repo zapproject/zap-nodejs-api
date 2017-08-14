@@ -5,7 +5,9 @@
   "dependencies": {
     "async": "^2.5.0",
     "bignumber.js": "^4.0.2",
+    "bson": "^1.0.4",
     "datastore-fs": "^0.3.0",
+    "elliptic": "^6.4.0",
     "ethereumjs-wallet": "^0.6.0",
     "ipfs": "^0.25.1",
     "solc": "^0.4.15",

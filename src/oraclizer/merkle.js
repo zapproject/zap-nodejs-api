@@ -19,12 +19,11 @@ class MerkleTree {
     }
 
     // Construct a merkle tree from the current data
-    constructTree(items = undefined) {
+    constructTree(items = undefined, leafs = undefined) {
         // If theres no more items left to be hashed, the root has been produced
         if ( items && items.length == 1 ) {
             const layer = items[0];
-            layer.hash = layer.hash.toString('hex');
-            return layer;
+            return layer.hash.toString('hex');
         }
 
         // If we haven't recursed yet, do the initial hashing of the data
@@ -39,6 +38,8 @@ class MerkleTree {
                     hash: sha256(item)
                 });
             }
+
+            leafs = items.slice();
         }
 
         // Prepare a layer
@@ -65,28 +66,7 @@ class MerkleTree {
         }
 
         // Recurse with the new data
-        return this.constructTree(layer);
-    }
-
-    // Verify a merkle tree
-    verifyTree(tree) {
-        // We're at a leaf, theres nothing to verify, so it's good.
-        if ( tree.a == undefined || tree.b == undefined ) {
-            return true;
-        }
-
-        // Verify the merkle tree
-        if ( tree.hash != sha256(tree.a.hash + tree.b.hash).toString('hex') ) {
-            return false;
-        }
-
-        // Verify it's sub-nodes
-        if ( !this.verifyTree(tree.a) || !this.verifyTree(tree.b) ) {
-            return false;
-        }
-
-        // If it's ok!
-        return true;
+        return this.constructTree(layer, leafs);
     }
 }
 
