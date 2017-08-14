@@ -171,21 +171,21 @@ class SynapseOraclizer {
             {
                 path: highFile,
                 content: bson.serialize({
-                    root: highMerkleTree.root,
+                    root: highMerkleTree,
                     items: this.pool.high
                 })
             },
             {
                 path: midFile,
                 content: bson.serialize({
-                    root: midMerkleTree.root,
+                    root: midMerkleTree,
                     items: this.pool.mid
                 })
             },
             {
                 path: lowFile,
                 content: bson.serialize({
-                    root: lowMerkleTree.root,
+                    root: lowMerkleTree,
                     items: this.pool.low
                 })
             },
