@@ -170,24 +170,15 @@ class SynapseOraclizer {
         ipfs.files.add([
             {
                 path: highFile,
-                content: bson.serialize({
-                    root: highMerkleTree,
-                    items: this.pool.high
-                })
+                content: bson.serialize(this.pool.high)
             },
             {
                 path: midFile,
-                content: bson.serialize({
-                    root: midMerkleTree,
-                    items: this.pool.mid
-                })
+                content: bson.serialize(this.pool.mid)
             },
             {
                 path: lowFile,
-                content: bson.serialize({
-                    root: lowMerkleTree,
-                    items: this.pool.low
-                })
+                content: bson.serialize(this.pool.low)
             },
 
         ], (err, files) => {
