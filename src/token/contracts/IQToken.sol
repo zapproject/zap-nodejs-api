@@ -52,6 +52,8 @@ contract IQToken{
     //recieve deposit from provider address
     function deposit(uint256 value) external returns(bool){
 
+        //approve market to transfer
+        syn.approve(this, amount);
         //attempt transfer
         if(!synToken.transferFrom(msg.sender, this, value)){
             InvalidDeposit();
@@ -72,6 +74,8 @@ contract IQToken{
             return false;
         }
         
+        //approve market to transfer
+        syn.approve(this, amount);
         //withdraw
         synToken.transferFrom(this, msg.sender, value);
         return true;

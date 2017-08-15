@@ -142,9 +142,13 @@ contract SynapseMarket {
         require( syn.balanceOf(msg.sender) >= payment );
 
         // Calculate amount of blocks based on amount sent, rounding down
-        //uint256 blockcount = msg.value / provider.wei_rate;
         uint256 blockcount = payment / provider.wei_rate;
+        
+        //uint256 blockcount = msg.value / provider.wei_rate;
         require(blockcount > 0);
+        
+        //approve market to transfer
+        syn.approve(this, amount);
         
         if(!syn.transferFrom(msg.sender, this, payment)){
             // Emit the event
@@ -233,7 +237,10 @@ contract SynapseMarket {
 
         // Empty his counter
         availablePayouts[msg.sender] = 0;
-
+        
+        //approve market to transfer
+        syn.approve(this, amount);
+        
         // Send the funds to his wallet
         if ( !syn.transferFrom(this, msg.sender, amount) ) {
             // Give him back the funds if it fails to send
