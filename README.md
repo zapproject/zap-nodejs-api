@@ -1,3 +1,3 @@
 # synapse-poc
 
-Proof of concept for synapse
+Proof of concept for synapse.
