@@ -57,7 +57,7 @@
          }
       
          // Constructor
-         function DevToken() {
+         function SynToken() {
              owner = msg.sender;
              balances[owner] = _totalSupply;
          }
