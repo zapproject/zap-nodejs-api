@@ -1,0 +1,40 @@
+Run nvm installer with either curl or wget.
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+If everything went well, open new Terminal window/tab.
+List what versions of Node are currently installed (probably none).
+nvm ls
+Install latest Node.js LTS release.
+nvm install v6.11.2
+Install Current Node.js release with latest features.
+nvm install v8.3.0
+Optional steps:
+
+Set a default Node version for nvm (enabling you to actually use it in a new Terminal session windows).
+nvm alias default v6.11.2
+nvm alias default v8.3.0
+It is also possible to select what Node.js version is used per project basis, by running nvm use v6.11.1 (or another version number) on the directory where the individual project is located. One way to do that is to create small Bash shell script for enabling the right environment when needed, so you would not have to remember what exact version was needed. Now you have it.
+
+After previous steps, now you should have a working Node.js installation with the ability to install new npm packages to your computer.
+
+Open new Terminal window.
+Install Yeoman project generator for web apps.
+npm install -g yo
+You can find a lot of other packages from the npm website. Have a good time with the tools.
+
+Upgrading from previous version of Node.js
+
+If you already have previous version of Node.js installed with nvm, you can upgrade to a different version with these steps.
+
+Open new Terminal window (to make sure you have latest Node.js version active in your command line environment).
+Linking global packages from previous version (at this example, v6.9.1 or v8.0.0).
+nvm reinstall-packages v6.11.1
+nvm reinstall-packages v8.2.1
+Deleting old Node.js versions
+
+Look what versions are installed.
+nvm ls
+Delete an older version (if it is no longer used in some of your projects).
+nvm uninstall v6.11.1
+nvm uninstall v8.2.1
+
