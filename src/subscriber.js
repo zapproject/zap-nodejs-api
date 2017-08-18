@@ -28,7 +28,6 @@ account.setWeb3(web3);
 class SynapseSubscriber {
     constructor(marketAddress, configFile=".synapsesubscriber", callback = undefined) {
         this.marketInstance = SynapseMarket;
-        console.log(this.marketInstance);
         this.checkForRegister(configFile, callback);
     }
 
@@ -121,46 +120,52 @@ class SynapseSubscriber {
 
         console.log(this.marketInstance.methods.getProviderAddress);
         //console.log(provider_address);
-        const providers_address = this.marketInstance.methods.getProviderAddress(group, provider_index).call();
-        const providers_public = this.marketInstance.methods.getProviderPublic(group, provider_index).call();
+        this.marketInstance.methods.getProviderAddress(web3.utils.utf8ToHex(group), provider_index).call().then( (res)=>{
+            
+            const providers_address = res;
+            this.marketInstance.methods.getProviderPublic(web3.utils.utf8ToHex(group), provider_index).call().then( (res)=>{
 
+                const providers_public = res;
 
-        console.log(providers_public);
+                console.log(providers_address);
+                console.log(web3.utils.fromDecimal(providers_public).substr(2));
 
-        // Do the key exchange
-        const secrethex = this.keypair.computeSecret(new Buffer(providers_public.toString('hex'), 'hex'));
+                // Do the key exchange
+                const secrethex = this.keypair.computeSecret(new Buffer("0"+web3.utils.fromDecimal(providers_public).substr(2), 16));
 
-        // Generate a nonce
-        const nonce = crypto.randomBytes(32);
-        const noncehex = "0x" + nonce.toString('hex');
+                // Generate a nonce
+                const nonce = crypto.randomBytes(32);
+                const noncehex = "0x" + nonce.toString('hex');
 
-        // Generate a UUID
-        const uuid = crypto.randomBytes(32);
+                // Generate a UUID
+                const uuid = crypto.randomBytes(32);
 
-        // Encrypt it with the secret key
-        const cipher = crypto.createCipheriv('aes-256-ctr', new Buffer(secrethex, 16), nonce);
-        const euuid = "0x" + cipher.update(uuid)
-                                   .final('hex');
+                // Encrypt it with the secret key
+                const cipher = crypto.createCipheriv('aes-256-ctr', new Buffer(secrethex, 16), nonce);
+                const euuid = "0x" + cipher.update(uuid)
+                                           .final('hex');
 
-        // Get my public key
-        const public_key = "0x" + this.keypair.getPublicKey('hex');
+                // Get my public key
+                const public_key = "0x" + this.keypair.getPublicKey('hex');
 
-        // Initiate the data feed
-        this.marketInstance.initSynapseDataFeed(group, providers_address, public_key, euuid, noncehex).send({
-            from: web3.eth.accounts.wallet[0].address,
-            gas: 300000 // TODO - not this
-        } , (err, result) => {
-            if ( err ) {
-                throw err;
-            }
+                // Initiate the data feed
+                this.marketInstance.initSynapseDataFeed(group, providers_address, public_key, euuid, noncehex).send({
+                    from: web3.eth.accounts.wallet[0].address,
+                    gas: 300000 // TODO - not this
+                } , (err, result) => {
+                    if ( err ) {
+                        throw err;
+                    }
 
-            console.log("Data feed initiated");
+                    console.log("Data feed initiated");
 
-            // Create the subscription object
-            const subscription = new SynapseSubscription(public_key, secrethex, noncehex, uuid.toString('base64'));
-            subscription.data(callback);
-        });
-    }
+                    // Create the subscription object
+                    const subscription = new SynapseSubscription(public_key, secrethex, noncehex, uuid.toString('base64'));
+                    subscription.data(callback);
+                });
+              });
+            });
+        }
 }
 
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
