@@ -24,6 +24,12 @@ const privateKeyHex = "0x8d2246c6f1238a97e84f39e18f84593a44e6622b67b8cebb7788320
 const account = new accounts(privateKeyHex);
 
 account.setWeb3(web3);
+function sha256(item) {
+    const hash = crypto.createHash("sha256");
+    hash.update(item);
+    return hash.digest();
+}
+
 
 class SynapseSubscriber {
     constructor(marketAddress, configFile=".synapsesubscriber", callback = undefined) {
@@ -131,25 +137,27 @@ class SynapseSubscriber {
                 console.log(web3.utils.fromDecimal(providers_public).substr(2));
 
                 // Do the key exchange
-                const secrethex = this.keypair.computeSecret(new Buffer("0"+web3.utils.fromDecimal(providers_public).substr(2), 16));
-
+                const secrethex = sha256(this.keypair.computeSecret(new Buffer("0"+web3.utils.fromDecimal(providers_public).substr(2), 'hex')));
+                console.log(secrethex.length);
                 // Generate a nonce
-                const nonce = crypto.randomBytes(32);
-                const noncehex = "0x" + nonce.toString('hex');
-
+                const nonce = crypto.randomBytes(16);
+                const noncehex = "0x" + new Buffer(nonce).toString('hex');
+                console.log(nonce.length);
                 // Generate a UUID
                 const uuid = crypto.randomBytes(32);
 
                 // Encrypt it with the secret key
-                const cipher = crypto.createCipheriv('aes-256-ctr', new Buffer(secrethex, 16), nonce);
-                const euuid = "0x" + cipher.update(uuid)
-                                           .final('hex');
-
+                const cipher = crypto.createCipheriv('aes-256-ctr', (secrethex), nonce);
+                let euuid = cipher.update(uuid);
+                euuid=euuid+cipher.final();
+                let euuid_hex =  web3.utils.utf8ToHex(euuid.toString());
                 // Get my public key
                 const public_key = "0x" + this.keypair.getPublicKey('hex');
 
                 // Initiate the data feed
-                this.marketInstance.initSynapseDataFeed(group, providers_address, public_key, euuid, noncehex).send({
+                //console.log(web3.utils.utf8ToHex(group), providers_address, public_key, euuid_hex, noncehex, "0x0");
+
+                this.marketInstance.methods.initSynapseDataFeed(web3.utils.utf8ToHex(group), providers_address, public_key, euuid_hex, noncehex, "0x0").send({
                     from: web3.eth.accounts.wallet[0].address,
                     gas: 300000 // TODO - not this
                 } , (err, result) => {

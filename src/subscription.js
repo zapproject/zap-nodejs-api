@@ -14,15 +14,14 @@ class SynapseSubscription {
         this.address = address;
         this.secret = secret;
         this.nonce = nonce;
-
+console.log(nonce, secret);
         // Create a cipher with the secret and nonce as buffers, not hex strings.
-        this.cipher = crypto.createCipheriv('aes-256-ctr', new Buffer(secret, 16),
-                                                           new Buffer(nonce, 16));
+        this.cipher = crypto.createCipheriv('aes-256-ctr', secret, new Buffer(nonce.substr(2), 'hex'));
 
         this.endblock = endblock;
         this.uuid = uuid;
     }
-
+    //TODO remove cipher chaining methods
     // Publish data for this feed
     publish(data) {
         // Encrypt the stringified data and output to a Buffer
@@ -38,6 +37,7 @@ class SynapseSubscription {
     }
 
     // Subscribe to the data from this feed
+    //TODO remove cipher chaining methods
     data(callback) {
         // Subscribe to the data
         ipfs.pubsub.subscribe(this.uuid, (err, data) => {
