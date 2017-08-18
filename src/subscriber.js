@@ -27,7 +27,7 @@ const account = new accounts(privateKeyHex);
 account.setWeb3(web3);
 
 class SynapseSubscriber {
-    constructor(marketAddress, configFile="~/.synapsesubscriber", callback = undefined) {
+    constructor(marketAddress, configFile=".synapsesubscriber", callback = undefined) {
         this.marketInstance = SynapseMarket;
 
         this.checkForRegister(configFile, callback);
@@ -65,7 +65,7 @@ class SynapseSubscriber {
 
         console.log("Successfully registered");
 
-        fs.writeFileSync("~/.synapsesubscriber", JSON.stringify({
+        fs.writeFileSync(".synapsesubscriber", JSON.stringify({
             private_key: this.keypair.getPrivateKey('hex'),
             subscriptions: []
         }));
@@ -118,11 +118,13 @@ class SynapseSubscriber {
     newSubscriptionWithIndex(provider_index, group, callback) {
         console.log("Starting subscription with index", provider_index);
         // Get the information of the provider
-        const providers_address = this.marketInstance.getProviderAddress(group, provider_index);
-        const providers_public = this.marketInstance.getProviderPublic(group, provider_index);
+        const providers_address = this.marketInstance.methods.getProviderAddress(group, provider_index).call();
+        const providers_public = this.marketInstance.methods.getProviderPublic(group, provider_index).call();
+
+        console.log(providers_public);
 
         // Do the key exchange
-        const secrethex = this.keypair.computeSecret(providers_public, 'hex');
+        const secrethex = this.keypair.computeSecret(new Buffer(providers_public.toString('hex'), 'hex'));
 
         // Generate a nonce
         const nonce = crypto.randomBytes(32);
@@ -156,5 +158,14 @@ class SynapseSubscriber {
         });
     }
 }
+
+const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
+
+setTimeout(() => {
+    subscriber.newSubscriptionWithIndex(0, "cool2", (err, data) => {
+        console.log(err);
+        console.log(data);
+    })
+}, 5000);
 
 module.exports = SynapseSubscriber;
