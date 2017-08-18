@@ -1,17 +1,30 @@
-const Web3 = require('web3');
-const fs = require('fs');
 const crypto = require('crypto');
+const Web3 = require('web3');
 
-const web3 = new Web3();
+//network
+const rpcHost = "https://rinkeby.infura.io";
+const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
 
-const SynapseMarket = web3.eth.contract("../../build/src_market_contracts_Market_sol_SynapseMarket.abi");
-const SynapseSubscription = require('./subscription.js');
+//market contract
+const file = "./market/contracts/abi.json";
+const abi = JSON.parse(fs.readFileSync(file));
+const marketAddress = "0x98f6d007a840782eea0fbc6584ab95e8c86d677e";
+const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
+
+//accounts
+const accounts = require('./account.js');
+//const privateKeyHex = "0x8d2246c6f1238a97e84f39e18f84593a44e6622b67b8cebb7788320486141f95";
+const privateKeyHex = "0x98970b96eb1118b1e52e2ccbcf9620281ab75a3d594dcaa4bb8cd97d1abc05fe";
+const account = new accounts(privateKeyHex);
+
+
+account.setWeb3(web3);
+console.log(web3.eth.accounts.wallet[0].address);
 
 class SynapseProvider {
-    constructor(marketAddress, group, wei_rate, configFile = "~/.synapseprovider") {
+    constructor(group, wei_rate, configFile = ".synapseprovider") {
         this.group = new Buffer(group).toString('hex');
-        this.marketInstance = SynapseMarket.at(marketAddress);
-
+        this.marketInstance = SynapseMarket;
         this.checkForRegister(configFile, group, wei_rate, () => {
             this.listenForEvent();
             this.listenForBlocks();
@@ -24,7 +37,6 @@ class SynapseProvider {
         // Already regsitered
         if ( fs.existsSync(configFile) ) {
             const data = JSON.parse(fs.readFileSync(configFile));
-
             this.private_key = data.private_key;
 
             // Generate a secp224k1 keypair
@@ -44,19 +56,15 @@ class SynapseProvider {
         }
 
         this.keypair = crypto.createECDH('secp224k1');
-        const public_key = "0x" + this.keypair.generateKeys('hex', 'compressed');
 
+        const public_key = "0x" + this.keypair.generateKeys('hex', 'compressed');
+         
         // Make the request
-        this.marketInstance.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate, {
-            gas: 300000 // TODO - not this
-        }, (err, result) => {
-            if ( err ) {
-                throw err;
-            }
+        this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate).send( { gas: 300000 }, () => {
 
             console.log("Successfully registered");
 
-            fs.writeFileSync("~/.synapseprovider", JSON.stringify({
+            fs.writeFileSync(".synapseprovider", JSON.stringify({
                 private_key: this.keypair.getPrivateKey('hex'),
                 subscriptions: []
             }));
@@ -69,9 +77,11 @@ class SynapseProvider {
 
     // Wait for subscription events
     listenForEvent() {
+
+
         // Wait for events of SynapseDataPurchase type with a provider that is us
-        this.marketInstance.SynapseDataPurchase([
-            { provider: web3.eth.accounts[0] }
+        this.marketInstance.events.SynapseDataPurchase([
+            { provider: web3.eth.accounts.wallet[0].address }
         ], (err, result) => {
             // Ignore errors
             if ( err ) {
@@ -111,7 +121,7 @@ class SynapseProvider {
 
     // Listen for terminations that wasn't initiated by us
     listenForTerms() {
-        this.marketInstance.SynapseDataSubscriptionEnd([
+        this.marketInstance.events.SynapseDataSubscriptionEnd([
             {
                 provider: web3.eth.accounts[0],
                 terminator: 1 // Subscriber temrinated
@@ -196,7 +206,7 @@ class SynapseProvider {
         // provider_address
         // subscriber_address
 
-        this.marketInstance.endSynapseSubscription_Provider(this.group, subscription.address, {
+        this.marketInstance.methods.sendSynapseSubscription_Provider(this.group, subscription.address).send({
             gas: 300000 // TODO - not this
         }, (err, result) => {
             if ( err ) {
