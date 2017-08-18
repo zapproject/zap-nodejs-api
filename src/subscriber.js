@@ -8,7 +8,6 @@ const SynapseSubscription = require('./subscription.js');
 const file = "./market/contracts/abi.json";
 const abi = JSON.parse(fs.readFileSync(file));
 const marketAddress = "0x98f6d007a840782eea0fbc6584ab95e8c86d677e";
-const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
 
 // Create a sending RPC
 const rpcHost = "http://localhost:8545";
@@ -88,12 +87,12 @@ class SynapseSubscriber {
         }, (err, result) => {
             if ( err ) {
                 throw err;
-            };
+            }
 
             console.log("Sent the request");
 
             // Watch for SynapseProviderFound events
-            const event = this.marketInstance.SynapseProviderFound();
+            const event = SynapseMarket_listen.SynapseProviderFound();
 
             event.watch((err, found_res) => {
                 if ( err ) {
@@ -144,7 +143,7 @@ class SynapseSubscriber {
         this.marketInstance.initSynapseDataFeed(group, providers_address, public_key, euuid, noncehex).send({
             from: web3.eth.accounts.wallet[0].address,
             gas: 300000 // TODO - not this
-       } , (err, result) => {
+        } , (err, result) => {
             if ( err ) {
                 throw err;
             }
