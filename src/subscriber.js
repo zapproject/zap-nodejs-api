@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const Web3 = require('web3');
-
 const SynapseSubscription = require('./subscription.js');
 
 //market contract
@@ -29,7 +28,7 @@ account.setWeb3(web3);
 class SynapseSubscriber {
     constructor(marketAddress, configFile=".synapsesubscriber", callback = undefined) {
         this.marketInstance = SynapseMarket;
-
+        console.log(this.marketInstance);
         this.checkForRegister(configFile, callback);
     }
 
@@ -118,8 +117,13 @@ class SynapseSubscriber {
     newSubscriptionWithIndex(provider_index, group, callback) {
         console.log("Starting subscription with index", provider_index);
         // Get the information of the provider
+
+
+        console.log(this.marketInstance.methods.getProviderAddress);
+        //console.log(provider_address);
         const providers_address = this.marketInstance.methods.getProviderAddress(group, provider_index).call();
         const providers_public = this.marketInstance.methods.getProviderPublic(group, provider_index).call();
+
 
         console.log(providers_public);
 
