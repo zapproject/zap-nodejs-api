@@ -1,9 +1,12 @@
+const fs = require('fs');
 const crypto = require('crypto');
 const Web3 = require('web3');
+const SynapseSubscription = require('./subscription.js');
 
 //network
-const rpcHost = "https://rinkeby.infura.io";
-const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
+// const rpcHost = "https://rinkeby.infura.io";
+const rpcHost = "ws://localhost:8546";
+const web3 = new Web3(new Web3.providers.WebsocketProvider(rpcHost));
 
 //market contract
 const file = "./market/contracts/abi.json";
@@ -36,6 +39,8 @@ class SynapseProvider {
     checkForRegister(configFile, group, wei_rate, callback) {
         // Already regsitered
         if ( fs.existsSync(configFile) ) {
+            console.log("Loading configuration from", configFile);
+
             const data = JSON.parse(fs.readFileSync(configFile));
             this.private_key = data.private_key;
 
@@ -58,11 +63,17 @@ class SynapseProvider {
         this.keypair = crypto.createECDH('secp224k1');
 
         const public_key = "0x" + this.keypair.generateKeys('hex', 'compressed');
-         
-        // Make the request
-        this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate).send( { gas: 300000 }, () => {
 
-            console.log("Successfully registered");
+        console.log("Created public key", public_key);
+
+        // Make the request
+        this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate).send({
+            gas: 900000,
+            from: web3.eth.accounts.wallet[0].address
+        }, (err, result) => {
+            if ( err ) {
+                throw err;
+            }
 
             fs.writeFileSync(".synapseprovider", JSON.stringify({
                 private_key: this.keypair.getPrivateKey('hex'),
@@ -77,8 +88,6 @@ class SynapseProvider {
 
     // Wait for subscription events
     listenForEvent() {
-
-
         // Wait for events of SynapseDataPurchase type with a provider that is us
         this.marketInstance.events.SynapseDataPurchase([
             { provider: web3.eth.accounts.wallet[0].address }
@@ -98,11 +107,8 @@ class SynapseProvider {
 
     // Listen for Ethereum blocks to end subscriptions
     listenForBlocks() {
-        const filter = web3.eth.filter('latest');
-
-        filter.watch((err, result) => {
-            const block = web3.eth.getBlock(result, true);
-            const blocknum = block.number;
+        web3.eth.subscribe('newBlockHeaders', (err, result) => {
+            const blocknum = result.number;
 
             // Filter out any old subscriptions
             this.subscriptions = this.subscriptions.filter(subscription => {
@@ -217,5 +223,8 @@ class SynapseProvider {
         });
     }
 }
+
+const provider = new SynapseProvider("test", 200);
+
 
 module.exports = SynapseProvider;
