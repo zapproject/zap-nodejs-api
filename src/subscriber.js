@@ -2,14 +2,34 @@ const crypto = require('crypto');
 const fs = require('fs');
 const Web3 = require('web3');
 
-const SynapseMarket = web3.eth.contract("../../build/src_market_contracts_Market_sol_SynapseMarket.abi");
 const SynapseSubscription = require('./subscription.js');
 
-const web3 = new Web3();
+//market contract
+const file = "./market/contracts/abi.json";
+const abi = JSON.parse(fs.readFileSync(file));
+const marketAddress = "0x98f6d007a840782eea0fbc6584ab95e8c86d677e";
+const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
+
+// Create a sending RPC
+const rpcHost = "http://localhost:8545";
+const web3 = new Web3(Web3.givenProvider || rpcHost);
+const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
+
+// Create a listening RPC
+const rpcHost_listen = "ws://localhost:8546";
+const web3_listen = new Web3(Web3.givenProvider || rpcHost_listen);
+const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
+
+//accounts
+const accounts = require('./account.js');
+const privateKeyHex = "0x8d2246c6f1238a97e84f39e18f84593a44e6622b67b8cebb7788320486141f95";
+const account = new accounts(privateKeyHex);
+
+account.setWeb3(web3);
 
 class SynapseSubscriber {
     constructor(marketAddress, configFile="~/.synapsesubscriber", callback = undefined) {
-        this.marketInstance = SynapseMarket.at(marketAddress);
+        this.marketInstance = SynapseMarket;
 
         this.checkForRegister(configFile, callback);
     }
@@ -62,12 +82,13 @@ class SynapseSubscriber {
         console.log("Looking for a provider of data");
 
         // Send the request
-        this.marketInstance.requestSynapseProvider(group, {
+        this.marketInstance.methods.requestSynapseProvider(group).send({
+            from: web3.eth.accounts.wallet[0].address,
             gas: 300000 // TODO - not this
         }, (err, result) => {
             if ( err ) {
                 throw err;
-            }
+            };
 
             console.log("Sent the request");
 
@@ -120,7 +141,10 @@ class SynapseSubscriber {
         const public_key = "0x" + this.keypair.getPublicKey('hex');
 
         // Initiate the data feed
-        this.marketInstance.initSynapseDataFeed(group, providers_address, public_key, euuid, noncehex, (err, result) => {
+        this.marketInstance.initSynapseDataFeed(group, providers_address, public_key, euuid, noncehex).send({
+            from: web3.eth.accounts.wallet[0].address,
+            gas: 300000 // TODO - not this
+       } , (err, result) => {
             if ( err ) {
                 throw err;
             }

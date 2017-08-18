@@ -23,8 +23,7 @@ const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
 
 //accounts
 const accounts = require('./account.js');
-//const privateKeyHex = "0x8d2246c6f1238a97e84f39e18f84593a44e6622b67b8cebb7788320486141f95";
-const privateKeyHex = "0x98970b96eb1118b1e52e2ccbcf9620281ab75a3d594dcaa4bb8cd97d1abc05fe";
+const privateKeyHex = "0x8d2246c6f1238a97e84f39e18f84593a44e6622b67b8cebb7788320486141f95";
 const account = new accounts(privateKeyHex);
 
 account.setWeb3(web3);
@@ -218,8 +217,9 @@ class SynapseProvider {
         // group
         // provider_address
         // subscriber_address
-
+//TODO
         this.marketInstance.methods.sendSynapseSubscription_Provider(this.group, subscription.address).send({
+            from: web3.eth.accounts.wallet[0].address,
             gas: 300000 // TODO - not this
         }, (err, result) => {
             if ( err ) {
