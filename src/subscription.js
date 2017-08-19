@@ -14,19 +14,19 @@ class SynapseSubscription {
         this.address = address;
         this.secret = secret;
         this.nonce = nonce;
-console.log(nonce, secret);
+
         // Create a cipher with the secret and nonce as buffers, not hex strings.
         this.cipher = crypto.createCipheriv('aes-256-ctr', secret, new Buffer(nonce.substr(2), 'hex'));
 
         this.endblock = endblock;
         this.uuid = uuid;
     }
-    //TODO remove cipher chaining methods
+
     // Publish data for this feed
     publish(data) {
         // Encrypt the stringified data and output to a Buffer
-        const pubdata = this.cipher.update(JSON.stringify(data))
-                                   .final();
+        const pubdata = this.cipher.update(JSON.stringify(data)) +
+                        this.cipher.final();
 
         // Publish to IPFS channel of UUID
         ipfs.pubsub.publish(this.uuid, pubdata, (err) => {
@@ -37,13 +37,12 @@ console.log(nonce, secret);
     }
 
     // Subscribe to the data from this feed
-    //TODO remove cipher chaining methods
     data(callback) {
         // Subscribe to the data
         ipfs.pubsub.subscribe(this.uuid, (err, data) => {
             // Decrypt the data
-            const decrypted = this.cipher.update(data['data'])
-                                         .final();
+            const decrypted = this.cipher.update(data['data']) +
+                              this.cipher.final();
 
             callback(decrypted);
         });

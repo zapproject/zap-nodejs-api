@@ -24,6 +24,7 @@ const privateKeyHex = "0x8d2246c6f1238a97e84f39e18f84593a44e6622b67b8cebb7788320
 const account = new accounts(privateKeyHex);
 
 account.setWeb3(web3);
+
 function sha256(item) {
     const hash = crypto.createHash("sha256");
     hash.update(item);
@@ -80,7 +81,7 @@ class SynapseSubscriber {
     // Create a new subscription
     newSubsription(group, callback) {
         // Conver group to bytes32 string
-        group = '0x' + (new Buffer(group)).toString('hex');
+        group = web3.utils.utf8ToHex(group);
 
         console.log("Looking for a provider of data");
 
@@ -119,45 +120,68 @@ class SynapseSubscriber {
     }
 
     // Start a subscription with a provider index
-    newSubscriptionWithIndex(provider_index, group, callback) {
+    newSubscriptionWithIndex(provider_index, group, amount, callback) {
         console.log("Starting subscription with index", provider_index);
+
+        // Make sure group is a bytes32 compatible object
+        if ( group.substring(0, 2) != '0x' ) {
+            group = web3.utils.utf8ToHex(group);
+        }
+
         // Get the information of the provider
+        this.marketInstance.methods.getProviderAddress(group, provider_index).call().then(providers_address => {
+            this.marketInstance.methods.getProviderPublic(group, provider_index).call().then(providers_public => {
+                // Parse solidity's garbage.
+                let provider_public_hex = web3.utils.fromDecimal(providers_public).substr(2);
 
-
-        console.log(this.marketInstance.methods.getProviderAddress);
-        //console.log(provider_address);
-        this.marketInstance.methods.getProviderAddress(web3.utils.utf8ToHex(group), provider_index).call().then( (res)=>{
-            
-            const providers_address = res;
-            this.marketInstance.methods.getProviderPublic(web3.utils.utf8ToHex(group), provider_index).call().then( (res)=>{
-
-                const providers_public = res;
-
-                console.log(providers_address);
-                console.log(web3.utils.fromDecimal(providers_public).substr(2));
+                if ( provider_public_hex.length != (28 * 2) ) {
+                    provider_public_hex = "0" + provider_public_hex;
+                }
 
                 // Do the key exchange
-                const secrethex = sha256(this.keypair.computeSecret(new Buffer("0"+web3.utils.fromDecimal(providers_public).substr(2), 'hex')));
-                console.log(secrethex.length);
+                const provider_public_buf = new Buffer(provider_public_hex, 'hex');
+                const secret_raw = this.keypair.computeSecret(provider_public_buf);
+                const secret = sha256(secret_raw);
+
                 // Generate a nonce
                 const nonce = crypto.randomBytes(16);
-                const noncehex = "0x" + new Buffer(nonce).toString('hex');
-                console.log(nonce.length);
+                const nonce_hex = "0x" + new Buffer(nonce).toString('hex');
+
                 // Generate a UUID
                 const uuid = crypto.randomBytes(32);
 
-                // Encrypt it with the secret key
-                const cipher = crypto.createCipheriv('aes-256-ctr', (secrethex), nonce);
-                let euuid = cipher.update(uuid);
-                euuid=euuid+cipher.final();
-                let euuid_hex =  web3.utils.utf8ToHex(euuid.toString());
+                // Setup the cipher object with the secret and nonce
+                const cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
+
+                cipher.setAutoPadding(false);
+
+                // Encrypt it (output is buffer)
+                const euuid = cipher.update(uuid) +
+                              cipher.final();
+
+                // Sanity check
+                if ( euuid.length > 32 ) {
+                    throw new Error("encrypted uuid is too long!");
+                }
+
+                // Hexify the euuid
+                const euuid_hex = "0x" + new Buffer(euuid, 'ascii').toString('hex');
+
                 // Get my public key
-                const public_key = "0x" + this.keypair.getPublicKey('hex');
+                const public_key = "0x" + this.keypair.getPublicKey('hex', 'compressed');
+
+                // Parse the amount
+                amount = web3.utils.fromDecimal(amount);
 
                 // Initiate the data feed
-                //console.log(web3.utils.utf8ToHex(group), providers_address, public_key, euuid_hex, noncehex, "0x0");
-
-                this.marketInstance.methods.initSynapseDataFeed(web3.utils.utf8ToHex(group), providers_address, public_key, euuid_hex, noncehex, "0x0").send({
+                this.marketInstance.methods.initSynapseDataFeed(
+                    group,
+                    providers_address,
+                    public_key,
+                    euuid_hex,
+                    nonce_hex,
+                    amount
+                ).send({
                     from: web3.eth.accounts.wallet[0].address,
                     gas: 300000 // TODO - not this
                 } , (err, result) => {
@@ -168,21 +192,21 @@ class SynapseSubscriber {
                     console.log("Data feed initiated");
 
                     // Create the subscription object
-                    const subscription = new SynapseSubscription(public_key, secrethex, noncehex, uuid.toString('base64'));
+                    const subscription = new SynapseSubscription(public_key, secret, nonce_hex, uuid.toString('base64'));
                     subscription.data(callback);
                 });
-              });
             });
-        }
+        });
+    }
 }
 
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "cool2", (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "cool2", 0, (err, data) => {
         console.log(err);
         console.log(data);
-    })
+    });
 }, 5000);
 
 module.exports = SynapseSubscriber;

@@ -3,10 +3,7 @@ const crypto = require('crypto');
 const Web3 = require('web3');
 const SynapseSubscription = require('./subscription.js');
 
-//network
-// const rpcHost = "http://rinkeby.infura.io";
-
-//market contract
+// Market contract
 const file = "./market/contracts/abi.json";
 const abi = JSON.parse(fs.readFileSync(file));
 const marketAddress = "0x98f6d007a840782eea0fbc6584ab95e8c86d677e";
@@ -21,7 +18,7 @@ const rpcHost_listen = "ws://localhost:8546";
 const web3_listen = new Web3(Web3.givenProvider || rpcHost_listen);
 const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
 
-//accounts
+// Accounts
 const accounts = require('./account.js');
 const privateKeyHex = "0x8d2246c6f1238a97e84f39e18f84593a44e6622b67b8cebb7788320486141f95";
 const account = new accounts(privateKeyHex);
@@ -102,6 +99,8 @@ class SynapseProvider {
             if ( err ) {
                 throw err;
             }
+
+            console.log(result);
 
             if ( !result.args ) {
                 return;
@@ -220,7 +219,7 @@ class SynapseProvider {
 //TODO
         this.marketInstance.methods.sendSynapseSubscription_Provider(this.group, subscription.address).send({
             from: web3.eth.accounts.wallet[0].address,
-            gas: 300000 // TODO - not this
+            gas: 900000 // TODO - not this
         }, (err, result) => {
             if ( err ) {
                 throw err;
@@ -232,6 +231,5 @@ class SynapseProvider {
 }
 
 const provider = new SynapseProvider("cool2", 200);
-
 
 module.exports = SynapseProvider;
