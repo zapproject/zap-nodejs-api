@@ -148,7 +148,7 @@ contract SynapseMarket {
         require(blockcount > 0);
         
         //approve market to transfer
-        syn.approve(this, amount);
+        syn.approve(this, payment);
         
         if(!syn.transferFrom(msg.sender, this, payment)){
             // Emit the event
@@ -157,7 +157,7 @@ contract SynapseMarket {
         }            
         // Add the subscription to the prvider
         provider.subscriptions[msg.sender] = SynapseSubscription({
-            amount: msg.value,
+            amount: payment,
             blockstart: block.number,
             preblockend: block.number + blockcount
         });
