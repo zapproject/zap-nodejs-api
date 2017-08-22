@@ -73,8 +73,9 @@ contract SynapseMarket {
     // Current mapping of available wei for payout
     mapping(address => uint256) availablePayouts;
 
-    function SynapseMarket() {
+    function SynapseMarket(address tokenAddress) {
         adminAddress = msg.sender;
+        syn = address(tokenAddress);
     }
 
     // When a provider asks to be registered, register them.
