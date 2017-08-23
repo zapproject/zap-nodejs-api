@@ -1,5 +1,4 @@
 pragma solidity ^0.4.14;
-import "../token/contracts/SynToken.sol";
 
 // Contract representing the Synase market place
 contract SynapseMarket {
@@ -73,9 +72,12 @@ contract SynapseMarket {
     // Current mapping of available wei for payout
     mapping(address => uint256) availablePayouts;
 
+    //current rinkeby
+    // SynToken: 0xEBf55198f04770FEb53571C870CC0746a37E153e
+    // Market: 0xe99166c1c1699720d32176d13e8e01dacad3b2e8
     function SynapseMarket(address tokenAddress) {
         adminAddress = msg.sender;
-        syn = address(tokenAddress);
+        syn = SynToken(tokenAddress);
     }
 
     // When a provider asks to be registered, register them.

@@ -8,7 +8,7 @@ const file = "./market/contracts/abi.json";
 const abi = JSON.parse(fs.readFileSync(file));
 //old contract
 //const marketAddress = "0x98f6d007a840782eea0fbc6584ab95e8c86d677e";
-const marketAddress = "0xfb510877169ef428ad3c38eaa2f25b0a32defd58";
+const marketAddress = "0xe99166c1c1699720d32176d13e8e01dacad3b2e8";
 
 // Create a sending RPC
 const rpcHost = "http://localhost:8545";
