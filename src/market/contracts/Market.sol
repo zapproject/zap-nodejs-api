@@ -1,5 +1,36 @@
 pragma solidity ^0.4.14;
 
+     contract SynToken{
+         // Get the total token supply
+         function totalSupply() constant returns (uint256 totalSupply);
+      
+         // Get the account balance of another account with address _owner
+         function balanceOf(address _owner) constant returns (uint256 balance);
+      
+         // Send _value amount of tokens to address _to
+         function transfer(address _to, uint256 _value) returns (bool success);
+      
+         // Send _value amount of tokens from address _from to address _to
+         function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
+      
+         // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
+         // If this function is called again it overwrites the current allowance with _value.
+         // this function is required for some DEX functionality
+         function approve(address _spender, uint256 _value) returns (bool success);
+      
+         // Returns the amount which _spender is still allowed to withdraw from _owner
+         function allowance(address _owner, address _spender) constant returns (uint256 remaining);
+      
+         // Triggered when tokens are transferred.
+         event Transfer(address indexed _from, address indexed _to, uint256 _value);
+      
+         // Triggered whenever approve(address _spender, uint256 _value) is called.
+         event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+     }
+      
+
+
+
 // Contract representing the Synase market place
 contract SynapseMarket {
     address adminAddress;
@@ -72,12 +103,9 @@ contract SynapseMarket {
     // Current mapping of available wei for payout
     mapping(address => uint256) availablePayouts;
 
-    //current rinkeby
-    // SynToken: 0xEBf55198f04770FEb53571C870CC0746a37E153e
-    // Market: 0xe99166c1c1699720d32176d13e8e01dacad3b2e8
-    function SynapseMarket(address tokenAddress) {
+    function SynapseMarket(address token) {
         adminAddress = msg.sender;
-        syn = SynToken(tokenAddress);
+        syn = SynToken(token);
     }
 
     // When a provider asks to be registered, register them.
@@ -86,9 +114,6 @@ contract SynapseMarket {
                                      uint256 wei_rate) {
         // Find the provider group
         SynapseProviderGroup storage providerGroup = providerGroups[group];
-
-        // Make sure we haven't used this address before
-        require( providerGroup.providers[msg.sender].user != msg.sender );
 
         // Mark the address as used
         providerGroup.providers[msg.sender] = SynapseProvider({
@@ -134,9 +159,6 @@ contract SynapseMarket {
 
         // Find the provider
         SynapseProvider storage provider = providerGroup.providers[provider_address];
-
-        // Make sure the provider is real, and not himself
-        require( provider.user == provider_address && provider.user != msg.sender );
 
         // Make sure hes not trying to do more than one subscription at a time
         require( provider.subscriptions[msg.sender].amount == 0 );
