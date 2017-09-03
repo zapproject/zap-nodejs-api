@@ -188,6 +188,7 @@ class SynapseSubscriber {
                     gas: 300000 // TODO - not this
                 } , (err, result) => {
                     if ( err ) {
+                        console.error("Failed to initialize synapse data feed");
                         throw err;
                     }
 
@@ -197,7 +198,13 @@ class SynapseSubscriber {
                     const subscription = new SynapseSubscription(public_key, secret, nonce_hex, uuid.toString('base64'));
                     subscription.data(callback);
                 });
+            }).catch(err => {
+                console.error("Failed to get provider public key");
+                throw err;
             });
+        }).catch(err => {
+            console.error("Failed to get provider address");
+            throw err;
         });
     }
 }
@@ -205,7 +212,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "cool2", 0, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "test02", 0, (err, data) => {
         console.log(err);
         console.log(data);
     });

@@ -233,9 +233,8 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider("test01", 1);
+const provider = new SynapseProvider("test02", 1);
 setInterval(() => {
-    console.log("Publishing new data");
     provider.publish('test');
 }, 10000);
 

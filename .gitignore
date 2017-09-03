@@ -2,3 +2,5 @@ build/
 .DS_Store
 node_modules/
 ipfs/
+src/.synapseprovider
+src/.synapsesubscriber

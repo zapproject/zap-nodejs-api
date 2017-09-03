@@ -29,8 +29,9 @@ class SynapseSubscription {
                         this.cipher.final();
 
         // Publish to IPFS channel of UUID
-        ipfs.pubsub.publish(this.uuid, pubdata, (err) => {
+        ipfs.pubsub.publish(this.uuid, pubdata, err => {
             if ( err ) {
+                console.error("Failed to publish to IPFS");
                 throw err;
             }
         });
@@ -39,12 +40,23 @@ class SynapseSubscription {
     // Subscribe to the data from this feed
     data(callback) {
         // Subscribe to the data
-        ipfs.pubsub.subscribe(this.uuid, (err, data) => {
+        ipfs.pubsub.subscribe(this.uuid, {
+            discover: true // Use DHT to find peers
+        }, (err, data) => {
+            if ( err ) {
+                throw err;
+            }
+
             // Decrypt the data
             const decrypted = this.cipher.update(data['data']) +
                               this.cipher.final();
 
             callback(decrypted);
+        }, err => {
+            if ( err ) {
+                console.error("Failed to initiate IPFS subscription.");
+                throw err;
+            }
         });
     }
 
