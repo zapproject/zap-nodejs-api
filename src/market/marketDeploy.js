@@ -11,7 +11,7 @@ const rpcHost = args[0] || "https://rinkeby.infura.io";
 const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
 
 // Read the private key
-const privateKeyHex = args[1] || "0x8d2246c6f1238a97e84f39e18f84593a44e6622b67b8cebb7788320486141f95";
+const privateKeyHex = args[1] || "0x6a7dfdf48155aa5d7654f392027e143d61dfe23ca2d9a8bbe7395192ffbd22d5";
 const account = new accounts(privateKeyHex);
 
 // Add the private key to web3 wallet
@@ -27,14 +27,14 @@ compileAndDeployContract([ "./contracts/Market.sol" ], fromAddress);
 function compileAndDeployContract(sources, fromAddress) {
     // Compile the contract
     const marketContractCompiled = compileContracts(sources);
-
+fs.writeFileSync("./contracts/abi.json",JSON.stringify(marketContractCompiled.SynapseMarket.abi));
     // Institiate the contract
     const marketContract = new web3.eth.Contract(marketContractCompiled.SynapseMarket.abi);
 
     // Deploy the contract
     marketContract.deploy({
         data: "0x" + marketContractCompiled.SynapseMarket.bytecode,
-        arguments: []
+        arguments: ['0x44202484ca784c3e4a33112cddd69c783c79572f']
     }).send({
         from: fromAddress,
         gas: 3000000
@@ -51,10 +51,10 @@ function compileAndDeployContract(sources, fromAddress) {
         console.log(receipt.contractAddress);
     })
     .on('confirmation', function(confirmationNumber, receipt){
-        console.log('confirmationNumber');
-        console.log(confirmationNumber);
-        console.log('receipt');
-        console.log(receipt);
+        //console.log('confirmationNumber');
+        //console.log(confirmationNumber);
+        //console.log('receipt');
+        //console.log(receipt);
     })
     .then(function(newContractInstance){
         console.log('newContractInstance');
@@ -71,14 +71,14 @@ function compileContracts(source_files) {
     const sources = {};
 
     for ( const file of source_files ) {
-        sources[file] = fs.readFileSync(file);
+        sources[file] = fs.readFileSync(file).toString();
     }
-
+    
     // Compile the input
     const output = solc.compile({
         sources: sources
     }, 1);
-    console.log(output);
+    console.log(23423,output);
     const result = {};
 
     // Parse all compiled contracts
@@ -96,6 +96,6 @@ function compileContracts(source_files) {
             abi: abi
         };
     }
-
+	//console.log(result);
     return result;
 }
