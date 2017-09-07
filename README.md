@@ -1,2 +1,1 @@
-# synapse-poc
-Feed arbitration PoC
+# Feed arbitration PoC
