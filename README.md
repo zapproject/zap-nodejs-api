@@ -1,3 +1,2 @@
 # synapse-poc
-
-Proof of concept for synapse.
+Feed arbitration PoC
