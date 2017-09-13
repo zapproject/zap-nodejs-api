@@ -16,7 +16,6 @@ class SynapseSubscription {
         this.nonce = nonce;
 
         // Create a cipher with the secret and nonce as buffers, not hex strings.
-        ///this.cipher = crypto.createCipheriv('aes-256-ctr', secret, new Buffer(nonce.substr(2), 'hex'));
         this.cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
         this.decryptCipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
 
