@@ -8,11 +8,16 @@ const file = "./market/contracts/abi.json";
 const abi = JSON.parse(fs.readFileSync(file));
 
 //old contract
+//const marketAddress = "0x98f6d007a840782eea0fbc6584ab95e8c86d677e";
 //const marketAddress = "0x7A787becFCD206EF969e3399B3cbEA8b4a15C2e8";
 const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
+//const marketAddress = "0xbb6FaF6972EF22Fb3dea4a8A33e9b04CF361712A";
+
 
 
 // Create a sending RPC
+//const rpcHost = "http://34.229.146.100:8545";
+//const web3 = new Web3(Web3.givenProvider || rpcHost);
 const rpcHost = "https://rinkeby.infura.io";
 const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
 const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
@@ -93,6 +98,27 @@ class SynapseProvider {
         console.log("Created public key", public_key);
 
         // Make the request
+        /*
+        this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), web3.utils.toBN(public_key), wei_rate).send({
+            gas: 300000,
+            from: web3.eth.accounts.wallet[0].address
+        }).on('error',(error)=>{
+            throw error;
+        }).then((receipt)=>{
+            //maybe do another call instead?
+            fs.writeFileSync(".synapseprovider", JSON.stringify({
+                private_key: this.keypair.getPrivateKey('hex'),
+                subscriptions: []
+            }));
+
+            this.subscriptions = [];
+
+            console.log("Created the provider!");
+
+            callback();
+        })
+        */
+
         this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate).send({
             gas: 300000,
             from: web3.eth.accounts.wallet[0].address
@@ -187,6 +213,8 @@ class SynapseProvider {
 
         const blocks = Math.floor(data.amount / this.wei_rate);
 
+        //data.public_key = web3.utils.toBN(data.public_key).toString(16);
+
         console.log ("public key",data.public_key);
 
         // Get the subscriber's public key
@@ -197,26 +225,26 @@ class SynapseProvider {
        	const subscriber_public_buf = Buffer.from(subscriber_public, 'hex'); 
          // Calculate the secret key
         const secrethex = this.keypair.computeSecret(subscriber_public, 'hex', 'hex');
+
         const noncehex = data.nonce.substring(2);
         const secret = sha256(secrethex);
-
         const nonce = Buffer.from(noncehex.slice(0,32),"hex");
-        const cipher_text = new Buffer(data.encrypted_uuid.substring(2), 16);
 
+ 	       
+        const cipher_text = data.encrypted_uuid.substring(2);
         // Create the decipher object
         const cipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
 
         // Add it to the decipher stream and decrypt to String
-        const uuid = cipher.update(cipher_text)
-            + cipher.final('base64');
+	const uuid = Buffer.concat([cipher.update(cipher_text,'hex'), cipher.final()]).toString('base64');
 
         console.log("Starting subscription with", data.subscriber, "on", uuid);
 
         // Create an internal subscription object and begin it
         this.subscriptions.push(new SynapseSubscription(
             data.subscriber,
-            secrethex,
-            noncehex,
+            secret,
+            nonce,
             blocknumber + blocks + 1, // End block is the last block + 1
             uuid
         ));
@@ -260,7 +288,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider("tom_08", 1);
+const provider = new SynapseProvider("tom_09", 1);
 //provider.on('ready', () => {})
 
 
