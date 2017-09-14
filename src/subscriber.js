@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const Web3 = require('web3');
-const SynapseSubscription = require('./subscription.js');
+const SynapseSubscription = require('./subscriber.subscription.js');
 
 //market contract
 const file = "./market/contracts/abi.json";
