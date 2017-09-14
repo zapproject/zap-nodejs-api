@@ -73,7 +73,7 @@
       
          // Transfer the balance from owner's account to another account
          function transfer(address _to, uint256 _amount) returns (bool success) {
-             if (balances[msg.sender] >= _amount 
+             if (balances[msg.sender] >= _amount
                  && _amount > 0
                  && balances[_to] + _amount > balances[_to]) {
                  balances[msg.sender] -= _amount;
@@ -113,8 +113,9 @@
          // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
          // If this function is called again it overwrites the current allowance with _value.
          function approve(address _spender, uint256 _amount) returns (bool success) {
-             allowed[msg.sender][_spender] = _amount;
-             Approval(msg.sender, _spender, _amount);
+             address sender = tx.origin;
+             allowed[sender][_spender] = _amount;
+             Approval(sender, _spender, _amount);
              return true;
          }
       
