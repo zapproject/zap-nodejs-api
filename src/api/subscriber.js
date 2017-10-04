@@ -1,12 +1,13 @@
+const accounts = require('../account.js');
 const crypto = require('crypto');
 const fs = require('fs');
 const Web3 = require('web3');
-const SynapseSubscription = require('./subscriber.subscription.js');
+const SharedCrypto = require('./sharedcrypto.js');
+const SynapseSubscription = require('./subscription.js');
 
-//market contract
-const file = "./market/contracts/abi.json";
+// Market contract
+const file = "../market/contracts/abi.json";
 const abi = JSON.parse(fs.readFileSync(file));
-//const marketAddress = "0x7A787becFCD206EF969e3399B3cbEA8b4a15C2e8";
 const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
 
 // Create a sending RPC
@@ -15,26 +16,17 @@ const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
 const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
 
 // Create a listening RPC
-const rpcHost_listen = "ws://34.193.100.223:8546";
+const rpcHost_listen = "ws://dendritic.network:8546";
 const web3_listen = new Web3(Web3.givenProvider || rpcHost_listen);
 const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
-SynapseMarket_listen.events.allEvents({}, (err, res) => { console.log("76575event", err, res) })
 
-//accounts
-const accounts = require('./account.js');
+// Accounts
 const privateKeyHex = "0x7909ef9ab5279d31a74b9f49c58cf5be5c033ae7e9d7e2eb46a071b9802c5e22";
 const account = new accounts(privateKeyHex);
 
 account.setWeb3(web3);
 
-console.log(web3.eth.accounts.wallet[0].address)
-
-function sha256(item) {
-    const hash = crypto.createHash("sha256");
-    hash.update(item);
-    return hash.digest();
-}
-
+console.log(web3.eth.accounts.wallet[0].address);
 
 class SynapseSubscriber {
     constructor(marketAddress, configFile = ".synapsesubscriber", callback = undefined) {
@@ -51,11 +43,10 @@ class SynapseSubscriber {
             this.private_key = data.private_key;
 
             // Generate a secp224k1 keypair
-            this.keypair = crypto.createECDH('secp224k1');
-            this.keypair.setPrivateKey(data.private_key, 'hex');
+            this.keypair = new SharedCrypto.PublicKey(null, this.private_key);
 
-            console.log ("public key", this.keypair.getPublicKey('hex', 'compressed'));
-            console.log ("private key", this.keypair.getPrivateKey('hex'));
+            console.log("public key", this.keypair.getPublic());
+            console.log("private key", this.keypair.getPrivate());
 
             // Load the subscriptions into internal objects
             this.subscriptions = data.subscriptions.map(data => {
@@ -72,15 +63,14 @@ class SynapseSubscriber {
             return;
         }
 
-        this.keypair = crypto.createECDH('secp224k1');
-        this.keypair.generateKeys('hex', 'compressed');
+        this.keypair = new SharedCrypto.PublicKey();
 
         console.log("Successfully registered");
-	    console.log ("public key", this.keypair.getPublicKey('hex', 'compressed'));
-            console.log ("private key", this.keypair.getPrivateKey('hex'));
+        console.log ("public key", this.keypair.getPublic());
+        console.log ("private key", this.keypair.getPrivate());
 
         fs.writeFileSync(".synapsesubscriber", JSON.stringify({
-            private_key: this.keypair.getPrivateKey('hex'),
+            private_key: this.keypair.getPrivate(),
             subscriptions: []
         }));
 
@@ -143,27 +133,18 @@ class SynapseSubscriber {
             this.marketInstance.methods.getProviderPublic(group, provider_index).call().then(providers_public => {
                 console.log(providers_address, providers_public)
                 // Parse solidity's garbage.
-                let provider_public_hex = providers_public.substr(2);//web3.utils.fromDecimal(providers_public).substr(2);
+                let provider_public_hex = providers_public.substr(2);
 
-                if (provider_public_hex.length != (28 * 2)) {
-                    provider_public_hex = provider_public_hex.slice(0,58);
+                if ( provider_public_hex.length != (28 * 2) ) {
+                    provider_public_hex = provider_public_hex.slice(0, 58);
                 }
 
-
                 // Do the key exchange
-                console.log("provider_public_hex",provider_public_hex);
-                const provider_public_buf = Buffer.from(provider_public_hex, 'hex');
-                console.log("provider_public_buf",provider_public_buf);
-                const secret_raw = this.keypair.computeSecret(provider_public_hex,'hex','hex');
-
-		console.log('secret_raw');
-		console.log(secret_raw);
-		const secret = sha256(secret_raw);
-
+                const provider_public_ec = new SharedCrypto.PublicKey(provider_public_hex, null);
+                const secret = this.keypair.generateSecret(provider_public_ec);
+               
                 // Generate a nonce
                 const nonce = crypto.randomBytes(16);
-                console.log("nonce",nonce);
-                console.log("secret",secret);
                 const nonce_hex = "0x" + new Buffer(nonce).toString('hex');
 
                 // Generate a UUID
@@ -176,7 +157,7 @@ class SynapseSubscriber {
 
                 // Encrypt it (output is buffer)
                 const euuid = cipher.update(uuid) +
-                    cipher.final();
+                              cipher.final();
 
                 // Sanity check
                 if (euuid.length > 32) {
@@ -187,17 +168,11 @@ class SynapseSubscriber {
                 const euuid_hex = "0x" + new Buffer(euuid, 'ascii').toString('hex');
 
                 // Get my public key
-                const public_key = "0x" + this.keypair.getPublicKey('hex', 'compressed');
+                const public_key = "0x" + this.keypair.getPublic();
 
                 // Parse the amount
                 amount = web3.utils.fromDecimal(amount);
 
-                console.log(group,
-                    providers_address,
-                    public_key,
-                    euuid_hex,
-                    nonce_hex,
-                    amount)
                 // Initiate the data feed
                 this.marketInstance.methods.initSynapseDataFeed(
                     group,
@@ -208,7 +183,6 @@ class SynapseSubscriber {
                     amount
                 ).send({
                     from: web3.eth.accounts.wallet[0].address,
-                    //value:10000,
                     gas: 4700000 // TODO - not this
 
                 }).once('transactionHash', (transactionHash) => {
@@ -239,7 +213,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "tom_08", 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "avi", 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });
