@@ -30,6 +30,7 @@ console.log(web3.eth.accounts.wallet[0].address);
 
 class SynapseProvider {
     constructor(group, wei_rate, configFile = ".synapseprovider") {
+        this.configFile = configFile;
         this.group = new Buffer(group).toString('hex');
         this.marketInstance = SynapseMarket;
 
@@ -212,7 +213,7 @@ class SynapseProvider {
     // Save the necessary data into the ~/.synapseprovider field
     save() {
         // Save private key and the serialized subscribers
-        fs.writeFileSync(JSON.stringify({
+        fs.writeFileSync(this.configFile, JSON.stringify({
             private_key: this.keypair.getPrivate(),
             subscribers: this.subscriptions.map(subscriber => subscriber.toObject())
         }));
