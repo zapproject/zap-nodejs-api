@@ -66,8 +66,8 @@ class SynapseSubscription {
     toObject() {
         return {
             address: this.address,
-            secret: this.secret,
-            nonce: this.nonce,
+            secret: this.secret.toString('hex'),
+            nonce: this.nonce.toString('hex'),
             endblock: this.endblock,
             uuid: this.uuid
         };
@@ -77,8 +77,8 @@ class SynapseSubscription {
     static fromObject(data) {
         return new SynapseSubscription(
             data.address,
-            data.secret,
-            data.nonce,
+            new Buffer(data.secret, 'hex'),
+            new Buffer(data.nonce, 'hex'),
             data.endblock,
             data.uuid
         );

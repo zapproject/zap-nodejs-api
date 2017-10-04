@@ -144,8 +144,8 @@ class SynapseSubscriber {
                 const secret = this.keypair.generateSecret(provider_public_ec);
                
                 // Generate a nonce
-                const nonce = crypto.randomBytes(16);
-                const nonce_hex = "0x" + new Buffer(nonce).toString('hex');
+                const nonce = new Buffer(crypto.randomBytes(16));
+                const nonce_hex = "0x" + nonce.toString('hex');
 
                 // Generate a UUID
                 const uuid = crypto.randomBytes(32);
@@ -199,8 +199,7 @@ class SynapseSubscriber {
                     console.log("Data feed initiated");
 
                     // Create the subscription object
-                    console.log("room", uuid.toString('base64'));
-                    const subscription = new SynapseSubscription(public_key, secret, nonce_hex, uuid.toString('base64'));
+                    const subscription = new SynapseSubscription(public_key, secret, nonce, uuid.toString('base64'));
                     subscription.data(callback);
                 })
 
