@@ -1,6 +1,6 @@
 const accounts = require('../account.js');
-const fs = require('fs');
 const crypto = require('crypto');
+const fs = require('fs');
 const Web3 = require('web3');
 const SharedCrypto = require('./sharedcrypto.js');
 const SynapseSubscription = require('./subscription.js');
@@ -8,7 +8,6 @@ const SynapseSubscription = require('./subscription.js');
 // Market contract
 const file = "../market/contracts/abi.json";
 const abi = JSON.parse(fs.readFileSync(file));
-
 const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
 
 // Create a sending RPC
@@ -238,7 +237,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider("avi", 1);
+const provider = new SynapseProvider("avi0", 1);
 //provider.on('ready', () => {})
 
 
