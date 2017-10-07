@@ -3,8 +3,25 @@ const IPFS = require('ipfs');
 const Room = require('ipfs-pubsub-room');
 
 // Establish an IPFS connection with pubsub enabled
+let additionalConfig = {};
+
+if ( typeof module == 'undefined' ) {
+    console.log("Adding additional configuration settings for the web...");
+    
+    additionalConfig = {
+        "Addresses": {
+            "Swarm": [
+                "/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star"
+            ],
+            "API": '',
+            "Gateway": ''
+        }
+    }
+}
+
 const ipfs = new IPFS({
     repo: 'ipfs/synapse-test/1',
+    config: additionalConfig,
     EXPERIMENTAL: {
         pubsub: true
     }

@@ -14,5 +14,12 @@
     "ipfs-pubsub-room": "^0.3.0",
     "solc": "^0.4.15",
     "web3": "^1.0.0-beta.18"
+  },
+  "scripts": {
+    "bundle": "browserify -o build/bundle.js -r fs:browserify-fs src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js"
+  },
+  "devDependencies": {
+    "browserify": "*",
+    "browserify-fs": "zapproject/browserify-fs"
   }
 }
