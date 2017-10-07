@@ -5,21 +5,23 @@
   "dependencies": {
     "async": "^2.5.0",
     "bignumber.js": "^4.0.2",
-    "browserify": "^14.4.0",
     "bson": "^1.0.4",
     "datastore-fs": "^0.3.0",
     "elliptic": "^6.4.0",
     "ethereumjs-wallet": "^0.6.0",
-    "ipfs": "^0.25.1",
+    "ipfs": "^0.25.4",
     "ipfs-pubsub-room": "^0.3.0",
+    "js-ipfs": "0.0.301",
+    "level-filesystem": "github:zapproject/level-filesystem",
+    "libp2p-webrtc-star": "^0.13.2",
     "solc": "^0.4.15",
     "web3": "^1.0.0-beta.18"
   },
   "scripts": {
-    "bundle": "browserify -o build/bundle.js -r fs:browserify-fs src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js"
+    "bundle": "browserify src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -r fs:browserify-fs -o build/bundle.js"
   },
   "devDependencies": {
     "browserify": "*",
-    "browserify-fs": "zapproject/browserify-fs"
+    "browserify-fs": "github:zapproject/browserify-fs"
   }
 }
