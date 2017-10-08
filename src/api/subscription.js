@@ -77,9 +77,9 @@ class SynapseSubscription {
 
     // Subscribe to the data from this feed
     data(callback) {
-        console.log("test");
         // Subscribe to the data
-        this.room.on('message', (err, data) => {
+        this.room.on('message', (data) => {
+            consle.log("Received message", err, data);
             if ( err ) {
                 throw err;
             }
