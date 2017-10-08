@@ -160,11 +160,10 @@ class SynapseSubscriber {
                 // Setup the cipher object with the secret and nonce
                 console.log("nonce", nonce);
                 const cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
-
-                cipher.setAutoPadding(false);
+                cipher.setAutoPadding(true);
 
                 // Encrypt it (output is buffer)
-                const euuid = cipher.update(raw_uuid) + cipher.final();
+                const euuid = Buffer.concat([cipher.update(raw_uuid), cipher.final()]);
 
                 console.log(euuid.length);
 
