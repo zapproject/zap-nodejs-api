@@ -131,7 +131,9 @@ class SynapseSubscriber {
         
         this.marketInstance.methods.getProviderAddress(group, provider_index).call().then(providers_address => {
             this.marketInstance.methods.getProviderPublic(group, provider_index).call().then(providers_public => {
-                console.log(providers_address, providers_public)
+                console.log("providers address", providers_address);
+                console.log("providers public", providers_public);
+
                 // Parse solidity's garbage.
                 let provider_public_hex = providers_public.substr(2);
 
@@ -142,6 +144,7 @@ class SynapseSubscriber {
                 // Do the key exchange
                 const provider_public_ec = new SharedCrypto.PublicKey(provider_public_hex, null);
                 const secret = this.keypair.generateSecret(provider_public_ec);
+                console.log("secret", secret);
                
                 // Generate a nonce
                 const nonce = new Buffer(crypto.randomBytes(16));
@@ -213,7 +216,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "avi11", 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "avi12", 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });

@@ -167,13 +167,16 @@ class SynapseProvider {
         const blocks = Math.floor(data.amount / this.wei_rate);
 
         // Get the subscriber's public key from the stream
-        const subscriber_public = data.public_key.slice(2,-6);
+        const subscriber_public = data.public_key.slice(2, -6);
+
+        console.log("subscriber_public", subscriber_public);
 
         // Derive an EC key object
         const subscriber_public_ec = new SharedCrypto.PublicKey(subscriber_public, null);
 
         // Calculate the secret key
         const secret = this.keypair.generateSecret(subscriber_public_ec);
+        console.log("secret", secret);
 
         // Get the nonce
         const noncehex = data.nonce.substring(2);
@@ -238,7 +241,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider("avi11", 1);
+const provider = new SynapseProvider("avi12", 1);
 //provider.on('ready', () => {})
 
 
