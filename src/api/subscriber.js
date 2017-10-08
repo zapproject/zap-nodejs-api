@@ -218,7 +218,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "avi13", 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "avi14", 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });
