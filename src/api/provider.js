@@ -238,7 +238,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider("avi7", 1);
+const provider = new SynapseProvider("avi8", 1);
 //provider.on('ready', () => {})
 
 
