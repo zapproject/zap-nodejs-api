@@ -80,7 +80,14 @@ class SynapseSubscription {
         console.log("test");
         // Subscribe to the data
         this.room.on('message', (err, data) => {
-            console.log("test");
+            if ( err ) {
+                throw err;
+            }
+
+            if ( !data ) {
+                return;
+            }
+
             // Decrypt the data
             let output = data['data'];
 

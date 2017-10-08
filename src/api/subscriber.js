@@ -161,7 +161,7 @@ class SynapseSubscriber {
                 console.log("nonce", nonce);
                 const cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
 
-                cipher.setAutoPadding(false);
+                cipher.setAutoPadding(true);
 
                 // Encrypt it (output is buffer)
                 const euuid = cipher.update(raw_uuid) + cipher.final();
@@ -225,7 +225,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "avi17", 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "avi18", 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });

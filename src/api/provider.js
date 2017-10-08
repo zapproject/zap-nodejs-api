@@ -190,7 +190,7 @@ class SynapseProvider {
 
         // Create the decipher object
         const cipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
-        cipher.setAutoPadding(false);
+        cipher.setAutoPadding(true);
 
         // Add it to the decipher stream and decrypt to String
         const raw_uuid = new Buffer(cipher.update(cipher_text, 'hex') + cipher.final());
@@ -247,7 +247,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider("avi17", 1);
+const provider = new SynapseProvider("avi18", 1);
 //provider.on('ready', () => {})
 
 
