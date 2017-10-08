@@ -183,6 +183,7 @@ class SynapseProvider {
         const nonce = Buffer.from(noncehex.slice(0, 32), "hex");
 
         // Get the UUID
+        console.log("encrypted uuid", data.encrypted_uuid);
         const cipher_text = data.encrypted_uuid.substring(2);
 
         console.log("nonce", nonce);

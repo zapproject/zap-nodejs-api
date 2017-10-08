@@ -175,6 +175,7 @@ class SynapseSubscriber {
 
                 // Hexify the euuid
                 const euuid_hex = "0x" + new Buffer(euuid, 'ascii').toString('hex');
+                console.log(euuid_hex);
 
                 // Get my public key
                 const public_key = "0x" + this.keypair.getPublic();
