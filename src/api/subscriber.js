@@ -161,7 +161,7 @@ class SynapseSubscriber {
                 console.log("nonce", nonce);
                 const cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
 
-                cipher.setAutoPadding(true);
+                cipher.setAutoPadding(false);
 
                 // Encrypt it (output is buffer)
                 const euuid = cipher.update(raw_uuid) + cipher.final();
@@ -169,8 +169,8 @@ class SynapseSubscriber {
                 console.log(euuid.length);
 
                 // Sanity check
-                if (euuid.length > 32) {
-                    throw new Error("encrypted uuid is too long!");
+                if (euuid.length != 32) {
+                    throw new Error("encrypted uuid is an invalid length");
                 }
 
                 // Hexify the euuid
@@ -225,7 +225,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "avi19", 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, process.argv[1], 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });
