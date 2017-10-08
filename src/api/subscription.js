@@ -42,6 +42,7 @@ class SynapseSubscription {
         this.address = address;
         this.secret = secret;
         this.nonce = nonce;
+        console.log('synapse-', uuid);
         this.room = Room(ipfs, 'synapse-' + uuid);
 
         if ( secret && nonce ) {
@@ -76,8 +77,10 @@ class SynapseSubscription {
 
     // Subscribe to the data from this feed
     data(callback) {
+        console.log("test");
         // Subscribe to the data
         this.room.on('message', (err, data) => {
+            console.log("test");
             // Decrypt the data
             let output = data['data'];
 
