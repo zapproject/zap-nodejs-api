@@ -151,7 +151,11 @@ class SynapseSubscriber {
                 const nonce_hex = "0x" + nonce.toString('hex');
 
                 // Generate a UUID
-                const uuid = crypto.randomBytes(32);
+                const raw_uuid = crypto.randomBytes(32);
+                console.log("raw_uuid", raw_uuid);
+
+                const uuid = uuid.toString('base64');
+                console.log("uuid", uuid);
 
                 // Setup the cipher object with the secret and nonce
                 console.log("nonce", nonce);
@@ -218,7 +222,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "avi14", 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "avi15", 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });

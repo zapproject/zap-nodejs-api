@@ -192,8 +192,10 @@ class SynapseProvider {
         cipher.setAutoPadding(false);
 
         // Add it to the decipher stream and decrypt to String
-        const uuid = Buffer.concat([cipher.update(cipher_text, 'hex'), cipher.final()]).toString('base64');
+        const raw_uuid = cipher.update(cipher_text, 'hex') + cipher.final();
+        const uuid = raw_uuid.toString('base64');
 
+        console.log("raw_uuid", raw_uuid);
         console.log("Starting subscription with", data.subscriber, "on", uuid);
 
         // Create an internal subscription object and begin it
@@ -244,7 +246,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider("avi14", 1);
+const provider = new SynapseProvider("avi15", 1);
 //provider.on('ready', () => {})
 
 
