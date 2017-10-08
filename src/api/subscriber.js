@@ -200,7 +200,7 @@ class SynapseSubscriber {
                     console.log("Data feed initiated");
 
                     // Create the subscription object
-                    const subscription = new SynapseSubscription(public_key, secret, nonce, uuid.toString('base64'));
+                    const subscription = new SynapseSubscription(providers_address, public_key, secret, nonce, uuid.toString('base64'));
                     subscription.data(callback);
                 });
 
@@ -213,7 +213,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "avi9", 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "avi10", 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });
