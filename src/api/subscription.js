@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+fconst crypto = require('crypto');
 const IPFS = require('ipfs');
 const Room = require('ipfs-pubsub-room');
 
@@ -62,7 +62,8 @@ class SynapseSubscription {
         let pubdata;
 
         if ( this.cipher ) {
-            pubdata = this.cipher.update(JSON.stringify(data));
+            pubdata = Buffer.concat(this.cipher.update(JSON.stringify(data)),
+                                    this.cipher.final());
         }
         else {
             pubdata = new Buffer(JSON.stringify(data));
@@ -82,7 +83,8 @@ class SynapseSubscription {
             let output = data['data'];
 
             if ( this.decryptCipher ) {
-                output = this.decryptCipher.update(output);
+                output = Buffer.concat(this.decryptCipher.update(output),
+                                       this.decryptCipher.final());
             }
 
             callback(decrypted);
