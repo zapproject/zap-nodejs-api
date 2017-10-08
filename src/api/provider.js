@@ -213,7 +213,7 @@ class SynapseProvider {
     // Save the necessary data into the ~/.synapseprovider field
     save() {
         // Save private key and the serialized subscribers
-        ConfigStorage.load(this.configFile, JSON.stringify({
+        ConfigStorage.save(this.configFile, JSON.stringify({
             private_key: this.keypair.getPrivate(),
             subscribers: this.subscriptions.map(subscriber => subscriber.toObject())
         }));
