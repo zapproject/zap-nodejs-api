@@ -173,6 +173,8 @@ class SynapseSubscriber {
                 // Parse the amount
                 amount = web3.utils.fromDecimal(amount);
 
+                console.log("Initiating data feed...");
+
                 // Initiate the data feed
                 this.marketInstance.methods.initSynapseDataFeed(
                     group,
@@ -184,7 +186,6 @@ class SynapseSubscriber {
                 ).send({
                     from: web3.eth.accounts.wallet[0].address,
                     gas: 4700000 // TODO - not this
-
                 }).once('transactionHash', (transactionHash) => {
                     //SynapseMarket_listen.events.allEvents({}, function (error, log) {
                     //    if (!error)
@@ -201,7 +202,7 @@ class SynapseSubscriber {
                     // Create the subscription object
                     const subscription = new SynapseSubscription(public_key, secret, nonce, uuid.toString('base64'));
                     subscription.data(callback);
-                })
+                });
 
             });
         });
