@@ -1,6 +1,6 @@
 const accounts = require('../account.js');
 const crypto = require('crypto');
-const fs = require('fs');
+const fs = require('browserify-fs');
 const Web3 = require('web3');
 const SharedCrypto = require('./sharedcrypto.js');
 const SynapseSubscription = require('./subscription.js');
@@ -212,7 +212,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "avi0", 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "avi1", 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });
