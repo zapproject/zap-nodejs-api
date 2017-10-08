@@ -1,5 +1,6 @@
 const accounts = require('../account.js');
 const crypto = require('crypto');
+const ConfigStorage = require('./configstorage.js');
 const fs = require('fs');
 const Web3 = require('web3');
 const SharedCrypto = require('./sharedcrypto.js');
@@ -50,10 +51,10 @@ class SynapseProvider {
     // Check whether or not we need to register, if so register
     checkForRegister(configFile, group, wei_rate, callback) {
         // Already regsitered
-        if (fs.existsSync(configFile)) {
+        if ( ConfigStorage.exists(configFile) ) {
             console.log("Loading configuration from", configFile);
 
-            const data = JSON.parse(fs.readFileSync(configFile));
+            const data = JSON.parse(ConfigStorage.load(configFile));
             this.private_key = data.private_key;
 
             // Import a secp224r1 keypair
@@ -86,7 +87,7 @@ class SynapseProvider {
                 if (err) {
                     throw err;
                 }
-                fs.writeFileSync(".synapseprovider", JSON.stringify({
+                ConfigStorage.save(".synapseprovider", JSON.stringify({
                     private_key: this.keypair.getPrivate(),
                     subscriptions: []
                 }));
@@ -212,7 +213,7 @@ class SynapseProvider {
     // Save the necessary data into the ~/.synapseprovider field
     save() {
         // Save private key and the serialized subscribers
-        fs.writeFileSync(this.configFile, JSON.stringify({
+        ConfigStorage.load(this.configFile, JSON.stringify({
             private_key: this.keypair.getPrivate(),
             subscribers: this.subscriptions.map(subscriber => subscriber.toObject())
         }));
