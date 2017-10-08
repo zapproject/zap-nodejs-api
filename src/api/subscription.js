@@ -1,4 +1,4 @@
-fconst crypto = require('crypto');
+const crypto = require('crypto');
 const IPFS = require('ipfs');
 const Room = require('ipfs-pubsub-room');
 
