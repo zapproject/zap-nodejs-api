@@ -180,7 +180,7 @@ class SynapseProvider {
 
         // Get the nonce
         const noncehex = data.nonce.substring(2);
-        const nonce = Buffer.from(noncehex.slice(0, 32),"hex");
+        const nonce = Buffer.from(noncehex.slice(0, 32), "hex");
 
         // Get the UUID
         const cipher_text = data.encrypted_uuid.substring(2);
@@ -241,7 +241,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider("avi12", 1);
+const provider = new SynapseProvider("avi13", 1);
 //provider.on('ready', () => {})
 
 
