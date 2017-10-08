@@ -247,7 +247,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider(process.argv[1], 1);
+const provider = new SynapseProvider(process.argv[2], 1);
 //provider.on('ready', () => {})
 
 

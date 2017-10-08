@@ -212,7 +212,7 @@ class SynapseSubscriber {
 
                     // Create the subscription object
                     // address, secret, nonce, endblock, uuid
-                    const subscription = new SynapseSubscription(providers_address, secret, nonce, -1, uuid.toString('base64'));
+                    const subscription = new SynapseSubscription(providers_address, secret, nonce, -1, uuid);
                     subscription.data(callback);
                 });
 
@@ -225,7 +225,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, process.argv[1], 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, process.argv[2], 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });
