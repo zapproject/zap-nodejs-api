@@ -64,7 +64,7 @@ class SynapseProvider {
             console.log("private key", this.keypair.getPrivate());
 
             // Load the subscriptions into internal objects
-            this.subscriptions = data.subscriptions.map(data => SynapseSubscription.fromObject(data));
+            this.subscriptions = data.subscribers.map(data => SynapseSubscription.fromObject(data));
 
             callback();
         }

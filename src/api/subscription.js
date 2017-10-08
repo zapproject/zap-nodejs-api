@@ -42,7 +42,7 @@ class SynapseSubscription {
         this.address = address;
         this.secret = secret;
         this.nonce = nonce;
-        this.room = Room(ipfs, 'synapse-' + uuid)
+        this.room = Room(ipfs, 'synapse-' + uuid);
 
         if ( secret && nonce ) {
             // Create a cipher with the secret and nonce as buffers, not hex strings.
