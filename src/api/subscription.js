@@ -62,7 +62,7 @@ class SynapseSubscription {
         let pubdata;
 
         if ( this.cipher ) {
-            pubdata = this.cipher.update(JSON.stringify(data)) + this.cipher.final();
+            pubdata = this.cipher.update(JSON.stringify(data));
         }
         else {
             pubdata = new Buffer(JSON.stringify(data));
@@ -82,8 +82,10 @@ class SynapseSubscription {
             let output = data['data'];
 
             if ( this.decryptCipher ) {
-                output = this.decryptCipher.update(output) +this.decryptCipher.final();
+                output = this.decryptCipher.update(output);
             }
+
+            console.log(output);
 
             callback(decrypted);
         });
