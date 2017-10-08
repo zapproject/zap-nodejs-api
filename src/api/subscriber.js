@@ -174,6 +174,7 @@ class SynapseSubscriber {
                 }
 
                 // Hexify the euuid
+                console.log()
                 const euuid_hex = "0x" + new Buffer(euuid, 'ascii').toString('hex');
                 console.log(euuid_hex);
 
@@ -224,7 +225,7 @@ class SynapseSubscriber {
 const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
 
 setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, "avi16", 10, (err, data) => {
+    subscriber.newSubscriptionWithIndex(0, "avi17", 10, (err, data) => {
         console.log(765765, err);
         console.log(973, data);
     });
