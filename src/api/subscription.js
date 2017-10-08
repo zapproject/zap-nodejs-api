@@ -17,8 +17,8 @@ let additionalConfig = {
     ]
 };
 
-if ( typeof window != 'undefined' ) {
-    console.log("Adding additional configuration settings for the web...");
+// if ( typeof window != 'undefined' ) {
+//     console.log("Adding additional configuration settings for the web...");
     
     additionalConfig["Addresses"] = {
         "Swarm": [
@@ -27,7 +27,7 @@ if ( typeof window != 'undefined' ) {
         "API": '',
         "Gateway": ''
     }
-}
+// }
 
 const ipfs = new IPFS({
     repo: 'ipfs/synapse-test/1',
