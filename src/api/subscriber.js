@@ -154,6 +154,7 @@ class SynapseSubscriber {
                 const uuid = crypto.randomBytes(32);
 
                 // Setup the cipher object with the secret and nonce
+                console.log("nonce", nonce);
                 const cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
 
                 cipher.setAutoPadding(false);

@@ -185,9 +185,12 @@ class SynapseProvider {
         // Get the UUID
         const cipher_text = data.encrypted_uuid.substring(2);
 
+        console.log("nonce", nonce);
+
         // Create the decipher object
         const cipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
-
+        cipher.setAutoPadding(false);
+        
         // Add it to the decipher stream and decrypt to String
         const uuid = Buffer.concat([cipher.update(cipher_text,'hex'), cipher.final()]).toString('base64');
 
