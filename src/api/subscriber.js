@@ -1,6 +1,6 @@
 const accounts = require('../account.js');
 const crypto = require('crypto');
-const fs = require('browserify-fs');
+const fs = require('fs');
 const Web3 = require('web3');
 const SharedCrypto = require('./sharedcrypto.js');
 const SynapseSubscription = require('./subscription.js');
