@@ -18,10 +18,10 @@
     "web3": "^1.0.0-beta.18"
   },
   "scripts": {
-    "bundle": "browserify src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -r fs:browserify-fs -o build/bundle.js"
+    "bundle": "browserify src/account.js src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -t brfs -o build/bundle.js"
   },
   "devDependencies": {
-    "browserify": "*",
-    "browserify-fs": "github:zapproject/browserify-fs"
+    "brfs": "^1.4.3",
+    "browserify": "*"
   }
 }
