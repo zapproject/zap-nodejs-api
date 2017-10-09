@@ -189,11 +189,11 @@ class SynapseProvider {
         console.log("nonce", nonce);
 
         // Create the decipher object
-        const cipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
+        const decipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
         // cipher.setAutoPadding(true);
 
         // Add it to the decipher stream and decrypt to String
-        const raw_uuid = Buffer.concat([cipher.update(cipher_text, 'hex'), cipher.final()]);
+        const raw_uuid = Buffer.concat([decipher.update(cipher_text, 'hex'), decipher.final()]);
         const uuid = raw_uuid.toString('base64');
 
         console.log("raw_uuid", raw_uuid);

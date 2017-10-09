@@ -19,6 +19,7 @@ const ipfs = new IPFS({
         ],
         "Addresses": {
             "Swarm": [
+                "/ip4/127.0.0.1/tcp/4003/ws"
                 // "/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star"
             ],
             "API": '',
@@ -38,12 +39,12 @@ class SynapseSubscription {
         console.log('synapse-', uuid);
         this.room = Room(ipfs, 'synapse-' + uuid);
 
-        if ( secret && nonce ) {
+        if (secret && nonce) {
             // Create a cipher with the secret and nonce as buffers, not hex strings.
             this.cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
             this.cipher.setAutoPadding(true);
 
-            this.decryptCipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
+            this.decipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
         }
 
         this.endblock = endblock;
@@ -55,15 +56,15 @@ class SynapseSubscription {
         // Encrypt the stringified data and output to a Buffer
         let pubdata;
 
-        if ( this.cipher ) {
+        if (this.cipher) {
             pubdata = this.cipher.update(JSON.stringify(data));
         }
         else {
-            pubdata = new Buffer(JSON.stringify(data));
+            pubdata = Buffer.from(JSON.stringify(data));
         }
 
         console.log(pubdata);
-    
+
         // Publish to IPFS channel of UUID
         this.room.broadcast(pubdata);
     }
@@ -72,20 +73,20 @@ class SynapseSubscription {
     data(callback) {
         // Subscribe to the data
         this.room.on('message', (data) => {
-            consle.log("Received message", err, data);
-            if ( err ) {
+            console.log("Received message", err, data);
+            if (err) {
                 throw err;
             }
 
-            if ( !data ) {
+            if (!data) {
                 return;
             }
 
             // Decrypt the data
             let output = data['data'];
 
-            if ( this.decryptCipher ) {
-                output = this.decryptCipher.update(output);
+            if (this.decipher) {
+                output = this.decipher.update(output);
             }
 
             console.log(output);
@@ -109,8 +110,8 @@ class SynapseSubscription {
     static fromObject(data) {
         return new SynapseSubscription(
             data.address,
-            new Buffer(data.secret, 'hex'),
-            new Buffer(data.nonce, 'hex'),
+            Buffer.from(data.secret, 'hex'),
+            Buffer.from(data.nonce, 'hex'),
             data.endblock,
             data.uuid
         );
