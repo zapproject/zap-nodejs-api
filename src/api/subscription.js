@@ -31,6 +31,16 @@ const ipfs = new IPFS({
     }
 });
 
+ipfs.on("ready",()=>{
+    ipfs.swarm.connect("/dns4/dendritic.network/tcp/4003/ws/ipfs/QmXVmNQLmCCTneHc4FeBQhP6fw65ayz6RieKtRGgeJt2ub", (err) => {
+        if (err) console.log(err);
+
+        ipfs.swarm.peers({}, function (err, peers) {
+            console.log("peers", peers)
+        })
+    })
+})
+
 class SynapseSubscription {
     constructor(address, secret, nonce, endblock, uuid) {
         this.address = address;
@@ -73,10 +83,7 @@ class SynapseSubscription {
     data(callback) {
         // Subscribe to the data
         this.room.on('message', (data) => {
-            console.log("Received message", err, data);
-            if (err) {
-                throw err;
-            }
+            console.log("Received message", data);
 
             if (!data) {
                 return;
@@ -89,9 +96,9 @@ class SynapseSubscription {
                 output = this.decipher.update(output);
             }
 
-            console.log(output);
+            console.log(output.toString());
 
-            callback(decrypted);
+            callback(output.toString());
         });
     }
 

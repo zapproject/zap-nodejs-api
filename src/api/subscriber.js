@@ -26,7 +26,7 @@ const account = new accounts(privateKeyHex);
 
 account.setWeb3(web3);
 
-console.log(web3.eth.accounts.wallet[0].address);
+console.log("account addr", web3.eth.accounts.wallet[0].address);
 
 class SynapseSubscriber {
     constructor(marketAddress, configFile = ".synapsesubscriber", callback = undefined) {
