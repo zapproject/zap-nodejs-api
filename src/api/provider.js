@@ -29,7 +29,7 @@ account.setWeb3(web3);
 console.log(web3.eth.accounts.wallet[0].address);
 
 class SynapseProvider {
-    constructor(group, wei_rate, configFile = ".synapseprovider") {
+    constructor(group, wei_rate, configFile = ".synapseprovider", callback) {
         this.configFile = configFile;
         this.group = Buffer.from(group).toString('hex');
         this.marketInstance = SynapseMarket;
@@ -38,7 +38,8 @@ class SynapseProvider {
             this.listenForEvent();
             this.listenForBlocks();
             this.listenForTerms();
-            this.testInterval();
+            //this.testInterval();
+            if (typeof callback == "function") callback();
         });
     }
 
@@ -83,10 +84,11 @@ class SynapseProvider {
             this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate).send({
                 gas: 300000,
                 from: web3.eth.accounts.wallet[0].address
-            }, (err, result) => {
+            }).on("error", (err, result) => {
                 if (err) {
                     throw err;
                 }
+            }).then((receipt)=>{
                 ConfigStorage.save(".synapseprovider", JSON.stringify({
                     private_key: this.keypair.getPrivate(),
                     subscriptions: []
@@ -97,7 +99,7 @@ class SynapseProvider {
                 console.log("Created the provider!");
 
                 callback();
-            });
+            })
         }
     }
 
@@ -247,7 +249,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider(process.argv[2], 1);
+//const provider = new SynapseProvider(process.argv[2], 1);
 //provider.on('ready', () => {})
 
 

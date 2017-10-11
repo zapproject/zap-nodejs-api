@@ -14,6 +14,8 @@ const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
 const rpcHost = "https://rinkeby.infura.io";
 const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
 const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
+const ZapDataProxy_abi = [{"constant":false,"inputs":[{"name":"providerGroup","type":"uint256"},{"name":"providerIndex","type":"uint256"},{"name":"zapStake","type":"uint256"},{"name":"var1","type":"bytes32"},{"name":"var2","type":"bytes32"},{"name":"trigger","type":"bytes32"}],"name":"oracleEventRequest","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"providerGroup","type":"uint256"},{"indexed":false,"name":"providerIndex","type":"uint256"},{"indexed":false,"name":"zapStake","type":"uint256"},{"indexed":false,"name":"var1","type":"bytes32"},{"indexed":false,"name":"var2","type":"bytes32"},{"indexed":false,"name":"trigger","type":"bytes32"}],"name":"OracleEventRequest","type":"event"}]
+const ZapDataProxy = new web3.eth.Contract(ZapDataProxy_abi, "0x0753740e1939ff47c5b916bf6385c907333894f9");
 
 // Create a listening RPC
 const rpcHost_listen = "ws://dendritic.network:8546";
@@ -30,6 +32,7 @@ console.log("account addr", web3.eth.accounts.wallet[0].address);
 
 class SynapseSubscriber {
     constructor(marketAddress, configFile = ".synapsesubscriber", callback = undefined) {
+        this.dataProxy = ZapDataProxy
         this.marketInstance = SynapseMarket;
         this.checkForRegister(configFile, callback);
     }
@@ -213,6 +216,17 @@ class SynapseSubscriber {
                     // address, secret, nonce, endblock, uuid
                     const subscription = new SynapseSubscription(providers_address, secret, nonce, -1, uuid);
                     subscription.data(callback);
+                }).then(()=>{
+                    console.log("Sending conditions");
+                    //uint providerGroup, uint providerIndex, uint zapStake, bytes32 var1, bytes32 var2, bytes32 trigger
+                    this.dataProxy.methods.oracleEventRequest("0x"+Buffer.from(process.argv[2]).toString("hex"),0,0,web3.utils.utf8ToHex("0~Poloniex~BTC~USD"),web3.utils.utf8ToHex("asdf"),web3.utils.utf8ToHex("")).send({
+                        from: web3.eth.accounts.wallet[0].address,
+                        gas: 4700000 // TODO - not this
+                    }).on("error", (error) => {
+                        console.log(3235, error);
+                    }).then((receipt)=>{
+                        console.log("Sent conditions")
+                    })
                 });
 
             });

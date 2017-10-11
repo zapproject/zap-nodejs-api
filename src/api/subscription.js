@@ -73,7 +73,7 @@ class SynapseSubscription {
             pubdata = Buffer.from(JSON.stringify(data));
         }
 
-        console.log(pubdata);
+        //console.log(pubdata);
 
         // Publish to IPFS channel of UUID
         this.room.broadcast(pubdata);
