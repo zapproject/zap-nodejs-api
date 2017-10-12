@@ -14,8 +14,6 @@ const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
 const rpcHost = "https://rinkeby.infura.io";
 const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
 const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
-const ZapDataProxy_abi = [{"constant":false,"inputs":[{"name":"providerGroup","type":"uint256"},{"name":"providerIndex","type":"uint256"},{"name":"zapStake","type":"uint256"},{"name":"var1","type":"bytes32"},{"name":"var2","type":"bytes32"},{"name":"trigger","type":"bytes32"}],"name":"oracleEventRequest","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"providerGroup","type":"uint256"},{"indexed":false,"name":"providerIndex","type":"uint256"},{"indexed":false,"name":"zapStake","type":"uint256"},{"indexed":false,"name":"var1","type":"bytes32"},{"indexed":false,"name":"var2","type":"bytes32"},{"indexed":false,"name":"trigger","type":"bytes32"}],"name":"OracleEventRequest","type":"event"}]
-const ZapDataProxy = new web3.eth.Contract(ZapDataProxy_abi, "0x0753740e1939ff47c5b916bf6385c907333894f9");
 
 // Create a listening RPC
 const rpcHost_listen = "ws://dendritic.network:8546";
@@ -32,7 +30,6 @@ console.log("account addr", web3.eth.accounts.wallet[0].address);
 
 class SynapseSubscriber {
     constructor(marketAddress, configFile = ".synapsesubscriber", callback = undefined) {
-        this.dataProxy = ZapDataProxy
         this.marketInstance = SynapseMarket;
         this.checkForRegister(configFile, callback);
     }
@@ -69,8 +66,8 @@ class SynapseSubscriber {
         this.keypair = new SharedCrypto.PublicKey();
 
         console.log("Successfully registered");
-        console.log ("public key", this.keypair.getPublic());
-        console.log ("private key", this.keypair.getPrivate());
+        console.log("public key", this.keypair.getPublic());
+        console.log("private key", this.keypair.getPrivate());
 
         fs.writeFileSync(".synapsesubscriber", JSON.stringify({
             private_key: this.keypair.getPrivate(),
@@ -131,117 +128,101 @@ class SynapseSubscriber {
         }
 
         // Get the information of the provider
-        
-        this.marketInstance.methods.getProviderAddress(group, provider_index).call().then(providers_address => {
-            this.marketInstance.methods.getProviderPublic(group, provider_index).call().then(providers_public => {
-                console.log("providers address", providers_address);
-                console.log("providers public", providers_public);
 
-                // Parse solidity's garbage.
-                let provider_public_hex = providers_public.substr(2);
+        let provAddrProm = this.marketInstance.methods.getProviderAddress(group, provider_index).call().then();
+        let provPublicProm = this.marketInstance.methods.getProviderPublic(group, provider_index).call().then();
+        return Promise.all([provAddrProm, provPublicProm]).then(res => {
+            console.log(res);
+            let providers_address = res[0];
+            let providers_public = res[1];
 
-                if ( provider_public_hex.length != (28 * 2) ) {
-                    provider_public_hex = provider_public_hex.slice(0, 58);
-                }
+            providers_address= providers_address.slice(0, 2) + providers_address.substr(-40);
+            let provider_public_hex = providers_public.substr(2,58);
 
-                // Do the key exchange
-                const provider_public_ec = new SharedCrypto.PublicKey(provider_public_hex, null);
-                const secret = this.keypair.generateSecret(provider_public_ec);
-                console.log("secret", secret);
-               
-                // Generate a nonce
-                const nonce = new Buffer(crypto.randomBytes(16));
-                const nonce_hex = "0x" + nonce.toString('hex');
+            console.log("providers address", providers_address);
+            console.log("providers public", providers_public);
 
-                // Generate a UUID
-                const raw_uuid = crypto.randomBytes(32);
-                console.log("raw_uuid", raw_uuid);
+            /*
+            if (provider_public_hex.length != (28 * 2)) {
+                provider_public_hex = provider_public_hex.slice(0, 58);
+            }*/
 
-                const uuid = raw_uuid.toString('base64');
-                console.log("uuid", uuid);
+            // Do the key exchange
+            const provider_public_ec = new SharedCrypto.PublicKey(provider_public_hex, null);
+            const secret = this.keypair.generateSecret(provider_public_ec);
+            console.log("secret", secret);
 
-                // Setup the cipher object with the secret and nonce
-                console.log("nonce", nonce);
-                const cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
-                cipher.setAutoPadding(true);
+            // Generate a nonce
+            const nonce = new Buffer(crypto.randomBytes(16));
+            const nonce_hex = "0x" + nonce.toString('hex');
 
-                // Encrypt it (output is buffer)
-                const euuid = Buffer.concat([cipher.update(raw_uuid), cipher.final()]);
+            // Generate a UUID
+            const raw_uuid = crypto.randomBytes(32);
+            console.log("raw_uuid", raw_uuid);
 
-                console.log(euuid.length);
+            const uuid = raw_uuid.toString('base64');
+            console.log("uuid", uuid);
 
-                // Sanity check
-                if (euuid.length != 32) {
-                    throw new Error("encrypted uuid is an invalid length");
-                }
+            // Setup the cipher object with the secret and nonce
+            console.log("nonce", nonce);
+            const cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
+            cipher.setAutoPadding(true);
 
-                // Hexify the euuid
-                console.log()
-                const euuid_hex = "0x" + new Buffer(euuid, 'ascii').toString('hex');
-                console.log(euuid_hex);
+            // Encrypt it (output is buffer)
+            const euuid = Buffer.concat([cipher.update(raw_uuid), cipher.final()]);
 
-                // Get my public key
-                const public_key = "0x" + this.keypair.getPublic();
+            console.log(euuid.length);
 
-                // Parse the amount
-                amount = web3.utils.fromDecimal(amount);
+            // Sanity check
+            if (euuid.length != 32) {
+                throw new Error("encrypted uuid is an invalid length");
+            }
 
-                console.log("Initiating data feed...");
+            // Hexify the euuid
+            console.log()
+            const euuid_hex = "0x" + new Buffer(euuid, 'ascii').toString('hex');
+            console.log(euuid_hex);
 
-                // Initiate the data feed
-                this.marketInstance.methods.initSynapseDataFeed(
-                    group,
-                    providers_address,
-                    public_key,
-                    euuid_hex,
-                    nonce_hex,
-                    amount
-                ).send({
-                    from: web3.eth.accounts.wallet[0].address,
-                    gas: 4700000 // TODO - not this
-                }).once('transactionHash', (transactionHash) => {
-                    //SynapseMarket_listen.events.allEvents({}, function (error, log) {
-                    //    if (!error)
-                    //        console.log(875685,log);
-                    //});
+            // Get my public key
+            const public_key = "0x" + this.keypair.getPublic();
 
-                    //console.log(3,transactionHash) 
+            // Parse the amount
+            amount = web3.utils.fromDecimal(amount);
 
-                }).on("error", (error) => {
-                    console.log(37776, error);
-                }).then((receipt) => {
-                    console.log("Data feed initiated");
+            console.log("Initiating data feed...");
 
-                    // Create the subscription object
-                    // address, secret, nonce, endblock, uuid
-                    const subscription = new SynapseSubscription(providers_address, secret, nonce, -1, uuid);
-                    subscription.data(callback);
-                }).then(()=>{
-                    console.log("Sending conditions");
-                    //uint providerGroup, uint providerIndex, uint zapStake, bytes32 var1, bytes32 var2, bytes32 trigger
-                    this.dataProxy.methods.oracleEventRequest("0x"+Buffer.from(process.argv[2]).toString("hex"),0,0,web3.utils.utf8ToHex("0~Poloniex~BTC~USD"),web3.utils.utf8ToHex("asdf"),web3.utils.utf8ToHex("")).send({
-                        from: web3.eth.accounts.wallet[0].address,
-                        gas: 4700000 // TODO - not this
-                    }).on("error", (error) => {
-                        console.log(3235, error);
-                    }).then((receipt)=>{
-                        console.log("Sent conditions")
-                    })
-                });
+            // Initiate the data feed
+            return this.marketInstance.methods.initSynapseDataFeed(
+                group,
+                providers_address,
+                public_key,
+                euuid_hex,
+                nonce_hex,
+                amount
+            ).send({
+                from: web3.eth.accounts.wallet[0].address,
+                gas: 4700000 // TODO - not this
+            }).once('transactionHash', (transactionHash) => {
+                //SynapseMarket_listen.events.allEvents({}, function (error, log) {
+                //    if (!error)
+                //        console.log(875685,log);
+                //});
 
-            });
+                //console.log(3,transactionHash) 
+
+            }).on("error", (error) => {
+                console.log(37776, error);
+            }).then((receipt) => {
+                console.log("Data feed initiated");
+
+                // Create the subscription object
+                // address, secret, nonce, endblock, uuid
+                const subscription = new SynapseSubscription(providers_address, secret, nonce, -1, uuid);
+                subscription.data(callback);
+            })
+
         });
-        
     }
 }
-
-const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
-
-setTimeout(() => {
-    subscriber.newSubscriptionWithIndex(0, process.argv[2], 10, (err, data) => {
-        console.log(765765, err);
-        console.log(973, data);
-    });
-}, 5000);
 
 module.exports = SynapseSubscriber;
