@@ -1,64 +1,50 @@
-const fs = require('fs');
+const accounts = require('../account.js');
 const crypto = require('crypto');
+const ConfigStorage = require('./configstorage.js');
+const fs = require('fs');
 const Web3 = require('web3');
+const SharedCrypto = require('./sharedcrypto.js');
 const SynapseSubscription = require('./subscription.js');
 
 // Market contract
-const file = "./market/contracts/abi.json";
+const file = "../market/contracts/abi.json";
 const abi = JSON.parse(fs.readFileSync(file));
-
-//old contract
-//const marketAddress = "0x98f6d007a840782eea0fbc6584ab95e8c86d677e";
-//const marketAddress = "0x7A787becFCD206EF969e3399B3cbEA8b4a15C2e8";
 const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
-//const marketAddress = "0xbb6FaF6972EF22Fb3dea4a8A33e9b04CF361712A";
-
-
 
 // Create a sending RPC
-//const rpcHost = "http://34.229.146.100:8545";
-//const web3 = new Web3(Web3.givenProvider || rpcHost);
 const rpcHost = "https://rinkeby.infura.io";
 const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
 const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
 
 // Create a listening RPC
-const rpcHost_listen = "ws://localhost:8546";
+const rpcHost_listen = "ws://dendritic.network:8546";
 const web3_listen = new Web3(Web3.givenProvider || rpcHost_listen);
 const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
-//SynapseMarket_listen.events.allEvents({},(err,res)=>{console.log("76575event",err,JSON.stringify(res.returnValues))})
 
 // Accounts
-const accounts = require('./account.js');
 const privateKeyHex = "0x6a7dfdf48155aa5d7654f392027e143d61dfe23ca2d9a8bbe7395192ffbd22d5";
 const account = new accounts(privateKeyHex);
 
 account.setWeb3(web3);
 console.log(web3.eth.accounts.wallet[0].address);
 
-//const EventEmitter = require('events').EventEmitter;
-
-function sha256(item) {
-    const hash = crypto.createHash("sha256");
-    hash.update(item);
-    return hash.digest();
-}
-
 class SynapseProvider {
-    constructor(group, wei_rate, configFile = ".synapseprovider") {
-        this.group = new Buffer(group).toString('hex');
+    constructor(group, wei_rate, configFile = ".synapseprovider", callback) {
+        this.configFile = configFile;
+        this.group = Buffer.from(group).toString('hex');
         this.marketInstance = SynapseMarket;
+
         this.checkForRegister(configFile, group, wei_rate, () => {
             this.listenForEvent();
             this.listenForBlocks();
             this.listenForTerms();
-            this.testInterval();
+            //this.testInterval();
+            if (typeof callback == "function") callback();
         });
     }
 
     testInterval(){
         setInterval(() => {
-            console.log("Publishing new data");
             this.publish('test');
         }, 10000);
     }
@@ -66,77 +52,55 @@ class SynapseProvider {
     // Check whether or not we need to register, if so register
     checkForRegister(configFile, group, wei_rate, callback) {
         // Already regsitered
-        if (fs.existsSync(configFile)) {
+        if ( ConfigStorage.exists(configFile) ) {
             console.log("Loading configuration from", configFile);
 
-            const data = JSON.parse(fs.readFileSync(configFile));
+            const data = JSON.parse(ConfigStorage.load(configFile));
             this.private_key = data.private_key;
 
-            // Generate a secp224k1 keypair
-            this.keypair = crypto.createECDH('secp224k1');
-            this.keypair.setPrivateKey(data.private_key, 'hex');
+            // Import a secp224r1 keypair
+            this.keypair = new SharedCrypto.PublicKey(null, data.private_key);
 
-            console.log ("public key", this.keypair.getPublicKey('hex', 'compressed'));
-            console.log ("private key", this.keypair.getPrivateKey('hex'));
+            console.log("public key", this.keypair.getPublic());
+            console.log("private key", this.keypair.getPrivate());
 
             // Load the subscriptions into internal objects
             this.subscriptions = data.subscriptions.map(data => SynapseSubscription.fromObject(data));
 
             callback();
-            return;
         }
-
-        // Don't overflow a solidity bytes32
-        if (group.length > 32) {
-            throw new Error("Group size is greater than 32 in length!");
-        }
-
-        this.keypair = crypto.createECDH('secp224k1');
-
-        const public_key = "0x" + this.keypair.generateKeys('hex', 'compressed');
-
-        console.log("Created public key", public_key);
-
-        // Make the request
-        /*
-        this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), web3.utils.toBN(public_key), wei_rate).send({
-            gas: 300000,
-            from: web3.eth.accounts.wallet[0].address
-        }).on('error',(error)=>{
-            throw error;
-        }).then((receipt)=>{
-            //maybe do another call instead?
-            fs.writeFileSync(".synapseprovider", JSON.stringify({
-                private_key: this.keypair.getPrivateKey('hex'),
-                subscriptions: []
-            }));
-
-            this.subscriptions = [];
-
-            console.log("Created the provider!");
-
-            callback();
-        })
-        */
-
-        this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate).send({
-            gas: 300000,
-            from: web3.eth.accounts.wallet[0].address
-        }, (err, result) => {
-            if (err) {
-                throw err;
+        else {
+             // Don't overflow a solidity bytes32
+            if (group.length > 32) {
+                throw new Error("Group size is greater than 32 in length!");
             }
-            fs.writeFileSync(".synapseprovider", JSON.stringify({
-                private_key: this.keypair.getPrivateKey('hex'),
-                subscriptions: []
-            }));
 
-            this.subscriptions = [];
+            this.keypair = new SharedCrypto.PublicKey();
+            const public_key = "0x" + this.keypair.getPublic();
 
-            console.log("Created the provider!");
+            console.log("Created public key", public_key);
 
-            callback();
-        });
+            // Make the request
+            this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate).send({
+                gas: 300000,
+                from: web3.eth.accounts.wallet[0].address
+            }).on("error", (err, result) => {
+                if (err) {
+                    throw err;
+                }
+            }).then((receipt)=>{
+                ConfigStorage.save(".synapseprovider", JSON.stringify({
+                    private_key: this.keypair.getPrivate(),
+                    subscriptions: []
+                }));
+
+                this.subscriptions = [];
+
+                console.log("Created the provider!");
+
+                callback();
+            })
+        }
     }
 
     // Wait for subscription events
@@ -146,16 +110,10 @@ class SynapseProvider {
             filter: { provider: web3.eth.accounts.wallet[0].address }
         }, (err, result) => {
             // Ignore errors
-            if (err) {
+            if ( err ) {
                 throw err;
             }
 
-            console.log(result.returnValues.provider);
-
-            if (!result.args) {
-                //return;
-            }
-            console.log("initSubscription",result.blockNumber, result.returnValues);
             this.initSubscription(result.blockNumber, result.returnValues);
         });
     }
@@ -188,12 +146,8 @@ class SynapseProvider {
                 terminator: 1 // Subscriber temrinated
             }
         ], (err, result) => {
-            if (err) {
+            if ( err ) {
                 throw err;
-            }
-
-            if (!result.args) {
-                return;
             }
 
             console.log("Subscription has been terminated by ", result.args.subscriber);
@@ -211,33 +165,40 @@ class SynapseProvider {
         // - encrypted_uuid: bytes32
         // - nonce: bytes32
 
+        // Calculate block length based off of wei rate
         const blocks = Math.floor(data.amount / this.wei_rate);
 
-        //data.public_key = web3.utils.toBN(data.public_key).toString(16);
+        // Get the subscriber's public key from the stream
+        const subscriber_public = data.public_key.slice(2, -6);
 
-        console.log ("public key",data.public_key);
+        console.log("subscriber_public", subscriber_public);
 
-        // Get the subscriber's public key
-        const subscriber_public = data.public_key.slice(2,-6); // bytes32 comes as 0x...
+        // Derive an EC key object
+        const subscriber_public_ec = new SharedCrypto.PublicKey(subscriber_public, null);
 
-        console.log ("public key",data.public_key, subscriber_public);
-       	 
-       	const subscriber_public_buf = Buffer.from(subscriber_public, 'hex'); 
-         // Calculate the secret key
-        const secrethex = this.keypair.computeSecret(subscriber_public, 'hex', 'hex');
+        // Calculate the secret key
+        const secret = this.keypair.generateSecret(subscriber_public_ec);
+        console.log("secret", secret);
 
+        // Get the nonce
         const noncehex = data.nonce.substring(2);
-        const secret = sha256(secrethex);
-        const nonce = Buffer.from(noncehex.slice(0,32),"hex");
+        const nonce = Buffer.from(noncehex.slice(0, 32), "hex");
 
- 	       
+        // Get the UUID
+        console.log("encrypted uuid", data.encrypted_uuid);
         const cipher_text = data.encrypted_uuid.substring(2);
+
+        console.log("nonce", nonce);
+
         // Create the decipher object
-        const cipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
+        const decipher = crypto.createDecipheriv('aes-256-ctr', secret, nonce);
+        // cipher.setAutoPadding(true);
 
         // Add it to the decipher stream and decrypt to String
-	const uuid = Buffer.concat([cipher.update(cipher_text,'hex'), cipher.final()]).toString('base64');
+        const raw_uuid = Buffer.concat([decipher.update(cipher_text, 'hex'), decipher.final()]);
+        const uuid = raw_uuid.toString('base64');
 
+        console.log("raw_uuid", raw_uuid);
         console.log("Starting subscription with", data.subscriber, "on", uuid);
 
         // Create an internal subscription object and begin it
@@ -248,24 +209,24 @@ class SynapseProvider {
             blocknumber + blocks + 1, // End block is the last block + 1
             uuid
         ));
+
+        this.save();
     }
 
     // Publish data to the subscribers
     publish(data) {
-        // TODO - publish to Synapse oricalizer
-        console.log("publish", this.subscriptions);
+        console.log("Publishing to", this.subscriptions.length, "subscriptions");
         this.subscriptions.forEach(subscription => {
             subscription.publish(data);
         });
     }
 
     // Save the necessary data into the ~/.synapseprovider field
-    close() {
+    save() {
         // Save private key and the serialized subscribers
-
-        fs.writeFileSync(JSON.stringify({
-            private_key: this.keypair.getPrivateKey(),
-            subscribers: this.subscriptions.map(subscriber => subscriber.toObject())
+        ConfigStorage.save(this.configFile, JSON.stringify({
+            private_key: this.keypair.getPrivate(),
+            subscriptions: this.subscriptions.map(subscriber => subscriber.toObject())
         }));
     }
 
@@ -288,7 +249,7 @@ class SynapseProvider {
     }
 }
 
-const provider = new SynapseProvider("tom_09", 1);
+//const provider = new SynapseProvider(process.argv[2], 1);
 //provider.on('ready', () => {})
 
 
