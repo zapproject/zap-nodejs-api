@@ -189,7 +189,7 @@ contract MintableToken is StandardToken, Ownable {
     }
 }
 contract ZapToken is MintableToken {
-    string public name = "IQ TOKEN";
-    string public symbol = "IQ";
+    string public name = "ZAP TOKEN";
+    string public symbol = "ZAP";
     uint256 public decimals = 18;
 }
