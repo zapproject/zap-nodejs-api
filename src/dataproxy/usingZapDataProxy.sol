@@ -19,7 +19,7 @@ contract ZapDataProxyLookup {
 
 // The actual part to be included in a client contract
 contract usingZapDataProxy {
-  address constant lookupContract =0x7213cd4412046342b97a09418710574cdade5c43;  // 0x19e9f7f558cc6161c903e6c9b7e514344ffa9319;
+  address constant lookupContract =0x67e199c5dac7f4fbc20a9dff1967fa7d35fd8ef6;
 
   modifier onlyFromZapDataProxy {
     ZapDataProxyLookup lookup = ZapDataProxyLookup(lookupContract);
