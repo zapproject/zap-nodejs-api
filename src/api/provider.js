@@ -39,7 +39,7 @@ class SynapseProvider {
             this.listenForBlocks();
             this.listenForTerms();
             //this.testInterval();
-            if (typeof callback == "function") callback();
+            if (typeof callback == "function") callback(this);
         });
     }
 
@@ -249,9 +249,16 @@ class SynapseProvider {
     }
 }
 
-//const provider = new SynapseProvider(process.argv[2], 1);
+const provider = new SynapseProvider(process.argv[2], 1, (liveProvider)=> {
+console.log(liveProvider);
+        setInterval(() => {
+            this.publish('test');
+        }, 10000);
+
+
+
+});
 //provider.on('ready', () => {})
 
 
 
-module.exports = SynapseProvider;
