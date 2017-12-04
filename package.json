@@ -1,4 +1,7 @@
 {
+  "bin": {
+    "zapcli": "./src/api/index.js"
+  },
   "name": "synapse-poc",
   "version": "0.0.0",
   "private": true,
@@ -6,7 +9,12 @@
     "async": "^2.5.0",
     "bignumber.js": "^4.0.2",
     "bson": "^1.0.4",
+    "co": "^4.6.0",
+    "co-prompt": "^1.0.0",
+    "commander": "^2.12.2",
+    "crypto-js": "^3.1.9-1",
     "datastore-fs": "^0.3.0",
+    "deasync": "^0.1.11",
     "elliptic": "^6.4.0",
     "ethereumjs-wallet": "^0.6.0",
     "ipfs": "^0.26.0",
@@ -14,7 +22,9 @@
     "js-ipfs": "*",
     "level-filesystem": "github:zapproject/level-filesystem",
     "libp2p-webrtc-star": "^0.13.2",
+    "readline": "^1.3.0",
     "solc": "^0.4.15",
+    "vorpal": "^1.12.0",
     "web3": "^1.0.0-beta.18"
   },
   "scripts": {

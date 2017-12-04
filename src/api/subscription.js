@@ -32,8 +32,9 @@ const ipfs = new IPFS({
 });
 
 ipfs.on("ready",()=>{
-    ipfs.swarm.connect("/dns4/dendritic.network/tcp/4003/ws/ipfs/QmXVmNQLmCCTneHc4FeBQhP6fw65ayz6RieKtRGgeJt2ub", (err) => {
-        if (err) console.log(err);
+    console.log('ipfs node is ready')
+    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmT9xvwLVR1GbHKj83YWcrZnrxo4bJ9cQ4jb35QcrSeSJA", (err) => {
+        if (err) console.log("======= crucial error ========",err);
 
         ipfs.swarm.peers({}, function (err, peers) {
             console.log("peers", peers)
