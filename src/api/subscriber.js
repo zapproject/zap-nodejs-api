@@ -3,10 +3,11 @@ const crypto = require('crypto');
 const fs = require('fs');
 const Web3 = require('web3');
 const SharedCrypto = require('./sharedcrypto.js');
-const SynapseSubscription = require('./subscription.js');
+const SynapseSubscription = require('./subscription1.js');
+const ConfigStorage = require('./configstorage.js');
 
 // Market contract
-const file = "../market/contracts/abi.json";
+const file = __dirname + "/../market/contracts/abi.json";
 const abi = JSON.parse(fs.readFileSync(file));
 const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
 
@@ -21,60 +22,72 @@ const web3_listen = new Web3(Web3.givenProvider || rpcHost_listen);
 const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
 
 // Accounts
-const privateKeyHex = "0x7909ef9ab5279d31a74b9f49c58cf5be5c033ae7e9d7e2eb46a071b9802c5e22";
-const account = new accounts(privateKeyHex);
+//const privateKeyHex = "0x1b851e482a6d0bad7fb0a958741ecf4fcd6b1f44cb39f9f625705fd0cc4e0382";
 
-account.setWeb3(web3);
+if (ConfigStorage.exists(__dirname + "/.currentAccount")) {
+    console.log("Loading configuration from", "currentAccount");
 
-console.log("account addr", web3.eth.accounts.wallet[0].address);
+    const data = JSON.parse(ConfigStorage.load(__dirname + "/.currentAccount"));
+    const privateKeyHex = data.privateKey
+    const account = new accounts(privateKeyHex);
+
+    account.setWeb3(web3);
+    console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
+}
+
 
 class SynapseSubscriber {
-    constructor(marketAddress, configFile = ".synapsesubscriber", callback = undefined) {
+    constructor(marketAddress, args, callback = undefined) {
         this.marketInstance = SynapseMarket;
-        this.checkForRegister(configFile, callback);
+        this.checkForRegister(args, callback);
     }
 
     // Check whether or not we need to register, if so register
-    checkForRegister(configFile, callback) {
+    checkForRegister(args, callback) {
         // Already regsitered
-        if (fs.existsSync(configFile)) {
-            const data = JSON.parse(fs.readFileSync(configFile));
+        if (args.action == 'load') {
+            if (fs.existsSync(__dirname + "/" + args.fileName)) {
 
-            this.private_key = data.private_key;
+                const data = JSON.parse(fs.readFileSync(__dirname + "/" + args.fileName));
 
-            // Generate a secp224k1 keypair
-            this.keypair = new SharedCrypto.PublicKey(null, this.private_key);
+                this.private_key = data.private_key;
 
+                // Generate a secp224k1 keypair
+                this.keypair = new SharedCrypto.PublicKey(null, this.private_key);
+
+                console.log("public key", this.keypair.getPublic());
+                console.log("private key", this.keypair.getPrivate());
+
+                // Load the subscriptions into internal objects
+                this.subscriptions = data.subscriptions.map(data => {
+                    const obj = SynapseSubscription.fromObject(data);
+                    console.log("exxxxxists")
+                        // If a callback was passed, initiate the stream with that
+                    if (callback) {
+                        obj.data(callback);
+                    }
+
+                    return obj;
+                });
+
+                return;
+            }
+        } else if (args.action == 'new') {
+            this.keypair = new SharedCrypto.PublicKey();
+
+            console.log("Successfully registered");
             console.log("public key", this.keypair.getPublic());
+            const public_key = this.keypair.getPublic()
             console.log("private key", this.keypair.getPrivate());
 
-            // Load the subscriptions into internal objects
-            this.subscriptions = data.subscriptions.map(data => {
-                const obj = SynapseSubscription.fromObject(data);
+            fs.writeFileSync(__dirname + "/.0x" + public_key, JSON.stringify({
+                private_key: this.keypair.getPrivate(),
+                subscriptions: []
+            }));
 
-                // If a callback was passed, initiate the stream with that
-                if (callback) {
-                    obj.data(callback);
-                }
-
-                return obj;
-            });
-
-            return;
+            this.subscriptions = [];
+            this.newSubscription(args.groupName, callback);
         }
-
-        this.keypair = new SharedCrypto.PublicKey();
-
-        console.log("Successfully registered");
-        console.log("public key", this.keypair.getPublic());
-        console.log("private key", this.keypair.getPrivate());
-
-        fs.writeFileSync(".synapsesubscriber", JSON.stringify({
-            private_key: this.keypair.getPrivate(),
-            subscriptions: []
-        }));
-
-        this.subscriptions = [];
     }
 
     // Create a new subscription
@@ -93,28 +106,28 @@ class SynapseSubscriber {
                 throw err;
             }
 
-            console.log("Sent the request");
+            console.log("Sent the request", result);
 
             // Watch for SynapseProviderFound events
-            const event = SynapseMarket_listen.SynapseProviderFound();
-
-            event.watch((err, found_res) => {
-                if (err) {
-                    throw err;
+            const event = SynapseMarket_listen.events.SynapseProviderFound('latest', (error, found_res) => {
+                if (error) {
+                    throw error;
                 }
 
                 // Make sure it was generated by the above request
-                if (found_res.transactionHash != result.transactionHash) {
-                    return;
+                if (found_res.transactionHash != result) {
+                    //return;
                 }
 
-                console.log("Found a provider of data");
+                console.log("Found a provider of data", found_res, result);
 
                 // Get the index of the provider
-                const provider_index = found_res.args.index;
+                const provider_index = found_res.returnValues.index;
 
                 this.newSubscriptionWithIndex(provider_index, group, 0, callback);
+
             });
+
         });
     }
 
@@ -136,8 +149,8 @@ class SynapseSubscriber {
             let providers_address = res[0];
             let providers_public = res[1];
 
-            providers_address= providers_address.slice(0, 2) + providers_address.substr(-40);
-            let provider_public_hex = providers_public.substr(2,58);
+            providers_address = providers_address.slice(0, 2) + providers_address.substr(-40);
+            let provider_public_hex = providers_public.substr(2, 58);
 
             console.log("providers address", providers_address);
             console.log("providers public", providers_public);
@@ -219,9 +232,18 @@ class SynapseSubscriber {
                 // address, secret, nonce, endblock, uuid
                 const subscription = new SynapseSubscription(providers_address, secret, nonce, -1, uuid);
                 subscription.data(callback);
+                this.subscriptions.push(subscription);
+                this.save()
             })
 
         });
+    }
+    save() {
+        // Save private key and the serialized subscribers
+        fs.writeFileSync(__dirname + "/.0x" + this.keypair.getPublic(), JSON.stringify({
+            private_key: this.keypair.getPrivate(),
+            subscriptions: this.subscriptions.map(subscriber => subscriber.toObject())
+        }));
     }
 }
 
