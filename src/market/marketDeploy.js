@@ -27,13 +27,13 @@ compileAndDeployContract([ "./contracts/Market.sol" ], fromAddress);
 function compileAndDeployContract(sources, fromAddress) {
     // Compile the contract
     const marketContractCompiled = compileContracts(sources);
-fs.writeFileSync("./contracts/abi.json",JSON.stringify(marketContractCompiled.SynapseMarket.abi));
+fs.writeFileSync("./contracts/abi.json",JSON.stringify(marketContractCompiled.ZapMarket.abi));
     // Institiate the contract
-    const marketContract = new web3.eth.Contract(marketContractCompiled.SynapseMarket.abi);
+    const marketContract = new web3.eth.Contract(marketContractCompiled.ZapMarket.abi);
 
     // Deploy the contract
     marketContract.deploy({
-        data: "0x" + marketContractCompiled.SynapseMarket.bytecode,
+        data: "0x" + marketContractCompiled.ZapMarket.bytecode,
         arguments: ['0x44202484ca784c3e4a33112cddd69c783c79572f']
     }).send({
         from: fromAddress,

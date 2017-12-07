@@ -32,28 +32,28 @@ pragma solidity ^0.4.14;
 
 
 // Contract representing the Synase market place
-contract SynapseMarket {
+contract ZapMarket {
     address adminAddress;
     SynToken public syn;
     
-    enum SynapseDataTypes {
-        SynapseDataHistory, // Historical data
-        SynapseDataStream,  // Real time data feed
-        SynapseDataSnapshot // Snapshot data
+    enum ZapDataTypes {
+        ZapDataHistory, // Historical data
+        ZapDataStream,  // Real time data feed
+        ZapDataSnapshot // Snapshot data
     }
 
-    enum SynapseSubscriptionTerminator {
-        SynapseTermProvider,
-        SynapseTermSubscriber
+    enum ZapSubscriptionTerminator {
+        ZapTermProvider,
+        ZapTermSubscriber
     }
 
     // Called when a data provider is found
-    event SynapseProviderFound(
+    event ZapProviderFound(
         uint256 index // Index in the addresses array of where the provider is
     );
 
     // Called when a data purchase is initiated
-    event SynapseDataPurchase(
+    event ZapDataPurchase(
         address provider,       // Etheruem address of the provider
         address subscriber,     // Ethereum address of the subscriber
         bytes32 public_key,     // Public key of the subscriber
@@ -63,10 +63,10 @@ contract SynapseMarket {
     );
 
     // Called when a data subscription is ended by either provider or terminator
-    event SynapseDataSubscriptionEnd(
+    event ZapDataSubscriptionEnd(
         address provider,   // Provider from the subscription
         address subsriber,  // Subscriber from the subscription
-        SynapseSubscriptionTerminator terminator // Which terminated the contract
+        ZapSubscriptionTerminator terminator // Which terminated the contract
     );
     
     event TransferFailed( 
@@ -74,49 +74,49 @@ contract SynapseMarket {
     );
 
     // Each subscription is represented as the following
-    struct SynapseSubscription {
+    struct ZapSubscription {
         uint256 amount;     // Amount of data involved
         uint blockstart;    // Block number subscription was initiated
         uint preblockend;   // Precalculated block end
     }
 
     // Each provider is allcoated a structure that contains their address and their public key
-    struct SynapseProvider {
+    struct ZapProvider {
         address user;       // User address to deposit money into
         bytes32 public_key; // Public key of the user
         int256 reputation;  // The user's current reputation
         uint256 wei_rate;   // Current amount of wei per block
-        mapping(address => SynapseSubscription) subscriptions; // A mapping of subscriber addresses to subscription objects
+        mapping(address => ZapSubscription) subscriptions; // A mapping of subscriber addresses to subscription objects
     }
 
-    // SynapseProviderGroups are a structure representing groupings of providers with a common data feed
-    struct SynapseProviderGroup {
-        SynapseDataTypes datatype;                     // The type of data they are distributing (history, stream, snapshot)
+    // ZapProviderGroups are a structure representing groupings of providers with a common data feed
+    struct ZapProviderGroup {
+        ZapDataTypes datatype;                     // The type of data they are distributing (history, stream, snapshot)
         address[] provider_addresses;                  // A list of their providres
         uint256 index;                                 // The current index within their providers
-        mapping(address => SynapseProvider) providers; // A map to determine addresses already registered
+        mapping(address => ZapProvider) providers; // A map to determine addresses already registered
     }
 
     // Map basic names (32 byte names) to provider data
-    mapping(bytes32 => SynapseProviderGroup) providerGroups;
+    mapping(bytes32 => ZapProviderGroup) providerGroups;
 
     // Current mapping of available wei for payout
     mapping(address => uint256) availablePayouts;
 
-    function SynapseMarket(address token) {
+    function ZapMarket(address token) {
         adminAddress = msg.sender;
         syn = SynToken(token);
     }
 
     // When a provider asks to be registered, register them.
-    function registerSynapseProvider(bytes32 group,
+    function registerZapProvider(bytes32 group,
                                      bytes32 public_key,
                                      uint256 wei_rate) {
         // Find the provider group
-        SynapseProviderGroup storage providerGroup = providerGroups[group];
+        ZapProviderGroup storage providerGroup = providerGroups[group];
 
         // Mark the address as used
-        providerGroup.providers[msg.sender] = SynapseProvider({
+        providerGroup.providers[msg.sender] = ZapProvider({
             public_key: public_key,
             user: msg.sender,
             reputation: 0,
@@ -128,9 +128,9 @@ contract SynapseMarket {
     }
 
     // If someone requsts a provider, find one and give them one
-    function requestSynapseProvider(bytes32 group) {
+    function requestZapProvider(bytes32 group) {
         // Find the provider group
-        SynapseProviderGroup storage providerGroup = providerGroups[group];
+        ZapProviderGroup storage providerGroup = providerGroups[group];
 
         // Make sure we have providers
         require(providerGroup.provider_addresses.length != 0);
@@ -142,11 +142,11 @@ contract SynapseMarket {
         providerGroup.index = providerGroup.index % providerGroup.provider_addresses.length;
 
         // Return the relevant information
-        SynapseProviderFound(index);
+        ZapProviderFound(index);
     }
 
     // Initiate a data feed with a given provider and emit necessary events
-    function initSynapseDataFeed(bytes32 group,            // Group of the user for validation
+    function initZapDataFeed(bytes32 group,            // Group of the user for validation
                                  address provider_address, // Provider address
                                  bytes32 public_key,       // Public key of the purchaser
                                  bytes32 encrypted_uuid,   // Encrypted UUID with the provider's public key
@@ -156,26 +156,26 @@ contract SynapseMarket {
                                   {
 
         // Emit the event
-        SynapseDataPurchase(provider_address, msg.sender, public_key, msg.value, encrypted_uuid, nonce);
+        ZapDataPurchase(provider_address, msg.sender, public_key, msg.value, encrypted_uuid, nonce);
     }
 
     // Finish the data feed
-    function endSynapseSubscription(bytes32 group,
+    function endZapSubscription(bytes32 group,
                                     address provider_address,
                                     address subscriber_address)
                                     internal
                                     returns (bool) {
         // Find the provider group
-        SynapseProviderGroup storage providerGroup = providerGroups[group];
+        ZapProviderGroup storage providerGroup = providerGroups[group];
 
         // Find the provider
-        SynapseProvider storage provider = providerGroup.providers[provider_address];
+        ZapProvider storage provider = providerGroup.providers[provider_address];
 
         // Make sure provider exists
         require( provider.user == provider_address );
 
         // Find the subscription
-        SynapseSubscription storage subscription = provider.subscriptions[subscriber_address];
+        ZapSubscription storage subscription = provider.subscriptions[subscriber_address];
 
         // Make sure the subscriber has a subscription
         if  ( subscription.amount == 0 ) {
@@ -205,20 +205,20 @@ contract SynapseMarket {
     }
 
     // Finish the data feed from the provider
-    function endSynapseSubscription_Provider(bytes32 group,
+    function endZapSubscription_Provider(bytes32 group,
                                              address subscriber_address) {
         // Emit an event on success about who ended the contract
-        if ( endSynapseSubscription(group, msg.sender, subscriber_address) ) {
-            SynapseDataSubscriptionEnd(msg.sender, subscriber_address, SynapseSubscriptionTerminator.SynapseTermProvider);
+        if ( endZapSubscription(group, msg.sender, subscriber_address) ) {
+            ZapDataSubscriptionEnd(msg.sender, subscriber_address, ZapSubscriptionTerminator.ZapTermProvider);
         }
     }
 
     // Finish the data feed from the subscriber
-    function endSynapseSubscription_Subscriber(bytes32 group,
+    function endZapSubscription_Subscriber(bytes32 group,
                                                address provider_address) {
         // Emit an event on success about who ended the contract
-        if ( endSynapseSubscription(group, provider_address, msg.sender) ) {
-            SynapseDataSubscriptionEnd(provider_address, msg.sender, SynapseSubscriptionTerminator.SynapseTermSubscriber);
+        if ( endZapSubscription(group, provider_address, msg.sender) ) {
+            ZapDataSubscriptionEnd(provider_address, msg.sender, ZapSubscriptionTerminator.ZapTermSubscriber);
         }
     }
 
@@ -258,7 +258,7 @@ contract SynapseMarket {
                              constant
                              returns (uint256) {
         // Get the provider group
-        SynapseProviderGroup storage providerGroup = providerGroups[group];
+        ZapProviderGroup storage providerGroup = providerGroups[group];
 
         // Make sure we're not going out of bounds
         require ( index < providerGroup.provider_addresses.length );
@@ -276,7 +276,7 @@ contract SynapseMarket {
                                 constant
                                 returns (address) {
         // Get the provider group
-        SynapseProviderGroup storage providerGroup = providerGroups[group];
+        ZapProviderGroup storage providerGroup = providerGroups[group];
 
         // Make sure we're not going out of bounds
         require ( index < providerGroup.provider_addresses.length );
@@ -293,7 +293,7 @@ contract SynapseMarket {
                                constant
                                returns (bytes32) {
         // Get the provider group
-        SynapseProviderGroup storage providerGroup = providerGroups[group];
+        ZapProviderGroup storage providerGroup = providerGroups[group];
 
         // Make sure we're not going out of bounds
         require ( index < providerGroup.provider_addresses.length );
@@ -311,7 +311,7 @@ contract SynapseMarket {
                                constant
                                returns (int256) {
         // Get the provider group
-        SynapseProviderGroup storage providerGroup = providerGroups[group];
+        ZapProviderGroup storage providerGroup = providerGroups[group];
 
         // Make sure we're not going out of bounds
         require ( index < providerGroup.provider_addresses.length );

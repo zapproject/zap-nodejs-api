@@ -1,5 +1,5 @@
-Experimental early-alpha. In development
-
+Experimental early-alpha
+Some modules contained have not been integrated or adequately documented
 
 first do
 ```

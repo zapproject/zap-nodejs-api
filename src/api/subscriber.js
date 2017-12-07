@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const Web3 = require('web3');
 const SharedCrypto = require('./sharedcrypto.js');
-const SynapseSubscription = require('./subscription1.js');
+const ZapSubscription = require('./subscription1.js');
 const ConfigStorage = require('./configstorage.js');
 
 // Market contract
@@ -14,12 +14,12 @@ const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
 // Create a sending RPC
 const rpcHost = "https://rinkeby.infura.io";
 const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
-const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
+const ZapMarket = new web3.eth.Contract(abi, marketAddress);
 
 // Create a listening RPC
 const rpcHost_listen = "ws://dendritic.network:8546";
 const web3_listen = new Web3(Web3.givenProvider || rpcHost_listen);
-const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
+const ZapMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
 
 // Accounts
 //const privateKeyHex = "0x1b851e482a6d0bad7fb0a958741ecf4fcd6b1f44cb39f9f625705fd0cc4e0382";
@@ -36,9 +36,9 @@ if (ConfigStorage.exists(__dirname + "/.currentAccount")) {
 }
 
 
-class SynapseSubscriber {
+class ZapSubscriber {
     constructor(marketAddress, args, callback = undefined) {
-        this.marketInstance = SynapseMarket;
+        this.marketInstance = ZapMarket;
         this.checkForRegister(args, callback);
     }
 
@@ -60,7 +60,7 @@ class SynapseSubscriber {
 
                 // Load the subscriptions into internal objects
                 this.subscriptions = data.subscriptions.map(data => {
-                    const obj = SynapseSubscription.fromObject(data);
+                    const obj = ZapSubscription.fromObject(data);
                     console.log("exxxxxists")
                         // If a callback was passed, initiate the stream with that
                     if (callback) {
@@ -98,7 +98,7 @@ class SynapseSubscriber {
         console.log("Looking for a provider of data");
 
         // Send the request
-        this.marketInstance.methods.requestSynapseProvider(group).send({
+        this.marketInstance.methods.requestZapProvider(group).send({
             from: web3.eth.accounts.wallet[0].address,
             gas: 4700000 // TODO - not this
         }, (err, result) => {
@@ -108,8 +108,8 @@ class SynapseSubscriber {
 
             console.log("Sent the request", result);
 
-            // Watch for SynapseProviderFound events
-            const event = SynapseMarket_listen.events.SynapseProviderFound('latest', (error, found_res) => {
+            // Watch for ZapProviderFound events
+            const event = ZapMarket_listen.events.ZapProviderFound('latest', (error, found_res) => {
                 if (error) {
                     throw error;
                 }
@@ -205,7 +205,7 @@ class SynapseSubscriber {
             console.log("Initiating data feed...");
 
             // Initiate the data feed
-            return this.marketInstance.methods.initSynapseDataFeed(
+            return this.marketInstance.methods.initZapDataFeed(
                 group,
                 providers_address,
                 public_key,
@@ -216,7 +216,7 @@ class SynapseSubscriber {
                 from: web3.eth.accounts.wallet[0].address,
                 gas: 4700000 // TODO - not this
             }).once('transactionHash', (transactionHash) => {
-                //SynapseMarket_listen.events.allEvents({}, function (error, log) {
+                //ZapMarket_listen.events.allEvents({}, function (error, log) {
                 //    if (!error)
                 //        console.log(875685,log);
                 //});
@@ -230,7 +230,7 @@ class SynapseSubscriber {
 
                 // Create the subscription object
                 // address, secret, nonce, endblock, uuid
-                const subscription = new SynapseSubscription(providers_address, secret, nonce, -1, uuid);
+                const subscription = new ZapSubscription(providers_address, secret, nonce, -1, uuid);
                 subscription.data(callback);
                 this.subscriptions.push(subscription);
                 this.save()
@@ -247,4 +247,4 @@ class SynapseSubscriber {
     }
 }
 
-module.exports = SynapseSubscriber;
+module.exports = ZapSubscriber;

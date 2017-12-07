@@ -1,6 +1,6 @@
-const SynapseSubscriber = require('../api/subscriber.js');
+const ZapSubscriber = require('../api/subscriber.js');
 const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
-const subscriber = new SynapseSubscriber(marketAddress, ".synapsesubscriber");
+const subscriber = new ZapSubscriber(marketAddress, ".synapsesubscriber");
 const Web3 = require('web3');
 const accounts = require('../account.js');
 

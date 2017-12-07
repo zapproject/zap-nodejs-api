@@ -5,7 +5,7 @@ module.exports = function(args) {
         const fs = require('fs');
         const Web3 = require('web3');
         const SharedCrypto = require('./sharedcrypto.js');
-        const SynapseSubscription = require('./subscription.js');
+        const ZapSubscription = require('./subscription.js');
 
         // Market contract
         const file = __dirname + "/../market/contracts/abi.json";
@@ -15,12 +15,12 @@ module.exports = function(args) {
         // Create a sending RPC
         const rpcHost = "https://rinkeby.infura.io";
         const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
-        const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
+        const ZapMarket = new web3.eth.Contract(abi, marketAddress);
 
         // Create a listening RPC
         const rpcHost_listen = "ws://dendritic.network:8546";
         const web3_listen = new Web3(Web3.givenProvider || rpcHost_listen);
-        const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
+        const ZapMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
 
         // Accounts
         //const privateKeyHex = "0x17516090beeb11b2068db940740bd86b26f7cf404d61c9c601d4b0201d7b8782";
@@ -37,12 +37,12 @@ module.exports = function(args) {
         }
             
 
-            class SynapseProvider {
+            class ZapProvider {
 
                 constructor(group, wei_rate, configFile = ".synapseprovider", callback) {
                     this.configFile = configFile;
                     this.group = Buffer.from(group).toString('hex');
-                    this.marketInstance = SynapseMarket;
+                    this.marketInstance = ZapMarket;
 
                     this.checkForRegister(configFile, group, wei_rate, () => {
                         this.listenForEvent();
@@ -76,7 +76,7 @@ module.exports = function(args) {
                             console.log("private key", this.keypair.getPrivate());
 
                             // Load the subscriptions into internal objects
-                            this.subscriptions = data.subscriptions.map(data => SynapseSubscription.fromObject(data));
+                            this.subscriptions = data.subscriptions.map(data => ZapSubscription.fromObject(data));
 
                             callback();
                         }
@@ -93,7 +93,7 @@ module.exports = function(args) {
 
                         // Make the request
                         console.log(web3.utils.fromUtf8(group), "====================")
-                        this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(args.groupName), public_key, args.weiRate).send({
+                        this.marketInstance.methods.registerZapProvider(web3.utils.fromUtf8(args.groupName), public_key, args.weiRate).send({
                             gas: 300000,
                             from: web3.eth.accounts.wallet[0].address
                         }).on("error", (err, result) => {
@@ -118,8 +118,8 @@ module.exports = function(args) {
 
                 // Wait for subscription events
                 listenForEvent() {
-                    // Wait for events of SynapseDataPurchase type with a provider that is us
-                    SynapseMarket_listen.events.SynapseDataPurchase({
+                    // Wait for events of ZapDataPurchase type with a provider that is us
+                    ZapMarket_listen.events.ZapDataPurchase({
                         filter: {
                             provider: web3.eth.accounts.wallet[0].address
                         }
@@ -155,7 +155,7 @@ module.exports = function(args) {
 
                 // Listen for terminations that wasn't initiated by us
                 listenForTerms() {
-                    SynapseMarket_listen.events.SynapseDataSubscriptionEnd([{
+                    ZapMarket_listen.events.ZapDataSubscriptionEnd([{
                         provider: web3.eth.accounts[0],
                         terminator: 1 // Subscriber temrinated
                     }], (err, result) => {
@@ -215,7 +215,7 @@ module.exports = function(args) {
                     console.log("Starting subscription with", data.subscriber, "on", uuid);
 
                     // Create an internal subscription object and begin it
-                    this.subscriptions.push(new SynapseSubscription(
+                    this.subscriptions.push(new ZapSubscription(
                         data.subscriber,
                         secret,
                         nonce,
@@ -249,7 +249,7 @@ module.exports = function(args) {
                     // provider_address
                     // subscriber_address
                     //TODO
-                    this.marketInstance.methods.sendSynapseSubscription_Provider(this.group, subscription.address).send({
+                    this.marketInstance.methods.sendZapSubscription_Provider(this.group, subscription.address).send({
                         from: web3.eth.accounts.wallet[0].address,
                         gas: 900000 // TODO - not this
                     }, (err, result) => {
@@ -262,7 +262,7 @@ module.exports = function(args) {
                 }
             }
 
-            const provider = new SynapseProvider(process.argv[2], 1, (liveProvider) => {
+            const provider = new ZapProvider(process.argv[2], 1, (liveProvider) => {
                 console.log(liveProvider);
                 setInterval(() => {
                     this.publish('test');
