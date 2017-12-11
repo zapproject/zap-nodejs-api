@@ -45,6 +45,7 @@ and paste the address inside this snippet to subscription1.js where you provide 
 
 2 - Open another terminal window
 
+
 ```
 zapcli new -s 'group_name'
 ```
@@ -57,19 +58,22 @@ To load subscriber
 ```
 zapcli load -s filename
 ```
-### Create Account
 
-Open another terminal and go to the directory "/src/api" and type the following command
+### Set RPC HOST 
+```
+zapcli set --rpc 'rpc host'
+```
+Example:
 
 ```
-node newAccount.js
+zapcli set --rpc https://rinkeby.infura.io
 ```
-The above command will create a new account and ask for password to encrypt the private key of account created. The resulting ciphered text will be stored in file currently named '.account'
 
-
-
-### Load Account
-It will load the account from file '.account' which we created in the last step and ask for password. It will be later converted to load account from file that we provide it as argument.
+### Set WS HOST 
 ```
-node loadAccount.js
+zapcli set --ws 'ws host'
+```
+Example:
+```
+zapcli set --ws ws://dendritic.network:8546
 ```

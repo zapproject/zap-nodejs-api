@@ -4,7 +4,9 @@ const Room = require('ipfs-pubsub-room');
 
 // Establish an IPFS connection with pubsub enabled
 const ipfs = new IPFS({
-    repo: 'ipfs/synapse-test/1',
+    repo: 'ipfs/synapse-test/2',
+    start: true,
+    init: true,
     config: {
         "Bootstrap": [
             "/ip4/104.131.131.82/tcp/4001/ipfs/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ",
@@ -19,7 +21,7 @@ const ipfs = new IPFS({
         ],
         "Addresses": {
             "Swarm": [
-                "/ip4/127.0.0.1/tcp/4003/ws"
+                "/ip4/127.0.0.1/tcp/1337/ws"
                 // "/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star"
             ],
             "API": '',
@@ -31,16 +33,29 @@ const ipfs = new IPFS({
     }
 });
 
-ipfs.on("ready",()=>{
-    console.log('ipfs node is ready')
-    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmT9xvwLVR1GbHKj83YWcrZnrxo4bJ9cQ4jb35QcrSeSJA", (err) => {
-        if (err) console.log("======= crucial error ========",err);
+ipfs.on("ready", () => {
 
-        ipfs.swarm.peers({}, function (err, peers) {
-            console.log("peers", peers)
-        })
-    })
-})
+    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmT9xvwLVR1GbHKj83YWcrZnrxo4bJ9cQ4jb35QcrSeSJA", (err) => {
+        if (err) console.log("======= crucial error ========", err);
+
+        ipfs.swarm.peers({}, function(err, peers) {
+            console.log("peers", peers);
+        });
+
+    });
+    // // we are setting this interval, so that subscirber could find provder again without restarting, once provider restarts
+    // setInterval(() => {
+    //     ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmT9xvwLVR1GbHKj83YWcrZnrxo4bJ9cQ4jb35QcrSeSJA", (err) => {
+    //         if (err) console.log("======= crucial error ========", err);
+    //
+    //         ipfs.swarm.peers({}, function(err, peers) {
+    //             console.log("peers", peers[0].addr);
+    //         });
+    //     });
+    //
+    // }, 30000);
+
+});
 
 class SynapseSubscription {
     constructor(address, secret, nonce, endblock, uuid) {
@@ -69,8 +84,7 @@ class SynapseSubscription {
 
         if (this.cipher) {
             pubdata = this.cipher.update(JSON.stringify(data));
-        }
-        else {
+        } else {
             pubdata = Buffer.from(JSON.stringify(data));
         }
 
