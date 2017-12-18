@@ -27,23 +27,23 @@ module.exports = function(args) {
     // Accounts
 
 
-    // const privateKeyHex = "0x17516090beeb11b2068db940740bd86b26f7cf404d61c9c601d4b0201d7b8782"; //test account with ethers
-    // const account = new accounts(privateKeyHex);
-    // account.setWeb3(web3);
-    // console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
+    const privateKeyHex = "0x17516090beeb11b2068db940740bd86b26f7cf404d61c9c601d4b0201d7b8782"; //test account with ethers
+    const account = new accounts(privateKeyHex);
+    account.setWeb3(web3);
+    console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
 
 
 
-    if (ConfigStorage.exists(__dirname + "/.currentAccount")) {
-        console.log("Loading configuration from", "currentAccount");
+    // if (ConfigStorage.exists(__dirname + "/.currentAccount")) {
+    //     console.log("Loading configuration from", "currentAccount");
 
-        const data = JSON.parse(ConfigStorage.load(__dirname + "/.currentAccount"));
-        const privateKeyHex = data.privateKey;
-        const account = new accounts(privateKeyHex);
+    //     const data = JSON.parse(ConfigStorage.load(__dirname + "/.currentAccount"));
+    //     const privateKeyHex = data.privateKey;
+    //     const account = new accounts(privateKeyHex);
 
-        account.setWeb3(web3);
-        console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
-    }
+    //     account.setWeb3(web3);
+    //     console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
+    // }
 
 
     class SynapseProvider {
@@ -57,8 +57,8 @@ module.exports = function(args) {
                 this.listenForEvent();
                 this.listenForBlocks();
                 this.listenForTerms();
-                this.testInterval();
-                //if (typeof callback == "function") callback(this);
+               // this.testInterval();
+                callback(this);
             });
         }
 
@@ -110,7 +110,6 @@ module.exports = function(args) {
                         throw err;
                     }
                 }).then((receipt) => {
-                    console.log(receipt, "receipt");
                     ConfigStorage.save(__dirname + "/." + public_key, JSON.stringify({
                         private_key: this.keypair.getPrivate(),
                         subscriptions: []
@@ -146,7 +145,6 @@ module.exports = function(args) {
         listenForBlocks() {
             web3_listen.eth.subscribe('newBlockHeaders', (err, result) => {
                 const blocknum = result.number;
-                console.log(blocknum, " block");
                 // Filter out any old subscriptions
                 this.subscriptions = this.subscriptions.filter(subscription => {
                     if (subscription.endblock <= blocknum) {
@@ -271,11 +269,10 @@ module.exports = function(args) {
         }
     }
 
-    new SynapseProvider(process.argv[2], 1, (liveProvider) => {
-        console.log(liveProvider);
+    new SynapseProvider(process.argv[2], 1, 'xyz',(liveProvider) => {
         setInterval(() => {
-            this.publish('test');
-        }, 10000);
+            liveProvider.publish('testing ZAPCLI');
+        }, 5000);
 
 
 

@@ -25,21 +25,21 @@ const web3_listen = new Web3(Web3.givenProvider || rpcHost_listen);
 const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
 
 // Accounts
-// const privateKeyHex = "0x1b851e482a6d0bad7fb0a958741ecf4fcd6b1f44cb39f9f625705fd0cc4e0382"; //test account with ethers
-// const account = new accounts(privateKeyHex);
-// account.setWeb3(web3);
-// console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
+const privateKeyHex = "0x1b851e482a6d0bad7fb0a958741ecf4fcd6b1f44cb39f9f625705fd0cc4e0382"; //test account with ethers
+const account = new accounts(privateKeyHex);
+account.setWeb3(web3);
+console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
 
-if (ConfigStorage.exists(__dirname + "/.currentAccount")) {
-    console.log("Loading configuration from", "currentAccount");
+// if (ConfigStorage.exists(__dirname + "/.currentAccount")) {
+//     console.log("Loading configuration from", "currentAccount");
 
-    const data = JSON.parse(ConfigStorage.load(__dirname + "/.currentAccount"));
-    const privateKeyHex = data.privateKey;
-    const account = new accounts(privateKeyHex);
+//     const data = JSON.parse(ConfigStorage.load(__dirname + "/.currentAccount"));
+//     const privateKeyHex = data.privateKey;
+//     const account = new accounts(privateKeyHex);
 
-    account.setWeb3(web3);
-    console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
-}
+//     account.setWeb3(web3);
+//     console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
+// }
 
 
 
@@ -68,7 +68,6 @@ class SynapseSubscriber {
                 // Load the subscriptions into internal objects
                 this.subscriptions = data.subscriptions.map(data => {
                     const obj = SynapseSubscription.fromObject(data);
-                    console.log("exxxxxists");
                     // If a callback was passed, initiate the stream with that
                     if (callback) {
                         obj.data(callback);

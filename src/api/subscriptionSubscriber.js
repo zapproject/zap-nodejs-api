@@ -35,7 +35,7 @@ const ipfs = new IPFS({
 
 ipfs.on("ready", () => {
 
-    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmT9xvwLVR1GbHKj83YWcrZnrxo4bJ9cQ4jb35QcrSeSJA", (err) => {
+    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmWNsfrUTuembDPN6fiar7QjYdfubgQ1TAp3CfAKBvZZd3", (err) => {
         if (err) console.log("======= crucial error ========", err);
 
         ipfs.swarm.peers({}, function(err, peers) {
@@ -111,9 +111,9 @@ class SynapseSubscription {
                 output = this.decipher.update(output);
             }
 
-            console.log(output.toString());
+            console.log(output);
 
-            callback(output.toString());
+            callback(output.toString('utf8'));
         });
     }
 
