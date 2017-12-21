@@ -25,11 +25,11 @@ filename starting with '.' will be generated in the directory src/api.
 
 
 ```
-zapcli new -p 'group name' 'wei rate'
+zapcli new -p 'group name' 'wei rate' 'callback file name'
 ```
 Example:
 ```
-zapcli new -p abc 1
+zapcli new -p abc 1 testCallback
 ```
 To load provider use
 ```

@@ -1,4 +1,4 @@
-module.exports = function(args) {
+
     const accounts = require('../account.js');
     const crypto = require('crypto');
     const ConfigStorage = require('./configstorage.js');
@@ -27,33 +27,35 @@ module.exports = function(args) {
     // Accounts
 
 
-    const privateKeyHex = "0x17516090beeb11b2068db940740bd86b26f7cf404d61c9c601d4b0201d7b8782"; //test account with ethers
+    
+
+
+
+    if (ConfigStorage.exists(__dirname + "/.currentAccount")) {
+        console.log("Loading configuration from", "currentAccount");
+
+        const data = JSON.parse(ConfigStorage.load(__dirname + "/.currentAccount"));
+        const privateKeyHex = data.privateKey;
+        const account = new accounts(privateKeyHex);
+
+        account.setWeb3(web3);
+        console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
+    } else {
+        const privateKeyHex = "0x17516090beeb11b2068db940740bd86b26f7cf404d61c9c601d4b0201d7b8782"; //test account with ethers
     const account = new accounts(privateKeyHex);
     account.setWeb3(web3);
     console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
-
-
-
-    // if (ConfigStorage.exists(__dirname + "/.currentAccount")) {
-    //     console.log("Loading configuration from", "currentAccount");
-
-    //     const data = JSON.parse(ConfigStorage.load(__dirname + "/.currentAccount"));
-    //     const privateKeyHex = data.privateKey;
-    //     const account = new accounts(privateKeyHex);
-
-    //     account.setWeb3(web3);
-    //     console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
-    // }
+    }
 
 
     class SynapseProvider {
 
-        constructor(group, wei_rate, configFile = ".synapseprovider", callback) {
+        constructor(group, wei_rate, configFile = ".synapseprovider", action, callback) {
             this.configFile = configFile;
             this.group = Buffer.from(group).toString('hex');
             this.marketInstance = SynapseMarket;
 
-            this.checkForRegister(configFile, group, wei_rate, () => {
+            this.checkForRegister(configFile, group, wei_rate, action, () => {
                 this.listenForEvent();
                 this.listenForBlocks();
                 this.listenForTerms();
@@ -69,13 +71,13 @@ module.exports = function(args) {
         }
 
         // Check whether or not we need to register, if so register
-        checkForRegister(configFile, group, wei_rate, callback) {
+        checkForRegister(configFile, group, wei_rate, action ,callback) {
             // Already regsitered
-            if (args.action == 'load') {
-                if (ConfigStorage.exists(__dirname + "/" + args.fileName)) {
-                    console.log("Loading configuration from", args.fileName);
+            if (action == 'load') {
+                if (ConfigStorage.exists(__dirname + "/" + configFile)) {
+                    console.log("Loading configuration from", configFile);
 
-                    const data = JSON.parse(ConfigStorage.load(__dirname + "/" + args.fileName));
+                    const data = JSON.parse(ConfigStorage.load(__dirname + "/" + configFile));
                     this.private_key = data.private_key;
 
                     // Import a secp224r1 keypair
@@ -89,7 +91,7 @@ module.exports = function(args) {
 
                     callback();
                 }
-            } else if (args.action == 'new') {
+            } else if (action == 'new') {
                 // Don't overflow a solidity bytes32
                 if (group.length > 32) {
                     throw new Error("Group size is greater than 32 in length!");
@@ -102,7 +104,7 @@ module.exports = function(args) {
 
                 // Make the request
                 console.log(web3.utils.fromUtf8(group), "====================");
-                this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(args.groupName), public_key, args.weiRate).send({
+                this.marketInstance.methods.registerSynapseProvider(web3.utils.fromUtf8(group), public_key, wei_rate).send({
                     gas: 300000,
                     from: web3.eth.accounts.wallet[0].address
                 }).on("error", (err, result) => {
@@ -269,13 +271,5 @@ module.exports = function(args) {
         }
     }
 
-    new SynapseProvider(process.argv[2], 1, 'xyz',(liveProvider) => {
-        setInterval(() => {
-            liveProvider.publish('testing ZAPCLI');
-        }, 5000);
-
-
-
-    });
-};
+    module.exports = SynapseProvider;
 //provider.on('ready', () => {})

@@ -7,17 +7,18 @@ var program = require('commander');
 
 
 program
-    .command('new [groupName] [weiRate]')
+    .command('new [groupName] [weiRate] [callback]')
     .option('-p', '--AddProvider', 'add provider')
     .option('-s', '--AddSubscriber', 'add subs')
     .option('-a', '--AddAccount', 'add account')
 
-    .action((groupName, weiRate, option) => {
+    .action((groupName, weiRate, callback, option) => {
         if (option.P) {
-            require('./provider')({
+            require('./initiateProvider')({
                 action: 'new',
                 groupName: groupName,
-                weiRate: weiRate
+                weiRate: weiRate,
+                callback:callback
             });
         } else if (option.S) {
             require('./subs')({
@@ -30,15 +31,16 @@ program
         }
     });
 program
-    .command('load <fileName>')
+    .command('load <fileName> [callback]')
     .option('-p', '--LoadProvider', 'add provider')
     .option('-s', '--LoadSubscriber', 'load subs')
     .option('-a', '--LoadAccount', 'load account')
-    .action((fileName, option) => {
+    .action((fileName, callback, option) => {
         if (option.P) {
-            require('./provider')({
+            require('./initiateProvider')({
                 fileName: fileName,
-                action: 'load'
+                action: 'load',
+                callback:callback
             });
         } else if (option.S) {
             require("./subs")({
