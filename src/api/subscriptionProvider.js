@@ -42,7 +42,7 @@ ipfs.on("ready", () => {
     });
 });
 
-class SynapseSubscription {
+class ZapSubscription {
     constructor(address, secret, nonce, endblock, uuid) {
         this.address = address;
         this.secret = secret;
@@ -115,7 +115,7 @@ class SynapseSubscription {
 
     // Establish from serialized object for loading
     static fromObject(data) {
-        return new SynapseSubscription(
+        return new ZapSubscription(
             data.address,
             Buffer.from(data.secret, 'hex'),
             Buffer.from(data.nonce, 'hex'),
@@ -125,4 +125,4 @@ class SynapseSubscription {
     }
 }
 
-module.exports = SynapseSubscription;
+module.exports = ZapSubscription;

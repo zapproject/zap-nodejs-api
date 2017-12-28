@@ -1,0 +1,380 @@
+[
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_address",
+				"type": "address"
+			}
+		],
+		"name": "getNumBonds",
+		"outputs": [
+			{
+				"name": "_length",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_address",
+				"type": "address"
+			}
+		],
+		"name": "getOracle",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "holderAddress",
+				"type": "address"
+			},
+			{
+				"name": "oracleAddress",
+				"type": "address"
+			}
+		],
+		"name": "getBondByOracleAddress",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getNumBondsUser",
+		"outputs": [
+			{
+				"name": "_length",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "decimals",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "x",
+				"type": "address"
+			}
+		],
+		"name": "toString",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "a",
+				"type": "address"
+			}
+		],
+		"name": "toBytes",
+		"outputs": [
+			{
+				"name": "b",
+				"type": "bytes"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "numDots",
+				"type": "uint256"
+			},
+			{
+				"name": "_oracleAddress",
+				"type": "address"
+			}
+		],
+		"name": "unbond",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "holderAddress",
+				"type": "address"
+			},
+			{
+				"name": "numDots",
+				"type": "uint256"
+			},
+			{
+				"name": "_oracleAddress",
+				"type": "address"
+			}
+		],
+		"name": "redeemBond",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getUserBondByIndex",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"name": "_numZap",
+				"type": "uint256"
+			},
+			{
+				"name": "_oracleAddress",
+				"type": "address"
+			}
+		],
+		"name": "addHolder",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "holderAddress",
+				"type": "address"
+			},
+			{
+				"name": "_numZap",
+				"type": "uint256"
+			},
+			{
+				"name": "_oracleAddress",
+				"type": "address"
+			}
+		],
+		"name": "addBond",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "holderAddress",
+				"type": "address"
+			},
+			{
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getBondByIndex",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "holderAddress",
+				"type": "address"
+			},
+			{
+				"name": "_oracleAddress",
+				"type": "address"
+			}
+		],
+		"name": "getDots",
+		"outputs": [
+			{
+				"name": "dots",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_startRate",
+				"type": "uint256"
+			},
+			{
+				"name": "_totalBond",
+				"type": "uint256"
+			},
+			{
+				"name": "_priceCurve",
+				"type": "uint256"
+			},
+			{
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"name": "_title",
+				"type": "string"
+			}
+		],
+		"name": "addOracle",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"name": "tokenAddress",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "numZap",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "oracle",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "totalBond",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "priceCurve",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "title",
+				"type": "string"
+			}
+		],
+		"name": "ShowBond",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "startRate",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "totalBond",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "priceCurve",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "title",
+				"type": "string"
+			}
+		],
+		"name": "ShowOracle",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "step",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "desc",
+				"type": "string"
+			}
+		],
+		"name": "StepThrough",
+		"type": "event"
+	}
+]

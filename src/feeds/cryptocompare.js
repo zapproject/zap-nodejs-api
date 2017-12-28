@@ -10,7 +10,7 @@ class CryptoCompare extends EventEmitter {
         this.wsServer = ioserver(57819);
 
         //connect to cryptocompare ws server
-        this.ccclient = ioclient("wss://streamer.cryptocompare.com");
+        this.ccclient = ioclient("https://streamer.cryptocompare.com");
 
         this.timestamp = 0
         if (subList) {
@@ -18,6 +18,7 @@ class CryptoCompare extends EventEmitter {
         }
 
         this.ccclient.on("m", (msg) => {
+console.log(msg);
             let data = msg.split("~")
             if (data[0] === "0" && parseInt(data[6]) > parseInt(this.timestamp)) {
                 let key = ["SubscriptionId", "ExchangeName", "FromCurrencySymbol", "ToCurrencySymbol", "Flag", "TradeId", "TimeStamp", "Quantity", "Price", "Total"];
