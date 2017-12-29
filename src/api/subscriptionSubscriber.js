@@ -35,7 +35,7 @@ const ipfs = new IPFS({
 
 ipfs.on("ready", () => {
 
-    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmWNsfrUTuembDPN6fiar7QjYdfubgQ1TAp3CfAKBvZZd3", (err) => {
+    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmSmwDi3AmMm3pFbyvzmRZ3FfLtNAtYv5ie7ispER1kGUB", (err) => {
         if (err) console.log("======= crucial error ========", err);
 
         ipfs.swarm.peers({}, function(err, peers) {

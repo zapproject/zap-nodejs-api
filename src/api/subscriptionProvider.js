@@ -33,7 +33,8 @@ const ipfs = new IPFS({
 
 ipfs.on("ready", () => {
     console.log('ipfs node is ready');
-    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmT9xvwLVR1GbHKj83YWcrZnrxo4bJ9cQ4jb35QcrSeSJA", (err) => {
+
+    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmSmwDi3AmMm3pFbyvzmRZ3FfLtNAtYv5ie7ispER1kGUB", (err) => {
         if (err) console.log("======= crucial error ========", err);
 
         ipfs.swarm.peers({}, function(err, peers) {

@@ -1,36 +1,16 @@
 [
 	{
-		"constant": false,
-		"inputs": [
+		"constant": true,
+		"inputs": [],
+		"name": "zap",
+		"outputs": [
 			{
-				"name": "group",
-				"type": "bytes32"
-			},
-			{
-				"name": "provider_address",
+				"name": "",
 				"type": "address"
-			},
-			{
-				"name": "public_key",
-				"type": "uint256"
-			},
-			{
-				"name": "encrypted_uuid",
-				"type": "bytes32"
-			},
-			{
-				"name": "nonce",
-				"type": "bytes32"
-			},
-			{
-				"name": "payment",
-				"type": "uint256"
 			}
 		],
-		"name": "initZapDataFeed",
-		"outputs": [],
-		"payable": true,
-		"stateMutability": "payable",
+		"payable": false,
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -58,111 +38,6 @@
 	},
 	{
 		"constant": true,
-		"inputs": [],
-		"name": "syn",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "group",
-				"type": "bytes32"
-			},
-			{
-				"name": "index",
-				"type": "uint256"
-			}
-		],
-		"name": "getProviderRate",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "withdraw",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "group",
-				"type": "bytes32"
-			}
-		],
-		"name": "requestZapProvider",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "group",
-				"type": "bytes32"
-			},
-			{
-				"name": "provider_address",
-				"type": "address"
-			}
-		],
-		"name": "endZapSubscription_Subscriber",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "group",
-				"type": "bytes32"
-			},
-			{
-				"name": "public_key",
-				"type": "uint256"
-			},
-			{
-				"name": "wei_rate",
-				"type": "uint256"
-			}
-		],
-		"name": "registerZapProvider",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
 		"inputs": [
 			{
 				"name": "group",
@@ -185,32 +60,18 @@
 		"type": "function"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [
 			{
 				"name": "group",
 				"type": "bytes32"
 			},
 			{
-				"name": "subscriber_address",
-				"type": "address"
+				"name": "index",
+				"type": "uint256"
 			}
 		],
-		"name": "endZapSubscription_Provider",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "group",
-				"type": "bytes32"
-			}
-		],
-		"name": "getProviderCount",
+		"name": "getProviderRate",
 		"outputs": [
 			{
 				"name": "",
@@ -245,27 +106,87 @@
 		"type": "function"
 	},
 	{
+		"constant": true,
 		"inputs": [
 			{
-				"name": "token",
-				"type": "address"
+				"name": "group",
+				"type": "bytes32"
+			}
+		],
+		"name": "getProviderCount",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "group",
+				"type": "bytes32"
+			},
+			{
+				"name": "provider_address",
+				"type": "address"
+			}
+		],
+		"name": "endZapSubscription_Subscriber",
+		"outputs": [],
+		"payable": false,
 		"stateMutability": "nonpayable",
-		"type": "constructor"
+		"type": "function"
 	},
 	{
 		"anonymous": false,
 		"inputs": [
 			{
 				"indexed": false,
-				"name": "index",
+				"name": "sender",
+				"type": "address"
+			}
+		],
+		"name": "TransferFailed",
+		"type": "event"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "group",
+				"type": "bytes32"
+			},
+			{
+				"name": "provider_address",
+				"type": "address"
+			},
+			{
+				"name": "public_key",
+				"type": "uint256"
+			},
+			{
+				"name": "encrypted_uuid",
+				"type": "bytes32"
+			},
+			{
+				"name": "nonce",
+				"type": "bytes32"
+			},
+			{
+				"name": "payment",
 				"type": "uint256"
 			}
 		],
-		"name": "ZapProviderFound",
-		"type": "event"
+		"name": "initZapDataFeed",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -331,11 +252,90 @@
 		"inputs": [
 			{
 				"indexed": false,
-				"name": "sender",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "ZapProviderFound",
+		"type": "event"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "group",
+				"type": "bytes32"
+			},
+			{
+				"name": "subscriber_address",
 				"type": "address"
 			}
 		],
-		"name": "TransferFailed",
-		"type": "event"
+		"name": "endZapSubscription_Provider",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "group",
+				"type": "bytes32"
+			},
+			{
+				"name": "public_key",
+				"type": "uint256"
+			},
+			{
+				"name": "wei_rate",
+				"type": "uint256"
+			}
+		],
+		"name": "registerZapProvider",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "group",
+				"type": "bytes32"
+			}
+		],
+		"name": "requestZapProvider",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"name": "token",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "withdraw",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ]
