@@ -121,7 +121,9 @@ module.exports = {
                         callback(err);
                         return;
                     }
-
+                    console.log(btcdata);
+                    console.log(usddata);
+                    
                     callback(null, btcdata * usddata);
                 });
             });
