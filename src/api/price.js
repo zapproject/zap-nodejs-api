@@ -88,7 +88,7 @@ function getZAPBTCAverage(callback) {
             
             callback(null, weighted_avg);
             
-            const p = require('./price'); p.price('USD', (a, b) => console.log(b.toFixed(2), "USD"));
+     
         });
     });
 }
