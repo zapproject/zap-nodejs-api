@@ -70,16 +70,25 @@ function getZAPBTCAverage(callback) {
 
             // Get total volume
             const total = cryptopia.volume + hitbtc.volume;
-
+            console.log(total);
+            
             // Get individual percentages for markets
             const cryptopia_percentage = cryptopia.volume / total;
+            console.log(cryptopia_percentage);
+            
             const hitbtc_percentage = hitbtc.volume / total;
-
+            console.log(hitbtc_percentage);
+            
             // Get weighted average
             const weighted_avg = (cryptopia.price * cryptopia_percentage) +
                                  (hitbtc.price * hitbtc_percentage);
-
+            
+            console.log((cryptopia.price * cryptopia_percentage));
+            console.log((hitbtc.price * hitbtc_percentage));
+            
             callback(null, weighted_avg);
+            
+            const p = require('./price'); p.price('USD', (a, b) => console.log(b.toFixed(2), "USD"));
         });
     });
 }
