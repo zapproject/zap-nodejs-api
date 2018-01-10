@@ -83,6 +83,9 @@ function getZAPBTCAverage(callback) {
             const weighted_avg = (cryptopia.price * cryptopia_percentage) +
                                  (hitbtc.price * hitbtc_percentage);
             
+            console.log("btc price of cryptopia" +(cryptopia.price));
+            console.log("btc price of hitbtc" +(hitbtc.price));       
+            
             console.log("btc price of cryptopia" +(cryptopia.price * cryptopia_percentage));
             console.log("btc price of hitbtc" +(hitbtc.price * hitbtc_percentage));
             
