@@ -35,8 +35,8 @@ function getCryptopiaData(callback) {
         }
 
         callback(null, {
-            price: data.Data.LastPrice,
-            volume: data.Data.Volume
+            price: +data.Data.LastPrice,
+            volume: +data.Data.Volume
         });
     });
 }
@@ -49,8 +49,8 @@ function getHitBTCData(callback) {
         }
 
         callback(null, {
-            price: data.last,
-            volume: data.volume
+            price: +data.last,
+            volume: +data.volume
         });
     });
 }
