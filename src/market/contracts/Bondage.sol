@@ -1,3 +1,5 @@
+pragma solidity ^0.4.14;
+
 contract ERC20Basic {
     uint256 public totalSupply;
     function balanceOf(address who) public constant returns (uint256);
@@ -15,209 +17,326 @@ contract ERC20 is ERC20Basic {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract Bondage{
-    
-    struct Holder{
-        address _address;//holder address
-        mapping(address => Bond) bonds;//oracle address to bond
-        address[] oracleList;//for traversing
-    }
-    
-    struct Bond{
-        uint numZap;
-        address oracle;
-    }
-    
-    //todo check total bond >= balanceOf
-    struct Oracle{
-        uint startRate;
-        uint totalBond;
-        uint priceCurve;
-        address _address;
-        string title;
-    }
-    
-    mapping(address => Holder) holders;
-    mapping(address => Oracle) oracles;
-    
-    address[] holderList;
-    address[] oracleList;
-    
-    
-    ERC20 token; 
-    uint public decimals = 10**18; 
-    
-    function Bondage(address tokenAddress){
-        token = ERC20(tokenAddress);
-    }
-    
-    event ShowBond(uint numZap, address oracle, uint totalBond, uint priceCurve, string title);
-    event ShowOracle(uint startRate, address _address, uint totalBond, uint priceCurve, string title);
-    
-/*
-TODO actually move zap
-"0xca35b7d915458ef540ade6068dfe2f44e8fa733c",1,"0xCF323e741a82fB8eb37B3B260A9C4907237A532A"
-"0x583031d1113ad414f02576bd6afabfb302140225",2"0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db"
-*/
-event StepThrough(uint step, string desc);
+pragma solidity ^0.4.14;
 
-    
-    function addBond(address holderAddress, uint _numZap, address _oracleAddress){
-StepThrough(0, toString(holders[holderAddress]._address));
-    
-    //not enough zap
-    if(_numZap < oracles[_oracleAddress].startRate || token.balanceOf(msg.sender) < (_numZap*decimals )){
-        throw;
-    }
-    //if transfer fails throw. prob because bondage contract not approved to move numZap
-    if(!token.transferFrom(msg.sender, this, _numZap)){
-        throw;
+contract Registry {
+    struct ZapOracle {
+        uint256 public_key;                  // Public key of the user
+        uint256[] route_keys;                // IPFS routing/other
+        string title;                        // Tags (csv)
+        mapping(bytes32 => ZapCurve) curves; // Price vs Supply (contract endpoint)
+   }
+
+    enum ZapCurveType {
+        ZapCurveNone,
+        ZapCurveLinear,
+        ZapCurveExponential,
+        ZapCurveLogarithmic
     }
 
-    if(holders[holderAddress]._address == 0){
-StepThrough(0,"new holder");
-            //new holder
-            addHolder(holderAddress, _numZap, _oracleAddress);
-        }
-        else{
-StepThrough(1,"old holder");
-            if(holders[holderAddress].bonds[_oracleAddress].numZap == 0){
-StepThrough(2,"first bond to oracle address");
-                //first bond to oracleAddress
-                holders[holderAddress].bonds[_oracleAddress] =  Bond(_numZap, _oracleAddress);
-                holders[holderAddress].oracleList.push(_oracleAddress);
-            }
-            else{
-StepThrough(3,"increment holder");
-                holders[holderAddress].bonds[_oracleAddress].numZap += _numZap;//change to zap
-            }
-        }
-        oracles[_oracleAddress].totalBond += _numZap;
-        
-    }
-    
-    function unbond(uint numDots, address _oracleAddress){
-        redeemBond(msg.sender, numDots, _oracleAddress);
-    }
-    
-    function redeemBond(address holderAddress, uint numDots, address _oracleAddress){
-
-        uint currentDots = getDots(holderAddress, _oracleAddress);//zap per dot
-        uint zap = 0;
-        if( currentDots >= numDots){
-            for(uint i=0; i<numDots; i++){
-              //uint rate = getRate(oracles[_oracleAddress].totalBond, oracles[_oracleAddress].priceCurve);
-              zap += updateCostOfToken(oracles[_oracleAddress].totalBond, oracles[_oracleAddress].startRate);
-              oracles[_oracleAddress].totalBond -= 1;
-              holders[holderAddress].bonds[_oracleAddress].numZap -=1;
-            }
-            token.transfer(holderAddress, zap);
-        }
+    struct ZapCurve {
+        ZapCurveType curveType;
+        uint256 curveStart;
+        uint256 curveMultiplier;
     }
 
-    function getDots(address holderAddress, address _oracleAddress) returns(uint dots){
-        StepThrough(oracles[_oracleAddress].totalBond, "oracle.totalBond");
-        StepThrough(oracles[_oracleAddress].startRate, "oracle.startRate");
-        uint cost = updateCostOfToken(oracles[_oracleAddress].totalBond, oracles[_oracleAddress].startRate);//zap per dot
-        
-        return holders[holderAddress].bonds[_oracleAddress].numZap / cost;
-    }
-    
-    function addHolder(address _address, uint _numZap, address _oracleAddress){
-        //StepThrough(0,"add holder");
-        if(holders[_address].bonds[_oracleAddress].numZap == 0){
-        //new holder
-            address[] oracleList;
-            holders[_address] = Holder(_address,oracleList);
-            holders[_address].bonds[_oracleAddress] = Bond(_numZap, _oracleAddress);
-            holders[_address].oracleList.push(_oracleAddress);
-            holderList.push(_address);//change to msg.sender
-        }
-        //holder exists 
-    }
-    
-/*
-1, 2,341234,"0xCF323e741a82fB8eb37B3B260A9C4907237A532A","PoliticalAction"
-5, 2,141234,"0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db","SportsNow"
-*/
-    function addOracle(uint _startRate, uint _totalBond, uint _priceCurve, address _address, string _title){
-        oracles[_address] = Oracle(_startRate, _totalBond, _priceCurve, _address, _title);        
-        oracleList.push(_address);
-    }
-    
-    function getNumBonds(address _address) returns (uint _length) {
-//        StepThrough(holders[_address].oracleList.length, 'length of oracleList');
-        return holders[_address].oracleList.length;
-    }
-    
-    function getNumBondsUser() returns(uint _length){
-        return getNumBonds(msg.sender);
-    }
-    
-    function getUserBondByIndex(uint index){
-        getBondByIndex(msg.sender, index);
-    }
-    
-    function getBondByIndex(address holderAddress, uint index){
-        address oracleAddress= holders[holderAddress].oracleList[index];
-        Bond bond = holders[holderAddress].bonds[oracleAddress];
-        Oracle oracle = oracles[bond.oracle];
-        ShowBond(bond.numZap, bond.oracle, oracle.totalBond, oracle.priceCurve, oracle.title);
-    }
-     
-    function getOracle(address _address){
-        Oracle oracle = oracles[_address];
-        ShowOracle(oracle.startRate, oracle._address, oracle.totalBond, oracle.priceCurve, oracle.title);
-    }
-    
-    function getBondByOracleAddress(address holderAddress, address oracleAddress){
-        Bond memory bond = holders[holderAddress].bonds[oracleAddress];
-        Oracle memory oracle = oracles[oracleAddress];
-        ShowBond(bond.numZap, bond.oracle, oracle.totalBond, oracle.priceCurve, oracle.title);
-    }
+    mapping(address => ZapOracle) oracles;
 
-    // via: http://ethereum.stackexchange.com/questions/10425/is-there-any-efficient-way-to-compute-the-exponentiation-of-a-fraction-and-an-in/10432#10432
-    // Computes `k * (1+1/q) ^ N`, with precision `p`. The higher
-    // the precision, the higher the gas cost. It should be
-    // something around the log of `n`. When `p == n`, the
-    // precision is absolute (sans possible integer overflows).
-    // Much smaller values are sufficient to get a great approximation.
-    function fracExp(uint k, uint q, uint n, uint p) internal returns (uint) {
-      uint s = 0;
-      uint N = 1;
-      uint B = 1;
-      for (uint i = 0; i < p; ++i){
-        s += k * N / B / (q**i);
-        N  = N * (n-i);
-        B  = B * (i+1);
-      }
-      return s;
-    }
+    function initiateProvider(uint256 public_key,
+                              uint256[] ext_info,
+                              string title)
+                              public;
 
-    function updateCostOfToken(uint256 _supply, uint256 baseCost) internal returns(uint _costPerToken) {
-        //from protocol design:
-        //costOfCoupon = (BaseCost + BaseCost*(1.000001618^AvailableSupply)+BaseCost*AvailableSupply/1000)
-        //totalSupply == AvailableSupply
-        StepThrough(baseCost, "baseCost");
-        StepThrough(_supply, "_supply");
-        uint costPerToken = baseCost+fracExp(baseCost, 618046, _supply, 2)+baseCost*_supply/1000;
-        return costPerToken;
-    }
-    
-    function toString(address x) returns (string) {
-    bytes memory b = new bytes(20);
-    for (uint i = 0; i < 20; i++)
-        b[i] = byte(uint8(uint(x) / (2**(8*(19 - i)))));
-    return string(b);
+    function initiateProviderCurve(bytes32 specifier,
+                                   ZapCurveType curveType,
+                                   uint256 curveStart,
+                                   uint256 curveMultiplier)
+                                   public;
+
+    function getProviderRouteKeys(address provider)
+                                  public
+                                  view
+                                  returns(uint256[]);
+
+    function getProviderTitle(address provider)
+                              public
+                              view
+                              returns(string);
+
+    function getProviderPublicKey(address provider)
+                                  public
+                                  view
+                                  returns(uint256);
+
+    function getProviderCurve(address provider,
+                              bytes32 specifier)
+                              view
+                              public
+                              returns (
+                                  ZapCurveType curveType,
+                                  uint256 curveStart,
+                                  uint256 curveMultiplier
+                                );
+
+    function exportProviderCurve(address provider,
+                                bytes32 specifier)
+                                public
+                                returns(
+                                    uint256 curveType,
+                                    uint256 curveStart,
+                                    uint256 curveMultiplier
+                                );
 }
 
-    function toBytes(address a) constant returns (bytes b){
-        assembly {
-            let m := mload(0x40)
-            mstore(add(m, 20), xor(0x140000000000000000000000000000000000000000, a))
-            mstore(0x40, add(m, 52))
-            b := m
+contract Bondage {
+    struct Holder {
+        mapping (bytes32 => mapping(address => uint256)) bonds;
+        mapping (address => bool) initialized;
+        address[] oracleList;//for traversing
+    }
+
+    Registry registry;
+    ERC20 token;
+    uint public decimals = 10**16; //dealing in units of 1/100 zap
+
+    address marketAddress;
+    address dispatchAddress;
+
+
+    mapping(address => Holder) holders;
+    // (holder => (oracleAddress => (specifier => numEscrow)))
+    mapping(address => mapping(address => mapping( bytes32 => uint256))) pendingEscrow;
+    // (specifier=>(oracleAddress=>numZap)
+    mapping(bytes32 => mapping(address=> uint)) public totalBound;
+
+
+    modifier operatorOnly {
+        if ( msg.sender == marketAddress || msg.sender == dispatchAddress ) {
+            _;
         }
     }
 
+    function Bondage(address tokenAddress, address registryAddress) public {
+        token = ERC20(tokenAddress);
+        registry = Registry(registryAddress);
+    }
+
+    function setMarketAddress(address _marketAddress) public {
+        if (marketAddress == 0) {
+            marketAddress = _marketAddress;
+        }
+    }
+
+    function setDispatchAddress(address _dispatchAddress) public {
+        if ( dispatchAddress == 0 ) {
+            dispatchAddress = _dispatchAddress;
+        }
+    }
+
+    // Transfer N dots from fromAddress to destAddress called only by the DisptachContract or MarketContract
+    // In smart contract endpoint, occurs per satisfied request, in socket endpoint called on termination of subscription
+    function transferDots(bytes32 specifier,
+                          address holderAddress,
+                          address oracleAddress,
+                          uint256 numDots)
+                          public operatorOnly {
+        Holder storage holder = holders[oracleAddress];
+
+        if ( numDots <= pendingEscrow[holderAddress][oracleAddress][specifier] ) {
+            pendingEscrow[holderAddress][oracleAddress][specifier] -= numDots;
+
+            if ( !holder.initialized[oracleAddress] ) {
+                // Initialize uninitialized holder
+                holder.initialized[oracleAddress] = true;
+                holder.oracleList.push(oracleAddress);
+            }
+
+            holder.bonds[specifier][oracleAddress] += numDots;
+        }
+    }
+
+    function escrowDots(bytes32 specifier,
+                        address holderAddress,
+                        address oracleAddress,
+                        uint256 numDots)
+                        public operatorOnly {
+        uint currentDots = _getDots(specifier, holderAddress, oracleAddress);
+
+        if ( currentDots >= numDots ) {
+            Holder storage holder = holders[holderAddress];
+
+            holder.bonds[specifier][oracleAddress] -= numDots;
+            pendingEscrow[holderAddress][oracleAddress][specifier] += numDots;
+        }
+    }
+
+    function redeemBond(bytes32 specifier,
+                        uint numDots,
+                        address oracleAddress)
+                        public {
+        _redeemBond(
+            specifier,
+            msg.sender,
+            numDots,
+            oracleAddress
+        );
+    }
+
+    function _redeemBond(bytes32 specifier,
+                         address holderAddress,
+                         uint numDots,
+                         address oracleAddress)
+                         internal {
+        Holder storage holder = holders[holderAddress];
+        uint256 currentDots = holder.bonds[specifier][oracleAddress];
+
+        if ( currentDots >= numDots ) {
+            uint numZap = 0;
+            uint localTotal = totalBound[specifier][oracleAddress];
+
+            for ( uint i = 0; i < numDots; i++ ) {
+                totalBound[specifier][oracleAddress] -= 1;
+                holder.bonds[specifier][oracleAddress] -= 1;
+
+                numZap += currentCostOfDot(
+                    oracleAddress,
+                    specifier,
+                    localTotal
+                );
+
+                localTotal -= 1;
+            }
+
+            token.transfer(holderAddress, numZap*decimals);
+        }
+    }
+
+    function bond(bytes32 specifier,
+                  uint numZap,
+                  address oracleAddress)
+                  public {
+        _bond(specifier, msg.sender, numZap, oracleAddress);
+    }
+
+    function _bond(bytes32 specifier,
+                   address holderAddress,
+                   uint numZap,
+                   address oracleAddress)
+                   internal {
+        Holder storage holder = holders[holderAddress];
+
+        if ( !holder.initialized[oracleAddress] ) {
+            // Initialize uninitialized holder
+            holder.initialized[oracleAddress] = true;
+            holder.oracleList.push(oracleAddress);
+        }
+
+        uint numDots;
+        (numZap, numDots) = calcZap(oracleAddress, specifier, numZap);
+
+        // Move zap user must have approved contract to transfer workingZap
+        if ( !token.transferFrom(msg.sender, this, numZap * decimals) ) {
+            revert();
+        }
+
+        holder.bonds[specifier][oracleAddress] += numDots;
+        totalBound[specifier][oracleAddress] += numZap;
+    }
+
+    function calcZap(address oracleAddress,
+                     bytes32 specifier,
+                     uint256 numZap)
+                     public
+                     returns(uint256 _numZap, uint256 _numDots) {
+        uint infinity = 10;
+        uint dotCost = 0;
+
+        for ( uint numDots = 0; numDots < infinity; numDots++ ) {
+            dotCost = currentCostOfDot(
+                oracleAddress,
+                specifier,
+                (totalBound[specifier][oracleAddress] + numDots)
+            );
+
+            if ( numZap > dotCost ) {
+                numZap -= dotCost;
+            }
+            else {
+                return (numZap, numDots);
+            }
+        }
+    }
+
+    function currentCostOfDot(address oracleAddress,
+                              bytes32 specifier,
+                              uint _totalBound)
+                              internal returns(uint _cost) {
+        var (curveTypeIndex, curveStart, curveMultiplier) = registry.exportProviderCurve(oracleAddress, specifier);
+        Registry.ZapCurveType curveType = Registry.ZapCurveType(curveTypeIndex);
+
+        uint cost = 0;
+
+        if ( curveType == Registry.ZapCurveType.ZapCurveLinear ) {
+            cost = curveMultiplier * _totalBound + curveStart;
+        }
+        else if ( curveType == Registry.ZapCurveType.ZapCurveExponential ) {
+
+            cost = curveMultiplier * (_totalBound ** 2) + curveStart;
+        }
+        else if ( curveType == Registry.ZapCurveType.ZapCurveLogarithmic ) {
+            if ( _totalBound == 0 ) {
+                _totalBound = 1;
+            }
+
+            cost = curveMultiplier * fastlog2(_totalBound) + curveStart;
+        }
+
+        return cost;
+    }
+
+
+    function getDots(bytes32 specifier,
+                     address oracleAddress)
+                     public view returns(uint dots) {
+        return _getDots(specifier, msg.sender, oracleAddress);
+    }
+
+    function _getDots(bytes32 specifier,
+                      address holderAddress,
+                      address oracleAddress)
+                      internal view returns(uint dots) {
+        return holders[holderAddress].bonds[specifier][oracleAddress];
+    }
+
+    // SPECTIAL CURVES
+    function fastlog2(uint x) public pure returns (uint y) {
+       assembly {
+            let arg := x
+            x := sub(x,1)
+            x := or(x, div(x, 0x02))
+            x := or(x, div(x, 0x04))
+            x := or(x, div(x, 0x10))
+            x := or(x, div(x, 0x100))
+            x := or(x, div(x, 0x10000))
+            x := or(x, div(x, 0x100000000))
+            x := or(x, div(x, 0x10000000000000000))
+            x := or(x, div(x, 0x100000000000000000000000000000000))
+            x := add(x, 1)
+            let m := mload(0x40)
+            mstore(m,           0xf8f9cbfae6cc78fbefe7cdc3a1793dfcf4f0e8bbd8cec470b6a28a7a5a3e1efd)
+            mstore(add(m,0x20), 0xf5ecf1b3e9debc68e1d9cfabc5997135bfb7a7a3938b7b606b5b4b3f2f1f0ffe)
+            mstore(add(m,0x40), 0xf6e4ed9ff2d6b458eadcdf97bd91692de2d4da8fd2d0ac50c6ae9a8272523616)
+            mstore(add(m,0x60), 0xc8c0b887b0a8a4489c948c7f847c6125746c645c544c444038302820181008ff)
+            mstore(add(m,0x80), 0xf7cae577eec2a03cf3bad76fb589591debb2dd67e0aa9834bea6925f6a4a2e0e)
+            mstore(add(m,0xa0), 0xe39ed557db96902cd38ed14fad815115c786af479b7e83247363534337271707)
+            mstore(add(m,0xc0), 0xc976c13bb96e881cb166a933a55e490d9d56952b8d4e801485467d2362422606)
+            mstore(add(m,0xe0), 0x753a6d1b65325d0c552a4d1345224105391a310b29122104190a110309020100)
+            mstore(0x40, add(m, 0x100))
+            let magic := 0x818283848586878898a8b8c8d8e8f929395969799a9b9d9e9faaeb6bedeeff
+            let shift := 0x100000000000000000000000000000000000000000000000000000000000000
+            let a := div(mul(x, magic), shift)
+            y := div(mload(add(m,sub(255,a))), shift)
+            y := add(y, mul(256, gt(arg, 0x8000000000000000000000000000000000000000000000000000000000000000)))
+        }
+    }
 }

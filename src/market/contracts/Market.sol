@@ -1,6 +1,6 @@
 pragma solidity ^0.4.14;
 
-     contract SynToken{
+     contract ZapToken{
          // Get the total token supply
          function totalSupply() constant returns (uint256 totalSupply);
       
@@ -31,10 +31,10 @@ pragma solidity ^0.4.14;
 
 
 
-// Contract representing the Synase market place
+// Contract representing the Zapase market place
 contract ZapMarket {
     address adminAddress;
-    SynToken public syn;
+    ZapToken public zap;
     
     enum ZapDataTypes {
         ZapDataHistory, // Historical data
@@ -105,7 +105,7 @@ contract ZapMarket {
 
     function ZapMarket(address token) {
         adminAddress = msg.sender;
-        syn = SynToken(token);
+        zap = ZapToken(token);
     }
 
     // When a provider asks to be registered, register them.
@@ -163,8 +163,8 @@ contract ZapMarket {
         // Make sure hes not trying to do more than one subscription at a time
         require( provider.subscriptions[msg.sender].amount == 0 );
 
-        //Make sure syn balance > 0
-        require( syn.balanceOf(msg.sender) >= payment );
+        //Make sure zap balance > 0
+        require( zap.balanceOf(msg.sender) >= payment );
 
         // Calculate amount of blocks based on amount sent, rounding down
         uint256 blockcount = payment / provider.wei_rate;
@@ -173,9 +173,9 @@ contract ZapMarket {
         require(blockcount > 0);
         
         //approve market to transfer
-        syn.approve(this, payment);
+        zap.approve(this, payment);
         
-        if(!syn.transferFrom(msg.sender, this, payment)){
+        if(!zap.transferFrom(msg.sender, this, payment)){
             // Emit the event
             TransferFailed(msg.sender);
             throw;
@@ -264,10 +264,10 @@ contract ZapMarket {
         availablePayouts[msg.sender] = 0;
         
         //approve market to transfer
-        syn.approve(this, amount);
+        zap.approve(this, amount);
         
         // Send the funds to his wallet
-        if ( !syn.transferFrom(this, msg.sender, amount) ) {
+        if ( !zap.transferFrom(this, msg.sender, amount) ) {
             // Give him back the funds if it fails to send
             availablePayouts[msg.sender] += amount;
             TransferFailed(msg.sender);

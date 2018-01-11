@@ -3,42 +3,50 @@ const crypto = require('crypto');
 const fs = require('fs');
 const Web3 = require('web3');
 const SharedCrypto = require('./sharedcrypto.js');
-const ZapSubscription = require('./subscription1.js');
+const SynapseSubscription = require('./subscriptionSubscriber.js');
 const ConfigStorage = require('./configstorage.js');
 
 // Market contract
-const file = __dirname + "/../market/contracts/abi.json";
+const file = __dirname + "/../market/contracts/abi.json"; // __dirname + "/../market/contracts/market.abi.json";
 const abi = JSON.parse(fs.readFileSync(file));
-const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";
+const marketAddress = "0x732a5496383DE6A55AE2Acc8829BE7eCE0833113";//"0x98ad8ab2d7c3fa27ef58a16213a63be5ca2d68f1";
 
 // Create a sending RPC
-const rpcHost = "https://rinkeby.infura.io";
+const setRPCAddress = fs.existsSync(__dirname + "/NodeConfig/.rpcAddress") ? JSON.parse(fs.readFileSync(__dirname + "/NodeConfig/.rpcAddress")).RPC : null;
+const rpcHost = setRPCAddress || "https://rinkeby.infura.io";
 const web3 = new Web3(new Web3.providers.HttpProvider(rpcHost));
-const ZapMarket = new web3.eth.Contract(abi, marketAddress);
+const SynapseMarket = new web3.eth.Contract(abi, marketAddress);
 
 // Create a listening RPC
-const rpcHost_listen = "ws://dendritic.network:8546";
+
+const setWSAddress = fs.existsSync(__dirname + "/NodeConfig/.wsAddress")?JSON.parse(fs.readFileSync(__dirname + "/NodeConfig/.wsAddress")).WS : null;
+const rpcHost_listen = setWSAddress || "ws://dendritic.network:8546";
 const web3_listen = new Web3(Web3.givenProvider || rpcHost_listen);
-const ZapMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
+const SynapseMarket_listen = new web3_listen.eth.Contract(abi, marketAddress);
 
 // Accounts
-//const privateKeyHex = "0x1b851e482a6d0bad7fb0a958741ecf4fcd6b1f44cb39f9f625705fd0cc4e0382";
 
 if (ConfigStorage.exists(__dirname + "/.currentAccount")) {
     console.log("Loading configuration from", "currentAccount");
 
     const data = JSON.parse(ConfigStorage.load(__dirname + "/.currentAccount"));
-    const privateKeyHex = data.privateKey
+    const privateKeyHex = data.privateKey;
     const account = new accounts(privateKeyHex);
 
+    account.setWeb3(web3);
+    console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
+} else {
+    const privateKeyHex = "0x1b851e482a6d0bad7fb0a958741ecf4fcd6b1f44cb39f9f625705fd0cc4e0382"; //test account with ethers
+    const account = new accounts(privateKeyHex);
     account.setWeb3(web3);
     console.log("wallet Address ", web3.eth.accounts.wallet[0].address);
 }
 
 
-class ZapSubscriber {
+
+class SynapseSubscriber {
     constructor(marketAddress, args, callback = undefined) {
-        this.marketInstance = ZapMarket;
+        this.marketInstance = SynapseMarket;
         this.checkForRegister(args, callback);
     }
 
@@ -60,9 +68,8 @@ class ZapSubscriber {
 
                 // Load the subscriptions into internal objects
                 this.subscriptions = data.subscriptions.map(data => {
-                    const obj = ZapSubscription.fromObject(data);
-                    console.log("exxxxxists")
-                        // If a callback was passed, initiate the stream with that
+                    const obj = SynapseSubscription.fromObject(data);
+                    // If a callback was passed, initiate the stream with that
                     if (callback) {
                         obj.data(callback);
                     }
@@ -77,7 +84,7 @@ class ZapSubscriber {
 
             console.log("Successfully registered");
             console.log("public key", this.keypair.getPublic());
-            const public_key = this.keypair.getPublic()
+            const public_key = this.keypair.getPublic();
             console.log("private key", this.keypair.getPrivate());
 
             fs.writeFileSync(__dirname + "/.0x" + public_key, JSON.stringify({
@@ -97,8 +104,9 @@ class ZapSubscriber {
 
         console.log("Looking for a provider of data");
 
+        console.log('Group ',group);
         // Send the request
-        this.marketInstance.methods.requestZapProvider(group).send({
+        this.marketInstance.methods.requestSynapseProvider(group).send({
             from: web3.eth.accounts.wallet[0].address,
             gas: 4700000 // TODO - not this
         }, (err, result) => {
@@ -108,8 +116,8 @@ class ZapSubscriber {
 
             console.log("Sent the request", result);
 
-            // Watch for ZapProviderFound events
-            const event = ZapMarket_listen.events.ZapProviderFound('latest', (error, found_res) => {
+            // Watch for SynapseProviderFound events
+            SynapseMarket_listen.events.SynapseProviderFound('latest', (error, found_res) => {
                 if (error) {
                     throw error;
                 }
@@ -141,13 +149,23 @@ class ZapSubscriber {
         }
 
         // Get the information of the provider
-
+        console.log('ARGS');
+        console.log(group);
+        console.log(provider_index);
         let provAddrProm = this.marketInstance.methods.getProviderAddress(group, provider_index).call().then();
         let provPublicProm = this.marketInstance.methods.getProviderPublic(group, provider_index).call().then();
+        
         return Promise.all([provAddrProm, provPublicProm]).then(res => {
             console.log(res);
             let providers_address = res[0];
             let providers_public = res[1];
+
+            console.log(providers_address);    
+            console.log(providers_public);    
+    // [
+    //   '554495745091888425658556056825151363130374150225',
+    //   '76007458926572850084310953486562492362119904803484136574312363505476'
+    // ]
 
             providers_address = providers_address.slice(0, 2) + providers_address.substr(-40);
             let provider_public_hex = providers_public.substr(2, 58);
@@ -192,7 +210,7 @@ class ZapSubscriber {
             }
 
             // Hexify the euuid
-            console.log()
+            console.log();
             const euuid_hex = "0x" + new Buffer(euuid, 'ascii').toString('hex');
             console.log(euuid_hex);
 
@@ -205,7 +223,7 @@ class ZapSubscriber {
             console.log("Initiating data feed...");
 
             // Initiate the data feed
-            return this.marketInstance.methods.initZapDataFeed(
+            return this.marketInstance.methods.initSynapseDataFeed(
                 group,
                 providers_address,
                 public_key,
@@ -216,12 +234,12 @@ class ZapSubscriber {
                 from: web3.eth.accounts.wallet[0].address,
                 gas: 4700000 // TODO - not this
             }).once('transactionHash', (transactionHash) => {
-                //ZapMarket_listen.events.allEvents({}, function (error, log) {
+                //SynapseMarket_listen.events.allEvents({}, function (error, log) {
                 //    if (!error)
                 //        console.log(875685,log);
                 //});
 
-                //console.log(3,transactionHash) 
+                //console.log(3,transactionHash)
 
             }).on("error", (error) => {
                 console.log(37776, error);
@@ -230,11 +248,11 @@ class ZapSubscriber {
 
                 // Create the subscription object
                 // address, secret, nonce, endblock, uuid
-                const subscription = new ZapSubscription(providers_address, secret, nonce, -1, uuid);
+                const subscription = new SynapseSubscription(providers_address, secret, nonce, -1, uuid);
                 subscription.data(callback);
                 this.subscriptions.push(subscription);
-                this.save()
-            })
+                this.save();
+            });
 
         });
     }
@@ -247,4 +265,4 @@ class ZapSubscriber {
     }
 }
 
-module.exports = ZapSubscriber;
+module.exports = SynapseSubscriber;

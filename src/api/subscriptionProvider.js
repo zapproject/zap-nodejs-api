@@ -31,16 +31,17 @@ const ipfs = new IPFS({
     }
 });
 
-ipfs.on("ready",()=>{
-    console.log('ipfs node is ready')
-    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmT9xvwLVR1GbHKj83YWcrZnrxo4bJ9cQ4jb35QcrSeSJA", (err) => {
-        if (err) console.log("======= crucial error ========",err);
+ipfs.on("ready", () => {
+    console.log('ipfs node is ready');
 
-        ipfs.swarm.peers({}, function (err, peers) {
-            console.log("peers", peers)
-        })
-    })
-})
+    ipfs.swarm.connect("/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmSmwDi3AmMm3pFbyvzmRZ3FfLtNAtYv5ie7ispER1kGUB", (err) => {
+        if (err) console.log("======= crucial error ========", err);
+
+        ipfs.swarm.peers({}, function(err, peers) {
+            console.log("peers", peers);
+        });
+    });
+});
 
 class ZapSubscription {
     constructor(address, secret, nonce, endblock, uuid) {
@@ -69,8 +70,7 @@ class ZapSubscription {
 
         if (this.cipher) {
             pubdata = this.cipher.update(JSON.stringify(data));
-        }
-        else {
+        } else {
             pubdata = Buffer.from(JSON.stringify(data));
         }
 

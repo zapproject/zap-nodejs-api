@@ -1,6 +1,3 @@
-Experimental early-alpha
-Some modules contained have not been integrated or adequately documented
-
 first do
 ```
 npm install
@@ -28,11 +25,11 @@ filename starting with '.' will be generated in the directory src/api.
 
 
 ```
-zapcli new -p 'group name' 'wei rate'
+zapcli new -p 'group name' 'wei rate' 'callback file name'
 ```
 Example:
 ```
-zapcli new -p abc 1
+zapcli new -p abc 1 testCallback
 ```
 To load provider use
 ```
@@ -48,6 +45,7 @@ and paste the address inside this snippet to subscription1.js where you provide 
 
 2 - Open another terminal window
 
+
 ```
 zapcli new -s 'group_name'
 ```
@@ -60,27 +58,30 @@ To load subscriber
 ```
 zapcli load -s filename
 ```
-### Create Account
 
-Open another terminal and go to the directory "/src/api" and type the following command
+### Set RPC HOST 
+```
+zapcli set --rpc 'rpc host'
+```
+Example:
 
 ```
-node newAccount.js
-```
-The above command will create a new account and ask for password to encrypt the private key of account created. The resulting ciphered text will be stored in file currently named '.account'
-
-
-
-### Load Account
-It will load the account from file '.account' which we created in the last step and ask for password. It will be later converted to load account from file that we provide it as argument.
-```
-node loadAccount.js
+zapcli set --rpc https://rinkeby.infura.io
 ```
 
-
+### Set WS HOST 
+```
+zapcli set --ws 'ws host'
+```
+Example:
+```
+zapcli set --ws ws://dendritic.network:8546
+```
 ### Security and Liability
 
 All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 ### License
+
 This code is released under GPL v.3.
+
