@@ -11,9 +11,9 @@ class ZapRegistry {
 
         // Load the Registry address
         const addresses = fs.readFileSync("../contracts/" + network + "/address.json");
-        const address = JSON.parse(addresses)['Registry'];
 
-        this.contract = eth.contract(abi).at(address);
+        this.address = JSON.parse(addresses)['Registry'];
+        this.contract = eth.contract(abi).at(this.address);
     }
 
     // Get oracle by address

@@ -43,6 +43,35 @@ class ZapWallet {
             callback(err);
         });
     }
+
+    // Bond a certain amount of Zap
+    bond(oracle, endpoint, amount, callback) {
+        // Estimate amount of Zap being spent
+        this.bondage.estimateBond(oracle, endpoint, amount, (err, numZap, numDot) => {
+            if ( err ) {
+                callback(err);
+                return;
+            }
+
+            // Approve to the token contract the spending
+            this.token_contract.approve(this.bondage.address, numZap).then((success) => {
+                if ( !success ) {
+                    callback(new Error("Failed to approve Bondage transfer"));
+                    return;
+                }
+
+                // Do the actual bondage
+                this.bondage.bond(oracle, endpoint, amount, callback);
+            }).catch((err) => {
+                callback(err);
+            });
+        });
+    }
+
+    // Wrapper function for the unbond
+    unbond(oracle, endpoint, amount, callback) {
+        this.bondage.unbond(oracle, endpoint, amount, callback);
+    }
 }
 
 module.exports = ZapWallet;

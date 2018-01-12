@@ -36,7 +36,7 @@ registry.getOracle('0xasdfasdfa...', (err, oracle) => {
 	});
 
 	// Bond 10 ZAP to 0xasdfasf's smartcontract endpoint
-	wallet.bondage.bond(oracle, "smartcontract", 10, (err, numZap, numDot) => {
+	wallet.bond(oracle, "smartcontract", 10, (err, numZap, numDot) => {
 		if ( err ) throw err;
 
 		console.log("You received", numDot);
@@ -44,7 +44,7 @@ registry.getOracle('0xasdfasdfa...', (err, oracle) => {
 	});
 
 	// Unbond 10 ZAP to 0xasdfasf's smartcontract endpoint
-	wallet.bondage.unbond(oracle, "smartcontract", 10, (err, numZap, numDot) => {
+	wallet.unbond(oracle, "smartcontract", 10, (err, numZap, numDot) => {
 		if ( err ) throw err;
 
 		console.log("You received", numDot);
