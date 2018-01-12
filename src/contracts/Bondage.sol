@@ -77,10 +77,10 @@ contract Registry {
                                   uint256 curveStart,
                                   uint256 curveMultiplier
                                 );
-                              
+
     function exportProviderCurve(address provider,
-                                bytes32 specifier) 
-                                public 
+                                bytes32 specifier)
+                                public
                                 returns(
                                     uint256 curveType,
                                     uint256 curveStart,
@@ -88,246 +88,228 @@ contract Registry {
                                 );
 }
 
-contract Bondage{
-    
-    struct Bond{
-        uint numDots;
-        address oracle;
-    }
-
-    struct Holder{
-        address _address;
-        mapping(bytes32 => mapping(address => Bond)) bonds;
+contract Bondage {
+    struct Holder {
+        mapping (bytes32 => mapping(address => uint256)) bonds;
         mapping (address => bool) initialized;
         address[] oracleList;//for traversing
     }
-    
+
     Registry registry;
     ERC20 token;
-    uint public decimals = 10**16;//dealing in units of 1/100 zap
+    uint public decimals = 10**16; //dealing in units of 1/100 zap
 
     address marketAddress;
     address dispatchAddress;
 
 
-    mapping(address=>Holder) holders;
-    //(holder => (oracleAddress => (specifier => numEscrow)))
-    mapping(address => mapping( address => mapping( bytes32 => uint256))) pendingEscrow;
-    //(specifier=>(oracleAddress=>numZap)
-    mapping(bytes32=>mapping(address=> uint)) public totalBound;
+    mapping(address => Holder) holders;
+    // (holder => (oracleAddress => (specifier => numEscrow)))
+    mapping(address => mapping(address => mapping( bytes32 => uint256))) pendingEscrow;
+    // (specifier=>(oracleAddress=>numZap)
+    mapping(bytes32 => mapping(address=> uint)) public totalBound;
 
 
-    modifier operatorOnly { if (msg.sender == marketAddress || msg.sender == dispatchAddress) _; }
+    modifier operatorOnly {
+        if ( msg.sender == marketAddress || msg.sender == dispatchAddress ) {
+            _;
+        }
+    }
 
-    function Bondage(address tokenAddress, address registryAddress, address marketAddress){
+    function Bondage(address tokenAddress, address registryAddress) public {
         token = ERC20(tokenAddress);
         registry = Registry(registryAddress);
     }
 
-    function setMarketAddress(address _marketAddress){
-        if(marketAddress == 0){
-            marketAddress = _marketAddress;            
+    function setMarketAddress(address _marketAddress) public {
+        if (marketAddress == 0) {
+            marketAddress = _marketAddress;
         }
     }
 
-    function setDispatchAddress(address _dispatchAddress){
-        if(dispatchAddress == 0){
+    function setDispatchAddress(address _dispatchAddress) public {
+        if ( dispatchAddress == 0 ) {
             dispatchAddress = _dispatchAddress;
         }
     }
-    
+
     // Transfer N dots from fromAddress to destAddress called only by the DisptachContract or MarketContract
-    // In smart contract endpoint, occurs per satisfied request, in socket endpoint called on termination of subscription 
-    function transferDots(bytes32 specifier, address holderAddress, address oracleAddress, uint256 numDots) operatorOnly{
-        
-        if(numDots <= pendingEscrow[holderAddress][oracleAddress][specifier] ){
-            
+    // In smart contract endpoint, occurs per satisfied request, in socket endpoint called on termination of subscription
+    function transferDots(bytes32 specifier,
+                          address holderAddress,
+                          address oracleAddress,
+                          uint256 numDots)
+                          public operatorOnly {
+        Holder storage holder = holders[oracleAddress];
+
+        if ( numDots <= pendingEscrow[holderAddress][oracleAddress][specifier] ) {
             pendingEscrow[holderAddress][oracleAddress][specifier] -= numDots;
-            //if holder isnt initialized
-            if(holders[oracleAddress]._address == 0){
-                address[] oracleList;
-                holders[oracleAddress] = Holder(oracleAddress, oracleList);  
+
+            if ( !holder.initialized[oracleAddress] ) {
+                // Initialize uninitialized holder
+                holder.initialized[oracleAddress] = true;
+                holder.oracleList.push(oracleAddress);
             }
-            
-            if(!holders[oracleAddress].initialized[oracleAddress]){
-                //initialize uninitialized holder
-                holders[oracleAddress].initialized[oracleAddress] = true;
-                holders[oracleAddress].oracleList.push(oracleAddress);
-            }
-    
-            //if bond isnt initialized
-            if(holders[oracleAddress].bonds[specifier][oracleAddress].numDots == 0){
-                holders[oracleAddress].bonds[specifier][oracleAddress] = Bond(numDots, oracleAddress);
-            }
-            else{
-                holders[oracleAddress].bonds[specifier][oracleAddress].numDots += numDots;
-            }            
-        }
-    }
-    
-    function escrowDots(bytes32 specifier, address holderAddress, address oracleAddress, uint256 numDots) operatorOnly{
-        
-        uint currentDots = _getDots(specifier, holderAddress, oracleAddress);
-        if(currentDots >= numDots){
-            
-            holders[holderAddress].bonds[specifier][oracleAddress].numDots-=numDots;
-            pendingEscrow[holderAddress][oracleAddress][specifier]+=numDots;
+
+            holder.bonds[specifier][oracleAddress] += numDots;
         }
     }
 
-    function redeemBond(
-        bytes32 specifier, 
-        uint numDots, 
-        address oracleAddress){
-        
-        _redeemBond(
-            specifier, 
+    function escrowDots(bytes32 specifier,
+                        address holderAddress,
+                        address oracleAddress,
+                        uint256 numDots)
+                        public operatorOnly {
+        uint currentDots = _getDots(specifier, holderAddress, oracleAddress);
+
+        if ( currentDots >= numDots ) {
+            Holder storage holder = holders[holderAddress];
+
+            holder.bonds[specifier][oracleAddress] -= numDots;
+            pendingEscrow[holderAddress][oracleAddress][specifier] += numDots;
+        }
+    }
+
+    function unbond(bytes32 specifier,
+                    uint numDots,
+                    address oracleAddress)
+                    public {
+        _unbond(
+            specifier,
             msg.sender,
             numDots,
             oracleAddress
-        );       
+        );
     }
 
-    function _redeemBond(
-        bytes32 specifier, 
-        address holderAddress, 
-        uint numDots, 
-        address oracleAddress) {
+    function _unbond(bytes32 specifier,
+                     address holderAddress,
+                     uint numDots,
+                     address oracleAddress)
+                     internal {
+        Holder storage holder = holders[holderAddress];
+        uint256 currentDots = holder.bonds[specifier][oracleAddress];
 
-        uint currentDots = holders[holderAddress].bonds[specifier][oracleAddress].numDots;
-        
-        if( currentDots >= numDots){
-        
+        if ( currentDots >= numDots ) {
             uint numZap = 0;
             uint localTotal = totalBound[specifier][oracleAddress];
 
-            for(uint i=0; i<numDots; i++){
-        
-                totalBound[specifier][oracleAddress] -=1;
-                holders[holderAddress].bonds[specifier][oracleAddress].numDots -=1;
-                
+            for ( uint i = 0; i < numDots; i++ ) {
+                totalBound[specifier][oracleAddress] -= 1;
+                holder.bonds[specifier][oracleAddress] -= 1;
+
                 numZap += currentCostOfDot(
-                        oracleAddress,
-                        specifier,
-                        localTotal
-                    );
-                
+                    oracleAddress,
+                    specifier,
+                    localTotal
+                );
+
                 localTotal -= 1;
             }
+
             token.transfer(holderAddress, numZap*decimals);
         }
     }
 
-    function bond(
-        bytes32 specifier, 
-        uint numZap, 
-        address oracleAddress){
-        _bond(specifier, msg.sender, numZap, oracleAddress);        
+    function bond(bytes32 specifier,
+                  uint numZap,
+                  address oracleAddress)
+                  public {
+        _bond(specifier, msg.sender, numZap, oracleAddress);
     }
 
-    function _bond(
-        bytes32 specifier, 
-        address holderAddress, 
-        uint numZap, 
-        address oracleAddress){
+    function _bond(bytes32 specifier,
+                   address holderAddress,
+                   uint numZap,
+                   address oracleAddress)
+                   internal {
+        Holder storage holder = holders[holderAddress];
 
-        if(holders[holderAddress]._address == 0){
-            //initialize uninitialized holder
-            address[] oracleList;
-            holders[holderAddress] = Holder(holderAddress, oracleList);
+        if ( !holder.initialized[oracleAddress] ) {
+            // Initialize uninitialized holder
+            holder.initialized[oracleAddress] = true;
+            holder.oracleList.push(oracleAddress);
         }
-    
-        if(!holders[holderAddress].initialized[oracleAddress]){
-            //initialize uninitialized holder
-            holders[holderAddress].initialized[oracleAddress] = true;
-            holders[holderAddress].oracleList.push(oracleAddress);
-        }
-        
+
         uint numDots;
         (numZap, numDots) = calcZap(oracleAddress, specifier, numZap);
 
-        //move zap user must have approved contract to transfer workingZap
-        if(!token.transferFrom(msg.sender, this, numZap*decimals)){
-            throw;
+        // Move zap user must have approved contract to transfer workingZap
+        if ( !token.transferFrom(msg.sender, this, numZap * decimals) ) {
+            revert();
         }
 
-        if(holders[holderAddress].bonds[specifier][oracleAddress].numDots == 0){
-            //new bond
-            holders[holderAddress].bonds[specifier][oracleAddress] = Bond(numDots, oracleAddress);
-        }
-        else{
-            //increment bond                
-            holders[holderAddress].bonds[specifier][oracleAddress].numDots += numDots;//change to zap
-        }
+        holder.bonds[specifier][oracleAddress] += numDots;
         totalBound[specifier][oracleAddress] += numZap;
     }
-  
-    function calcZap(address oracleAddress, bytes32 specifier, uint256 numZap) returns(uint256 _numZap, uint256 _numDots){
-        
-        uint infinity=10;
+
+    function calcZap(address oracleAddress,
+                     bytes32 specifier,
+                     uint256 numZap)
+                     public
+                     returns(uint256 _numZap, uint256 _numDots) {
+        uint infinity = 10;
         uint dotCost = 0;
-        
-        for(uint numDots=0; numDots < infinity; numDots++){
-        
+
+        for ( uint numDots = 0; numDots < infinity; numDots++ ) {
             dotCost = currentCostOfDot(
-                oracleAddress, 
+                oracleAddress,
                 specifier,
                 (totalBound[specifier][oracleAddress] + numDots)
             );
 
-            if(numZap > dotCost){
-                numZap -= dotCost;           
+            if ( numZap > dotCost ) {
+                numZap -= dotCost;
             }
-            else{
-                return(numZap, numDots);                
+            else {
+                return (numZap, numDots);
             }
         }
     }
-  
-    function currentCostOfDot(
-        address oracleAddress, 
-        bytes32 specifier,
-        uint totalBound) 
-        internal returns(uint _cost){
-        
+
+    function currentCostOfDot(address oracleAddress,
+                              bytes32 specifier,
+                              uint _totalBound)
+                              internal returns(uint _cost) {
         var (curveTypeIndex, curveStart, curveMultiplier) = registry.exportProviderCurve(oracleAddress, specifier);
-        Registry.ZapCurveType curveType= Registry.ZapCurveType(curveTypeIndex);
-        Registry.ZapCurve memory curve = Registry.ZapCurve(curveType, curveStart, curveMultiplier);        
-        
-        uint cost;
-        if(curveType == Registry.ZapCurveType.ZapCurveNone){
-            cost = 0;
+        Registry.ZapCurveType curveType = Registry.ZapCurveType(curveTypeIndex);
+
+        uint cost = 0;
+
+        if ( curveType == Registry.ZapCurveType.ZapCurveLinear ) {
+            cost = curveMultiplier * _totalBound + curveStart;
         }
-        else if(curveType == Registry.ZapCurveType.ZapCurveLinear){
-        
-            cost = curveMultiplier * totalBound + curveStart;
+        else if ( curveType == Registry.ZapCurveType.ZapCurveExponential ) {
+
+            cost = curveMultiplier * (_totalBound ** 2) + curveStart;
         }
-        else if(curveType == Registry.ZapCurveType.ZapCurveExponential){
-        
-            cost = curveMultiplier* totalBound**2 + curveStart;            
+        else if ( curveType == Registry.ZapCurveType.ZapCurveLogarithmic ) {
+            if ( _totalBound == 0 ) {
+                _totalBound = 1;
+            }
+
+            cost = curveMultiplier * fastlog2(_totalBound) + curveStart;
         }
-        else if(curveType == Registry.ZapCurveType.ZapCurveLogarithmic){
-        
-            if(totalBound == 0) totalBound=1;
-            cost = curveMultiplier * log2(totalBound) + curveStart;
-        }
-        
-        return cost;    
+
+        return cost;
     }
-  
-  
-    function getDots(bytes32 specifier, address oracleAddress) public returns(uint dots){
+
+
+    function getDots(bytes32 specifier,
+                     address oracleAddress)
+                     public view returns(uint dots) {
         return _getDots(specifier, msg.sender, oracleAddress);
     }
-  
-    function _getDots(bytes32 specifier, address holderAddress, address oracleAddress) returns(uint dots){
-        
-        return holders[holderAddress].bonds[specifier][oracleAddress].numDots;
+
+    function _getDots(bytes32 specifier,
+                      address holderAddress,
+                      address oracleAddress)
+                      internal view returns(uint dots) {
+        return holders[holderAddress].bonds[specifier][oracleAddress];
     }
 
-//SPECTIAL CURVES 
-
-    function log2(uint x) returns (uint y){
+    // SPECTIAL CURVES
+    function fastlog2(uint x) public pure returns (uint y) {
        assembly {
             let arg := x
             x := sub(x,1)
@@ -355,6 +337,6 @@ contract Bondage{
             let a := div(mul(x, magic), shift)
             y := div(mload(add(m,sub(255,a))), shift)
             y := add(y, mul(256, gt(arg, 0x8000000000000000000000000000000000000000000000000000000000000000)))
-        }  
+        }
     }
 }
