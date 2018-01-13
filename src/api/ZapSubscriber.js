@@ -1,6 +1,4 @@
-const Eth = require('ethjs');
 const EventEmitter = require('events');
-const fs = require('fs');
 const ZapArbiter = require('./contracts/ZapArbiter');
 const ZapRegistry = require('./contracts/ZapRegistry');
 
