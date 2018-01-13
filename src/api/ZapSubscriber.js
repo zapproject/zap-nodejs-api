@@ -3,6 +3,45 @@ const EventEmitter = require('events');
 const fs = require('fs');
 const ZapRegistry = require('./ZapRegistry');
 
+// Parse JavaScript parameters into something ethjs can use
+function parseZapParameters(params) {
+    const output = [];
+
+    for ( let i = 0; i < params.length; i++ ) {
+        const param = params[i];
+
+        if ( typeof param == 'string' ) {
+            if ( param.startsWith('0x') ) {
+                // Already in hex
+                output.push(param);
+            }
+            else {
+                // Handle strings
+                output.push(Eth.fromAscii(param));
+            }
+
+        }
+        else if ( typeof param == 'number' ) {
+            // Parse numbers to big nums
+            output.push(Eth.toBN(param));
+        }
+        else if ( typeof param == 'object' ) {
+            if ( param.constructor.name == 'BN' ) {
+                // Bignums are fine
+                output.push(param);
+            }
+            else {
+                return new Error("Unable to handle parameter of type " + param.constructor.name);
+            }
+        }
+        else {
+            return new Error("Unable to handle parameter of type " + typeof param);
+        }
+    }
+
+    return output;
+}
+
 class ZapSubscriber extends EventEmitter {
     constructor(wallet) {
         super();
@@ -54,41 +93,16 @@ class ZapSubscriber extends EventEmitter {
         });
     }
 
-    subscribe(oracle, endpoint, params, dots, callback) {
+    subscribe(oracle, endpoint, js_params, dots, callback) {
+        const params = parseZapParameters(js_params);
+
+        // Make sure we could parse it correctly
+        if ( params instanceof Error ) {
+            callback(params);
+            return;
+        }
+
         if ( endpoint != "smartcontract" ) {
-            // Parse the parameters
-            for ( let i = 0; i < params.length; i++ ) {
-                const param = params[i];
-
-                if ( typeof param == 'string' ) {
-                    // Already in hex
-                    if ( param.startsWith('0x') ) {
-                        continue;
-                    }
-
-                    // Handle strings
-                    params[i] = Eth.fromAscii(param);
-                }
-                else if ( typeof param == 'number' ) {
-                    // Parse numbers to big nums
-                    params[i] = Eth.toBN(param);
-                }
-                else if ( typeof param == 'object' ) {
-                    if ( param.constructor.name == 'BN' ) {
-                        // Bignums are fine
-                        continue;
-                    }
-                    else {
-                        callback(new Error("Unable to handle parameter of type " + param.constructor.name));
-                        return;
-                    }
-                }
-                else {
-                    callback(new Error("Unable to handle parameter of type " + typeof param));
-                    return;
-                }
-            }
-
             // Do a temporal endpoint
             // Get the amount of zap needed for given amount of dots
             this.getZapRequired(oracle, endpoint, dots, (err, amount) => {
