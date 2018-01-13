@@ -1,3 +1,5 @@
+const ZapCurve = require('./ZapCurve');
+
 class ZapOracle {
     consructor(registry) {
         this.registry = registry;
@@ -13,11 +15,21 @@ class ZapOracle {
         const contract = this.registry.contract;
 
         contract.getProviderCurve(this.address, endpoint).then((curveType, curveStart, curveMultiplier) => {
-            callback(null, {
-                type: curveType,
-                start: curveStart,
-                multiplier: curveMultiplier
-            });
+            callback(null, new ZapCurve(
+                curveType,
+                curveStart,
+                curveMultiplier
+            ));
+        }).catch((err) => {
+            callback(err);
+        });
+    }
+
+    getZapBound(endpoint, callback) {
+        const contract = this.registry.contract;
+
+        contract.getZapBound(this.address, endpoint).then((totalBound) => {
+            callback(null, totalBound);
         }).catch((err) => {
             callback(err);
         });

@@ -66,6 +66,14 @@ contract ZapBondage {
         }
     }
 
+    function getZapBound(address oracleAddress,
+                         bytes32 endpoint)
+                         public
+                         view
+                         returns (uint256) {
+        return totalBound[endpoint][oracleAddress];
+    }
+
     // Transfer N dots from fromAddress to destAddress called only by the DisptachContract or MarketContract
     // In smart contract endpoint, occurs per satisfied request, in socket endpoint called on termination of subscription
     function transferDots(bytes32 specifier,
