@@ -1,8 +1,9 @@
-const Eth = require('ethjs');
+const EventEmitter = require('events');
 const fs = require('fs');
 
-class ZapProvider {
+class ZapProvider extends EventEmitter {
     constructor(eth, network) {
+        super();
         this.eth = eth;
 
         const arbitrator_file = fs.readFileSync("../contracts/abis/Arbitrator.json");
@@ -24,22 +25,39 @@ class ZapProvider {
 
             const account = accounts[0];
 
+            // Create the Event filter
             this.filter = this.contract.ZapDataPurchase().new((err, res) => {
                 callback(err);
             });
 
+            // Watch the event filter
             this.filter.watch().then((result) => {
+                // Sanity check
+                if ( result.length != 6 ) {
+                    callback(new Error("Received invalid ZapDataPurchase event"));
+                    return;
+                }
+
+                // Make sure it is us
                 if ( result[0] != account ) {
                     return;
                 }
 
-                
+                // Emit event
+                this.emit("new_subscription", {
+                    subscriber: result[1],
+                    public_key: result[2],
+                    amount: result[3],
+                    endpoint_params: result[4],
+                    enpoint: result[5]
+                });
             }).catch((err) => {
                 callback(err);
             });
         });
     }
 
+    // Close the connection
     close() {
         if ( this.filter ) {
             this.filter.stopWatching();
@@ -47,3 +65,5 @@ class ZapProvider {
         }
     }
 }
+
+module.exports = ZapProvider;
