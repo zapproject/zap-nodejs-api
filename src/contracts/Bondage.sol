@@ -246,7 +246,7 @@ contract Bondage {
     function calcZap(address oracleAddress,
                      bytes32 specifier,
                      uint256 numZap)
-                     public
+                     public constant
                      returns(uint256 _numZap, uint256 _numDots) {
         uint infinity = 10;
         uint dotCost = 0;
@@ -270,7 +270,7 @@ contract Bondage {
     function currentCostOfDot(address oracleAddress,
                               bytes32 specifier,
                               uint _totalBound)
-                              internal returns(uint _cost) {
+                              internal constant returns(uint _cost) {
         var (curveTypeIndex, curveStart, curveMultiplier) = registry.exportProviderCurve(oracleAddress, specifier);
         Registry.ZapCurveType curveType = Registry.ZapCurveType(curveTypeIndex);
 
