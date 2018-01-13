@@ -1,5 +1,7 @@
 pragma solidity ^0.4.14;
 
+import "ZapRegistry.sol";
+
 contract ERC20Basic {
     uint256 public totalSupply;
     function balanceOf(address who) public constant returns (uint256);
@@ -19,83 +21,14 @@ contract ERC20 is ERC20Basic {
 
 pragma solidity ^0.4.14;
 
-contract Registry {
-    struct ZapOracle {
-        uint256 public_key;                  // Public key of the user
-        uint256[] route_keys;                // IPFS routing/other
-        string title;                        // Tags (csv)
-        mapping(bytes32 => ZapCurve) curves; // Price vs Supply (contract endpoint)
-   }
-
-    enum ZapCurveType {
-        ZapCurveNone,
-        ZapCurveLinear,
-        ZapCurveExponential,
-        ZapCurveLogarithmic
-    }
-
-    struct ZapCurve {
-        ZapCurveType curveType;
-        uint256 curveStart;
-        uint256 curveMultiplier;
-    }
-
-    mapping(address => ZapOracle) oracles;
-
-    function initiateProvider(uint256 public_key,
-                              uint256[] ext_info,
-                              string title)
-                              public;
-
-    function initiateProviderCurve(bytes32 specifier,
-                                   ZapCurveType curveType,
-                                   uint256 curveStart,
-                                   uint256 curveMultiplier)
-                                   public;
-
-    function getProviderRouteKeys(address provider)
-                                  public
-                                  view
-                                  returns(uint256[]);
-
-    function getProviderTitle(address provider)
-                              public
-                              view
-                              returns(string);
-
-    function getProviderPublicKey(address provider)
-                                  public
-                                  view
-                                  returns(uint256);
-
-    function getProviderCurve(address provider,
-                              bytes32 specifier)
-                              view
-                              public
-                              returns (
-                                  ZapCurveType curveType,
-                                  uint256 curveStart,
-                                  uint256 curveMultiplier
-                                );
-
-    function exportProviderCurve(address provider,
-                                bytes32 specifier)
-                                public
-                                returns(
-                                    uint256 curveType,
-                                    uint256 curveStart,
-                                    uint256 curveMultiplier
-                                );
-}
-
-contract Bondage {
+contract ZapBondage {
     struct Holder {
         mapping (bytes32 => mapping(address => uint256)) bonds;
         mapping (address => bool) initialized;
         address[] oracleList;//for traversing
     }
 
-    Registry registry;
+    ZapRegistry registry;
     ERC20 token;
     uint public decimals = 10**16; //dealing in units of 1/100 zap
 
@@ -116,9 +49,9 @@ contract Bondage {
         }
     }
 
-    function Bondage(address tokenAddress, address registryAddress) public {
+    function ZapBondage(address tokenAddress, address registryAddress) public {
         token = ERC20(tokenAddress);
-        registry = Registry(registryAddress);
+        registry = ZapRegistry(registryAddress);
     }
 
     function setMarketAddress(address _marketAddress) public {
@@ -270,20 +203,22 @@ contract Bondage {
     function currentCostOfDot(address oracleAddress,
                               bytes32 specifier,
                               uint _totalBound)
-                              internal constant returns(uint _cost) {
-        var (curveTypeIndex, curveStart, curveMultiplier) = registry.exportProviderCurve(oracleAddress, specifier);
-        Registry.ZapCurveType curveType = Registry.ZapCurveType(curveTypeIndex);
+                              internal
+                              constant
+                              returns (uint _cost) {
+        var (curveTypeIndex, curveStart, curveMultiplier) = registry.getProviderCurve(oracleAddress, specifier);
+        ZapRegistry.ZapCurveType curveType = ZapRegistry.ZapCurveType(curveTypeIndex);
 
         uint cost = 0;
 
-        if ( curveType == Registry.ZapCurveType.ZapCurveLinear ) {
+        if ( curveType == ZapRegistry.ZapCurveType.ZapCurveLinear ) {
             cost = curveMultiplier * _totalBound + curveStart;
         }
-        else if ( curveType == Registry.ZapCurveType.ZapCurveExponential ) {
+        else if ( curveType == ZapRegistry.ZapCurveType.ZapCurveExponential ) {
 
             cost = curveMultiplier * (_totalBound ** 2) + curveStart;
         }
-        else if ( curveType == Registry.ZapCurveType.ZapCurveLogarithmic ) {
+        else if ( curveType == ZapRegistry.ZapCurveType.ZapCurveLogarithmic ) {
             if ( _totalBound == 0 ) {
                 _totalBound = 1;
             }

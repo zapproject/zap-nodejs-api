@@ -1,6 +1,6 @@
 pragma solidity ^0.4.14;
 
-contract Registry {
+contract ZapRegistry {
     struct ZapOracle {
         uint256 public_key;                  // Public key of the user
         uint256[] route_keys;                // IPFS routing/other
@@ -23,7 +23,7 @@ contract Registry {
 
     mapping(address => ZapOracle) oracles;
 
-    function Registry() public {
+    function ZapRegistry() public {
 
     }
 
