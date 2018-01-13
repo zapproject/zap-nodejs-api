@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 const fs = require('fs');
-const ZapArbiter = require('./ZapArbiter');
+const ZapArbiter = require('./contracts/ZapArbiter');
 
 class ZapProvider extends EventEmitter {
     constructor(eth, network) {

@@ -1,4 +1,4 @@
-const ZapOracle = require('./ZapOracle');
+const ZapOracle = require('../ZapOracle');
 const fs = require('fs');
 
 class ZapRegistry {

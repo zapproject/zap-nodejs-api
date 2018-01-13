@@ -1,8 +1,8 @@
 const Eth = require('ethjs');
 const EventEmitter = require('events');
 const fs = require('fs');
-const ZapArbiter = require('./ZapArbiter');
-const ZapRegistry = require('./ZapRegistry');
+const ZapArbiter = require('./contracts/ZapArbiter');
+const ZapRegistry = require('./contracts/ZapRegistry');
 
 class ZapSubscriber extends EventEmitter {
     constructor(wallet) {
