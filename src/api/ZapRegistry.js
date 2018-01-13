@@ -6,7 +6,7 @@ class ZapRegistry {
         this.eth = eth;
 
         // Load the Registry ABI
-        const registry_file = fs.readFileSync("../contracts/abis/Registry.json");
+        const registry_file = fs.readFileSync("../contracts/abis/ZapRegistry.json");
         const abi = JSON.parse(registry_file);
 
         // Load the Registry address

@@ -6,7 +6,7 @@ class ZapProvider extends EventEmitter {
         super();
         this.eth = eth;
 
-        const arbitrator_file = fs.readFileSync("../contracts/abis/Arbitrator.json");
+        const arbitrator_file = fs.readFileSync("../contracts/abis/ZapArbiter.json");
         const abi = JSON.parse(arbitrator_file);
 
         // Load the Registry address
