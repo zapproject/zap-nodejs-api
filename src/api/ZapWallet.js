@@ -16,8 +16,8 @@ class ZapWallet {
         this.token_contract = eth.contract(token_abi_json).at(token_address);
     }
 
-    // Get Balance in Zap
-    getBalance(callback) {
+    // Get our address
+    getAddress(callback) {
         this.eth.accounts().then((accounts) => {
             if ( accounts.length == 0 ) {
                 callback(new Error("No accounts loaded"));
@@ -25,11 +25,25 @@ class ZapWallet {
             }
 
             const account = accounts[0];
-            return this.token_contract.balanceOf(account);
-        }).then((balance) => {
-            callback(null, balance);
+            callback(null, account);
         }).catch((err) => {
             callback(err);
+        });
+    }
+
+    // Get Balance in Zap
+    getBalance(callback) {
+        this.getAddress((err, address) => {
+            if ( err ) {
+                callback(err);
+                return;
+            }
+
+            this.token_contract.balanceOf(address).then((balance) => {
+                callback(null, balance);
+            }).catch((err) => {
+                callback(err);
+            });
         });
     }
 
