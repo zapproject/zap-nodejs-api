@@ -1,69 +1,30 @@
 const EventEmitter = require('events');
 const fs = require('fs');
+const ZapArbiter = require('./ZapArbiter');
 
 class ZapProvider extends EventEmitter {
     constructor(eth, network) {
         super();
-        this.eth = eth;
-
-        const arbitrator_file = fs.readFileSync("../contracts/abis/ZapArbiter.json");
-        const abi = JSON.parse(arbitrator_file);
-
-        // Load the Registry address
-        const addresses = fs.readFileSync("../contracts/" + network + "/address.json");
-
-        this.address = JSON.parse(addresses)['Arbitrator'];
-        this.contract = eth.contract(abi).at(this.address);
+        this.arbiter = new ZapArbiter(eth, network);
     }
 
+    // Listen for new subscriptions
     listen(callback) {
-        this.eth.accounts().then((accounts) => {
-            if ( accounts.length == 0 ) {
-                callback(new Error("No accounts loaded"));
+        this.arbiter.listen((err, data) => {
+            if ( err ) {
+                callback(err);
                 return;
             }
 
-            const account = accounts[0];
-
-            // Create the Event filter
-            this.filter = this.contract.ZapDataPurchase().new((err, res) => {
-                callback(err);
-            });
-
-            // Watch the event filter
-            this.filter.watch().then((result) => {
-                // Sanity check
-                if ( result.length != 6 ) {
-                    callback(new Error("Received invalid ZapDataPurchase event"));
-                    return;
-                }
-
-                // Make sure it is us
-                if ( result[0] != account ) {
-                    return;
-                }
-
-                // Emit event
-                this.emit("new_subscription", {
-                    subscriber: result[1],
-                    public_key: result[2],
-                    amount: result[3],
-                    endpoint_params: result[4],
-                    enpoint: result[5]
-                });
-            }).catch((err) => {
-                callback(err);
-            });
+            this.emit('new_subscription', data);
         });
     }
 
-    // Close the connection
+    // Close the current listener
     close() {
-        if ( this.filter ) {
-            this.filter.stopWatching();
-            delete this.filter;
-        }
+        this.arbiter.close();
     }
+
 }
 
 module.exports = ZapProvider;

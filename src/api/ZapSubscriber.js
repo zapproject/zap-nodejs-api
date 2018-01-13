@@ -1,62 +1,17 @@
 const Eth = require('ethjs');
 const EventEmitter = require('events');
 const fs = require('fs');
+const ZapArbiter = require('./ZapArbiter');
 const ZapRegistry = require('./ZapRegistry');
-
-// Parse JavaScript parameters into something ethjs can use
-function parseZapParameters(params) {
-    const output = [];
-
-    for ( let i = 0; i < params.length; i++ ) {
-        const param = params[i];
-
-        if ( typeof param == 'string' ) {
-            if ( param.startsWith('0x') ) {
-                // Already in hex
-                output.push(param);
-            }
-            else {
-                // Handle strings
-                output.push(Eth.fromAscii(param));
-            }
-
-        }
-        else if ( typeof param == 'number' ) {
-            // Parse numbers to big nums
-            output.push(Eth.toBN(param));
-        }
-        else if ( typeof param == 'object' ) {
-            if ( param.constructor.name == 'BN' ) {
-                // Bignums are fine
-                output.push(param);
-            }
-            else {
-                return new Error("Unable to handle parameter of type " + param.constructor.name);
-            }
-        }
-        else {
-            return new Error("Unable to handle parameter of type " + typeof param);
-        }
-    }
-
-    return output;
-}
 
 class ZapSubscriber extends EventEmitter {
     constructor(wallet) {
         super();
         this.wallet = wallet;
         this.eth = wallet.eth;
+
         this.registry = new ZapRegistry(this.eth, wallet.network);
-
-        const arbitrator_file = fs.readFileSync("../contracts/abis/ZapArbiter.json");
-        const abi = JSON.parse(arbitrator_file);
-
-        // Load the Registry address
-        const addresses = fs.readFileSync("../contracts/" + wallet.network + "/address.json");
-
-        this.address = JSON.parse(addresses)['Arbitrator'];
-        this.contract = this.eth.contract(abi).at(this.address);
+        this.arbiter = new ZapArbiter(this.eth, wallet.network);
     }
 
     // Get the amount of zap necessary for a given amount of dots
@@ -94,14 +49,6 @@ class ZapSubscriber extends EventEmitter {
     }
 
     subscribe(oracle, endpoint, js_params, dots, callback) {
-        const params = parseZapParameters(js_params);
-
-        // Make sure we could parse it correctly
-        if ( params instanceof Error ) {
-            callback(params);
-            return;
-        }
-
         if ( endpoint != "smartcontract" ) {
             // Do a temporal endpoint
             // Get the amount of zap needed for given amount of dots
@@ -138,16 +85,16 @@ class ZapSubscriber extends EventEmitter {
                             return;
                         }
 
-                        this.contract.initiateSubscription(
-                            this.oracle.address,
-                            params,
+                        this.arbiter.initiateSubscription(
+                            oracle.address,
+                            js_params,
                             endpoint,
                             0 /* TODO: actual public key */,
-                            dots
-                        ).then(() => {
-                            callback(null);
-                            // TODO: start listening for the event
-                        });
+                            dots,
+                            () => {
+                                callback(null);
+                            }
+                        );
                     });
                 });
             });
