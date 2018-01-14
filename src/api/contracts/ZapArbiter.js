@@ -44,11 +44,11 @@ class ZapArbiter {
     constructor(eth, network) {
         this.eth = eth;
 
-        const arbitrator_file = fs.readFileSync("../contracts/abis/ZapArbiter.json");
+        const arbitrator_file = fs.readFileSync("../../contracts/abis/ZapArbiter.json");
         const abi = JSON.parse(arbitrator_file);
 
         // Load the Registry address
-        const addresses = fs.readFileSync("../contracts/" + network + "/address.json");
+        const addresses = fs.readFileSync("../../contracts/" + network + "/address.json");
 
         this.address = JSON.parse(addresses)['Arbitrator'];
         this.contract = eth.contract(abi).at(this.address);
@@ -89,7 +89,9 @@ class ZapArbiter {
 
             // Create the Event filter
             this.filter = this.contract.ZapDataPurchase().new((err, res) => {
-                callback(err);
+                if ( err ) {
+                    callback(err);
+                }
             });
 
             // Watch the event filter

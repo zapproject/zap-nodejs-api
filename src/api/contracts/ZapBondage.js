@@ -5,10 +5,10 @@ class ZapBondage {
     constructor(eth, network) {
         this.eth = eth;
 
-        const bondage_abi_file = fs.readFileSync('../contracts/abis/ZapBondage.json');
+        const bondage_abi_file = fs.readFileSync('../../contracts/abis/ZapBondage.json');
         const bondage_abi_json = JSON.parse(bondage_abi_file);
 
-        const addresses = fs.readFileSync('../contracts/' + network + '/address.json');
+        const addresses = fs.readFileSync('../../contracts/' + network + '/address.json');
         const bondage_address = JSON.parse(addresses)['Bondage'];
 
         this.contract = eth.contract(bondage_abi_json).at(bondage_address);

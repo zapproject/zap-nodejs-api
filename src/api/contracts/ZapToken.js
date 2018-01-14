@@ -5,10 +5,10 @@ class ZapToken {
     constructor(eth, network) {
         this.eth = eth;
 
-        const token_abi_file = fs.readFileSync('../contracts/abis/ZapToken.json');
+        const token_abi_file = fs.readFileSync('../../contracts/abis/ZapToken.json');
         const token_abi_json = JSON.parse(token_abi_file);
 
-        const addresses = fs.readFileSync('../contracts/' + network + '/address.json');
+        const addresses = fs.readFileSync('../../contracts/' + network + '/address.json');
         const token_address = JSON.parse(addresses)['Token'];
 
         this.token_contract = eth.contract(token_abi_json).at(token_address);

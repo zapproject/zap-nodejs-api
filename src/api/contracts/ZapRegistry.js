@@ -6,11 +6,11 @@ class ZapRegistry {
         this.eth = eth;
 
         // Load the Registry ABI
-        const registry_file = fs.readFileSync("../contracts/abis/ZapRegistry.json");
+        const registry_file = fs.readFileSync("../../contracts/abis/ZapRegistry.json");
         const abi = JSON.parse(registry_file);
 
         // Load the Registry address
-        const addresses = fs.readFileSync("../contracts/" + network + "/address.json");
+        const addresses = fs.readFileSync("../../contracts/" + network + "/address.json");
 
         this.address = JSON.parse(addresses)['Registry'];
         this.contract = eth.contract(abi).at(this.address);
