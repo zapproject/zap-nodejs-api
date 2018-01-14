@@ -124,7 +124,7 @@ This code is released under GPL v.3.
 │                              Sends     .───────.     contract data   │
 │                              socket  ,'         `.  and listens for  │
 │                               data  ;  Providers  :  data requests   │
-│─────────────────────────────────────:             ;──────────────────┘
+└─────────────────────────────────────:             ;──────────────────┘
                                        ╲           ╱
                                         `.       ,'
                                           `─────'
