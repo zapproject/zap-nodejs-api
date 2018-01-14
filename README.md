@@ -89,7 +89,7 @@ All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MER
 This code is released under GPL v.3.
 ```
                                           .───────────.
-──────────────────────────────────────▶ ,'             `.
+┌─────────────────────────────────────▶ ,'             `.
 │  ┌──────────────────────────────────▶(   Subscriber    )                                     ┌────────────────────┐
 │  │                                    '─.           ,─'                                      │ Zap Token Contract │
 │  │                                       `─────────'                            Spends ZAP   │                    │
