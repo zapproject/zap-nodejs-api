@@ -1,11 +1,9 @@
 const Eth = require('ethjs');
 const fs = require('fs');
-const ZapBondage = require('./ZapBondage.js');
 
-class ZapWallet {
+class ZapToken {
     constructor(eth, network) {
         this.eth = eth;
-        this.bondage = new ZapBondage(eth, network);
 
         const token_abi_file = fs.readFileSync('../contracts/abis/ZapToken.json');
         const token_abi_json = JSON.parse(token_abi_file);
@@ -58,34 +56,20 @@ class ZapWallet {
         });
     }
 
-    // Bond a certain amount of Zap
-    bond(oracle, endpoint, amount, callback) {
-        // Estimate amount of Zap being spent
-        this.bondage.estimateBond(oracle, endpoint, amount, (err, numZap, numDot) => {
-            if ( err ) {
-                callback(err);
+    // Approve a certain amount of zap to be sent
+    approve(address, amount, callback) {
+        // Approve to the token contract the spending
+        this.token_contract.approve(this.bondage.address, amount).then((success) => {
+            if ( !success ) {
+                callback(new Error("Failed to approve Bondage transfer"));
                 return;
             }
 
-            // Approve to the token contract the spending
-            this.token_contract.approve(this.bondage.address, numZap).then((success) => {
-                if ( !success ) {
-                    callback(new Error("Failed to approve Bondage transfer"));
-                    return;
-                }
-
-                // Do the actual bondage
-                this.bondage.bond(oracle, endpoint, amount, callback);
-            }).catch((err) => {
-                callback(err);
-            });
+            callback(null);
+        }).catch((err) => {
+            callback(err);
         });
-    }
-
-    // Wrapper function for the unbond
-    unbond(oracle, endpoint, amount, callback) {
-        this.bondage.unbond(oracle, endpoint, amount, callback);
     }
 }
 
-module.exports = ZapWallet;
+module.exports = ZapToken;
