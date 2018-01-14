@@ -62,7 +62,7 @@ To load subscriber
 zapcli load -s filename
 ```
 
-### Set RPC HOST 
+### Set RPC HOST
 ```
 zapcli set --rpc 'rpc host'
 ```
@@ -72,7 +72,7 @@ Example:
 zapcli set --rpc https://rinkeby.infura.io
 ```
 
-### Set WS HOST 
+### Set WS HOST
 ```
 zapcli set --ws 'ws host'
 ```
@@ -87,44 +87,45 @@ All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MER
 ### License
 
 This code is released under GPL v.3.
-
-                                             .───────────.                                                                           
-      ──────────────────────────────────────▶ ,'             `.                                                                         
-      │  ┌──────────────────────────────────▶(   Subscriber    )                                     ┌────────────────────┐             
-      │  │                                    '─.           ,─'                                      │ Zap Token Contract │                         
-      │  │                                       `─────────'                            Spends ZAP   │                    │             
-      │  │                                            │                               ┌─────────────▶│   - ERC20 token    │             
-      │  │                                   Requests │                               │              │                    │             
-      │  │                                   registry │                               │              └────────────────────┘             
-      │  │                                   contract │                               │                         ▲                       
-      │  │                                            │                               │               Sent ZAP to eachother             
-      │  │                                                ▼                               │                         ▼                       
-      │  │                           ┌─────────────────────────────────┐              │              ┌────────────────────┐   Queries   
-      │  │                           │         Market Contract         │◀─────────────┘  Spends DOT  │  Bondage Contract  │    curve    
-      │  │                           │                                 │◀─────────────┐   balances   │                    │ information 
-      │  │                  Points to│   Responsible for initiating    │              └──────────────┤Stores bound Zap and│   on bond   
-      │  │                   ┌───────│subscriptions and alerting either│─────┐                                                           │ DOT balances (not  │────────────┐
-      │  │                   │       │  the provider or the dispatch   │     │                       │     sendable)      │            │
-      │  │ Sends             │       │ contract of the newly initiated │ Points to         Comm.  ┌─▶│  Escrows DOT for   │            │
-      │  │provider           │       └─────────────────────────────────┘      │             Escrow │  │   subscriptions    │            │
-      │  │  info             ▼                        │                      ▼              info  │  └────────────────────┘            │
-      │  │  ┌───────────────────┐◀─┘                                    │───────
-      │  │  │       Registry Contract        │Listens │   │         Dispatch Contract          │              ┌─────────────────┐      │
-      │  │  │                                │for sub │   │                                    │   Forwards   │                 │      │
-      │  └──│  Registry of all the oracles,  │  info  │   │ Location where providers send data │   data to    │ User Contracts  │      │
-      │     │    their rates, and related    │        │   │    to be forwarded to the user     │─────────────▶│                 │      │
-      │     │    contact/DOT information     │     ┌──┘   │             contracts              │    Requests  │                 │      │
-      │     └─────────────────                                      ───────────────┘     │      │ Controls the escrow in the Bondage │      Data    └─────────────────┘      │
-      │                      ▲                     │      │              contract              │◀─────────────                         │
-      │                      │                     │      └────────────────────────────────────┘                                       │
-      │                      └─────────────────────┼───────────────────────────────────────────────────────────────────────────────────┘
-      │                                            │                         │                                                                
-      │                                            │                         │                                                          
-      │                                            ▼          Send smart     │                                                          
-      │                              Sends     .───────.     contract data   │                                                          
-      │                              socket  ,'         `.  and listens for  │                                                          
-      │                               data  ;  Providers  :  data requests   │                                                          
-      │─────────────────────────────────────:                        ────────┘                                            
-                                             ╲           ╱                                                                              
-                                              `.       ,'                                                                               
-                                                `─────'                               
+```
+                                          .───────────.
+──────────────────────────────────────▶ ,'             `.
+│  ┌──────────────────────────────────▶(   Subscriber    )                                     ┌────────────────────┐
+│  │                                    '─.           ,─'                                      │ Zap Token Contract │
+│  │                                       `─────────'                            Spends ZAP   │                    │
+│  │                                            │                               ┌─────────────▶│   - ERC20 token    │
+│  │                                   Requests │                               │              │                    │
+│  │                                   registry │                               │              └────────────────────┘
+│  │                                   contract │                               │                         ▲
+│  │                                            │                               │               Sent ZAP to eachother
+│  │                                            ▼                               │                         ▼
+│  │                           ┌─────────────────────────────────┐              │              ┌────────────────────┐   Queries
+│  │                           │        Arbiter Contract         │◀─────────────┘  Spends DOT  │  Bondage Contract  │    curve
+│  │                           │                                 │◀─────────────┐   balances   │                    │ information
+│  │                  Points to│   Responsible for initiating    │              └──────────────┤Stores bound Zap and│   on bond
+│  │                   ┌───────│subscriptions and alerting either│─────┐                       │ DOT balances (not  │────────────┐
+│  │                   │       │  the provider or the dispatch   │     │                       │     sendable)      │            │
+│  │ Sends             │       │ contract of the newly initiated │ Points to         Comm.  ┌─▶│  Escrows DOT for   │            │
+│  │provider           │       └─────────────────────────────────┘     │             Escrow │  │   subscriptions    │            │
+│  │  info             ▼                        │                      ▼              info  │  └────────────────────┘            │
+│  │  ┌────────────────────────────────┐        │   ┌────────────────────────────────────┐◀─┘                                    │
+│  │  │       Registry Contract        │Listens │   │         Dispatch Contract          │              ┌─────────────────┐      │
+│  │  │                                │for sub │   │                                    │   Forwards   │                 │      │
+│  └──│  Registry of all the oracles,  │  info  │   │ Location where providers send data │   data to    │ User Contracts  │      │
+│     │    their rates, and related    │        │   │    to be forwarded to the user     │─────────────▶│                 │      │
+│     │    contact/DOT information     │     ┌──┘   │             contracts              │    Requests  │                 │      │
+│     └────────────────────────────────┘     │      │ Controls the escrow in the Bondage │      Data    └─────────────────┘      │
+│                      ▲                     │      │              contract              │◀─────────────                         │
+│                      │                     │      └────────────────────────────────────┘                                       │
+│                      └─────────────────────┼───────────────────────────────────────────────────────────────────────────────────┘
+│                                            │                         │
+│                                            │                         │
+│                                            ▼          Send smart     │
+│                              Sends     .───────.     contract data   │
+│                              socket  ,'         `.  and listens for  │
+│                               data  ;  Providers  :  data requests   │
+│─────────────────────────────────────:             ;──────────────────┘
+                                       ╲           ╱
+                                        `.       ,'
+                                          `─────'
+```
