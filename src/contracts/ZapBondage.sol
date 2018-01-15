@@ -186,7 +186,6 @@ contract ZapBondage {
 
     function calcZapForDots(        
         bytes32 specifier, 
-        address holderAddress, 
         uint numDots,
         address oracleAddress) public constant returns(uint256 _numZap){
             
