@@ -96,18 +96,18 @@ contract ZapBondage {
         }
     }
 
-    function escrowDots(bytes32 specifier,
-                        address holderAddress,
-                        address oracleAddress,
-                        uint256 numDots)
-                        public operatorOnly {
+    function escrowDots(bytes32 specifier, address holderAddress, address oracleAddress, uint256 numDots) 
+    operatorOnly returns (bool success)  {
+        
         uint currentDots = _getDots(specifier, holderAddress, oracleAddress);
-
-        if ( currentDots >= numDots ) {
-            Holder storage holder = holders[holderAddress];
-
-            holder.bonds[specifier][oracleAddress] -= numDots;
-            pendingEscrow[holderAddress][oracleAddress][specifier] += numDots;
+        if(currentDots >= numDots){
+            
+            holders[holderAddress].bonds[specifier][oracleAddress].numDots-=numDots;
+            pendingEscrow[holderAddress][oracleAddress][specifier]+=numDots;
+            return true;
+        }
+        else{
+            return false;
         }
     }
 
@@ -182,6 +182,24 @@ contract ZapBondage {
 
         holder.bonds[specifier][oracleAddress] += numDots;
         totalBound[specifier][oracleAddress] += numZap;
+    }
+
+    function calcZapForDots(        
+        bytes32 specifier, 
+        address holderAddress, 
+        uint numDots,
+        address oracleAddress) public constant returns(uint256 _numZap){
+            
+        uint256 localTotal = totalBound[specifier][oracleAddress];
+        uint256 numZap;
+        for(uint i=0; i<numDots; i++){
+            numZap += currentCostOfDot(
+            oracleAddress,
+            specifier,
+            localTotal+i
+            );
+        }
+        return numZap;
     }
 
     function calcZap(address oracleAddress,
