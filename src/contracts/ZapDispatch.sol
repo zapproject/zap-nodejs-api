@@ -26,14 +26,14 @@ contract ZapDispatch {
     mapping (uint256 => Query) queries;
 
     address bondageAddress;
-    Bondage bondage;
+    ZapBondage bondage;
 
     function ZapDataProxyDispatch() {}
     
     function setBondageAddress(address _bondageAddress){
         if(bondageAddress == 0){
             bondageAddress = _bondageAddress;
-            bondage = Bondage(_bondageAddress);            
+            bondage = ZapBondage(_bondageAddress);            
         }
     }
     
