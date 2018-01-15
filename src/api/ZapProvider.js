@@ -1,9 +1,7 @@
-const EventEmitter = require('events');
 const ZapArbiter = require('./contracts/ZapArbiter');
 
-class ZapProvider extends EventEmitter {
+class ZapProvider {
     constructor(eth, network) {
-        super();
         this.arbiter = new ZapArbiter(eth, network);
     }
 
@@ -15,7 +13,7 @@ class ZapProvider extends EventEmitter {
                 return;
             }
 
-            this.emit('new_subscription', data);
+            callback(null, data);
         });
     }
 
