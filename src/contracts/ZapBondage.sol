@@ -102,7 +102,7 @@ contract ZapBondage {
         uint currentDots = _getDots(specifier, holderAddress, oracleAddress);
         if(currentDots >= numDots){
             
-            holders[holderAddress].bonds[specifier][oracleAddress].numDots-=numDots;
+            holders[holderAddress].bonds[specifier][oracleAddress]-=numDots;
             pendingEscrow[holderAddress][oracleAddress][specifier]+=numDots;
             return true;
         }
