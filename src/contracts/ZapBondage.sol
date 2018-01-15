@@ -265,7 +265,7 @@ contract ZapBondage {
     function _getDots(bytes32 specifier,
                       address holderAddress,
                       address oracleAddress)
-                      internal view returns(uint dots) {
+                      view returns(uint dots) {
         return holders[holderAddress].bonds[specifier][oracleAddress];
     }
 
