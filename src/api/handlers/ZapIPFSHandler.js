@@ -9,6 +9,38 @@ class ZapIPFSHandler extends ZapHandler {
         this.keypair = keypair;
     }
 
+    // Generate paremeters to initiate a smart contract
+    initiateSubscription(oracle) {
+        // Do the key exchange
+        const provider_public_ec = new ZapCrypto.PublicKey(oracle.public_key, null);
+        const secret = this.keypair.generateSecret(provider_public_ec);
+
+        // Generate a nonce
+        const nonce = new Buffer(crypto.randomBytes(16));
+        const nonce_hex = "0x" + nonce.toString('hex');
+
+        // Generate a UUID
+        const raw_uuid = crypto.randomBytes(32);
+        const uuid = raw_uuid.toString('base64');
+
+        // Setup the cipher object with the secret and nonce
+        const cipher = crypto.createCipheriv('aes-256-ctr', secret, nonce);
+        cipher.setAutoPadding(true);
+
+        // Encrypt it (output is buffer)
+        const euuid = Buffer.concat([cipher.update(raw_uuid), cipher.final()]);
+
+        // Sanity check
+        if (euuid.length != 32) {
+            throw new Error("encrypted uuid is an invalid length");
+        }
+
+        // Hexify the euuid
+        const euuid_hex = "0x" + new Buffer(euuid, 'ascii').toString('hex');
+
+        return [nonce_hex, euuid_hex];
+    }
+
     // Override the listen to decrypt IPFS related data
     parseSubscription(event) {
         const args = event.params;

@@ -107,6 +107,7 @@ class ZapArbiter {
                     return;
                 }
 
+                // Get the block number
                 this.eth.blockNumber().then((blockNumber) => {
                     // Emit event
                     callback(null, {

@@ -6,12 +6,18 @@ class ZapSubscriber extends EventEmitter {
     constructor(wallet, keypair) {
         super();
 
+        this.handlers = {};
         this.keypair = keypair;
         this.wallet = wallet;
         this.eth = wallet.eth;
 
         this.registry = new ZapRegistry(this.eth, wallet.network);
         this.arbiter = new ZapArbiter(this.eth, wallet.network);
+    }
+
+    // Add a endpoint handler
+    addHandler(type, handler) {
+        this.handlers[type] = handler;
     }
 
     // Get the amount of zap necessary for a given amount of dots
@@ -48,8 +54,16 @@ class ZapSubscriber extends EventEmitter {
         });
     }
 
-    subscribe(oracle, endpoint, js_params, dots, callback) {
+    subscribe(oracle, endpoint, dots, callback) {
         if ( endpoint != "smartcontract" ) {
+            if ( !this.handlers[endpoint] ) {
+                callback(new Error("Unable to find a handler for endpoint " + endpoint));
+                return;
+            }
+
+            // Generate parameters for this handler
+            const js_params = this.handlers[endpoint].initiateSubscription(oracle);
+
             // Do a temporal endpoint
             // Get the amount of zap needed for given amount of dots
             this.getZapRequired(oracle, endpoint, dots, (err, amount) => {
@@ -86,11 +100,11 @@ class ZapSubscriber extends EventEmitter {
                         }
 
                         this.arbiter.initiateSubscription(
-                            oracle.address,
-                            js_params,
-                            endpoint,
-                            this.keypair.getPublic(),
-                            dots,
+                            oracle.address,             // Oracle's address
+                            js_params,                  // Unencoded parameters
+                            endpoint,                   // Which endpoint to use
+                            this.keypair.getPublic(),   // Our public key
+                            dots,                       // Amount of dots we're using
                             () => {
                                 this.pendingSubscriptions[oracle.address] = callback;
                             }
