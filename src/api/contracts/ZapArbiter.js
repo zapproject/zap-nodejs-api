@@ -103,13 +103,14 @@ class ZapArbiter {
                 }
 
                 // Make sure it is us
-                if ( result[0] != account ) {
+                if ( result[0] != account || result[1] != account ) {
                     return;
                 }
 
                 this.eth.blockNumber().then((blockNumber) => {
                     // Emit event
                     callback(null, {
+                        provider: result[0],
                         subscriber: result[1],
                         public_key: result[2],
                         endblock: result[3] + blockNumber.toNumber(),

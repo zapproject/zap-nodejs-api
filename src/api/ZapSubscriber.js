@@ -3,8 +3,10 @@ const ZapArbiter = require('./contracts/ZapArbiter');
 const ZapRegistry = require('./contracts/ZapRegistry');
 
 class ZapSubscriber extends EventEmitter {
-    constructor(wallet) {
+    constructor(wallet, keypair) {
         super();
+
+        this.keypair = keypair;
         this.wallet = wallet;
         this.eth = wallet.eth;
 
@@ -87,16 +89,30 @@ class ZapSubscriber extends EventEmitter {
                             oracle.address,
                             js_params,
                             endpoint,
-                            0 /* TODO: actual public key */,
+                            this.keypair.getPublic(),
                             dots,
                             () => {
-                                callback(null);
+                                this.pendingSubscriptions[oracle.address] = callback;
                             }
                         );
                     });
                 });
             });
         }
+    }
+
+    // Listen for events from the Arbiter class.
+    listen() {
+        // Listen for events
+        this.arbiter.listen((err, event) => {
+            // See if we have any subscriptions pending on this event
+            const callback = this.pendingSubscriptions[event.provider];
+
+            if ( callback ) {
+                this.pendingSubscriptions[event.provider] = null;
+                this.pendingSubscriptions[event.provider](err, event);
+            }
+        });
     }
 }
 
