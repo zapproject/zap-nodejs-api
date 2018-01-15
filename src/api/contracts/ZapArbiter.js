@@ -107,13 +107,17 @@ class ZapArbiter {
                     return;
                 }
 
-                // Emit event
-                callback(null, {
-                    subscriber: result[1],
-                    public_key: result[2],
-                    amount: result[3],
-                    endpoint_params: result[4],
-                    enpoint: result[5]
+                this.eth.blockNumber().then((blockNumber) => {
+                    // Emit event
+                    callback(null, {
+                        subscriber: result[1],
+                        public_key: result[2],
+                        endblock: result[3] + blockNumber.toNumber(),
+                        endpoint_params: result[4],
+                        endpoint: result[5]
+                    });
+                }).catch(err => {
+                    callback(err);
                 });
             }).catch((err) => {
                 callback(err);
