@@ -15,7 +15,7 @@ contract Client4 {
 
 contract ZapDispatch {
 
-    event Incoming(uint256 id, address recipient, string query, bytes32 endpoint, bytes32[] endpoint_params);
+    event Incoming(uint256 id, address provider, address recipient, string query, bytes32 endpoint, bytes32[] endpoint_params);
     enum Status { Pending, Fulfilled }
     struct Query {
         address subscriber;
@@ -51,7 +51,7 @@ contract ZapDispatch {
             bondage.escrowDots(endpoint, subscriber, oracleAddress, 1);
             id = uint256(sha3(block.number, now, query, msg.sender));
             queries[id] = Query(subscriber, oracleAddress, endpoint, Status.Pending);
-            Incoming(id, msg.sender, query, endpoint, endpoint_params);            
+            Incoming(id, oracleAddress, msg.sender, query, endpoint, endpoint_params);            
         }
 
     }
