@@ -1,4 +1,5 @@
 const ZapArbiter = require('./contracts/ZapArbiter');
+const ZapArbiter = require('./contracts/ZapDispatch');
 const EventEmitter = require('event');
 
 class ZapProvider extends EventEmitter {
@@ -6,7 +7,9 @@ class ZapProvider extends EventEmitter {
         super();
 
         this.arbiter = new ZapArbiter(eth, network);
+        this.dispatch = new ZapDispatch(eth, network);
         this.subscriptions = {}; // In-memory stored subscriptions
+        this.requests = {}; // In-memory stored oracle requests 
         this.handler = {};       // Map for handlers for different endpoints
     }
 
@@ -15,8 +18,9 @@ class ZapProvider extends EventEmitter {
         this.handler[type] = handler;
     }
 
-    // Listen for new subscriptions
-    listen(callback) {
+    // Listen for new subscriptions 
+    listenSubscription(callback) {
+
         this.arbiter.listen((err, data) => {
             if ( err ) {
                 callback(err);
@@ -35,7 +39,30 @@ class ZapProvider extends EventEmitter {
 
             this.emit("new_subscription", data.subscriber);
         });
+        
     }
+
+    listenOracle(callback){
+
+        this.dispatch.listen((err, data) => {
+            if ( err ) {
+                callback(err);
+                return;
+            }
+
+            const handler = this.handler[data.endpoint];
+
+            if ( !handler ) {
+                callback(new Error("Got unhandled endpoint " + data.endpoint));
+                return;
+            }
+
+            const request = handler.parseRequest(data);
+            this.requests.push(request);
+            callback(null, this);
+            this.emit("new_oracle_request", data.id);
+        });
+    } 
 
     // Publish
     publish(endpoint, data) {
@@ -59,10 +86,15 @@ class ZapProvider extends EventEmitter {
             }
         }
     }
+    
+    respond(endpoint, data){
+        this.dispatch.respond(data.id, data.params);
+    }
 
     // Close the current listener
     close() {
         this.arbiter.close();
+        this.dispatch.close();
     }
 
 }
