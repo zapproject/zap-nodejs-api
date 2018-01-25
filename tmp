@@ -1,6 +1,272 @@
-            return query(
-                    oracleAddress,
-                    msg.sender,
-                    query,
-                    endpoint,
-                    processed_params);
+Described below are our core contracts and methods
+
+Zap platform provides tools for data providers to monetize their data via token bonding mechanism built with ethereum smart contracts.
+
+Zap platform consists of 5 solidity contract and a think nodejs client to provide interface. Currrently the platform supports 2 data endpoints: client smart contracts requesting data from offchain oracle daemon(proxying query response data to smart contract in manner similar to oraclize.it) and socket subscribers(pushing data over IPFS.pubsub sockets to IPFS.pubsub socket subscriber)
+
+Payment is handled via Bonding contract. To access data provider on any endpoint, ZAP token must be bonded to data provider's record in ZapRegistry contract in order to obtain access tokens( referred to as 'dots'). Price of 'dot' in ZAP is calculated via a price/supply function specifiedby data provider during its registration.
+
+    example price/supply function
+    
+    dot cost = 2 * ( oracle dots in existance) + (initial cost )
+ 
+For smart contract endpoint, 1 dot = 1 query handled via ZapDispatch contract 
+For socket subscription endpoint, 1 dot = 1 ethereum block time of subscription handled via ZapArbiter contract 
+
+Contracts:
+
+ZapToken
+   
+    ERC20 token used by subscribers who wish to purchase oracle-specific dots(access tokens) and data provider speculators
+ 
+ZapRegistry
+
+    Registry of data provider accounts. Registry contract contains 
+
+ZapBondage
+
+    Contract handling ZAP token bonding 
+
+ZapDispatch
+
+ZapArbiter
+ 
+Data providers register their accounts via ZapRegistry contract, providing identity and endpoint spec
+
+
+
+
+Data provders 
+
+
+ZapToken
+    
+ZapRegistry
+
+ZapBondage
+
+ZapDispatch
+
+ZapArbiter
+ 
+
+
+ZapRegistry
+
+
+Solidity: https://github.com/zapproject/FeedArbitration/blob/master/src/contracts/ZapRegistry.sol
+Wrapper: https://github.com/zapproject/FeedArbitration/blob/master/src/api/contracts/ZapRegistry.js
+
+ZapRegistry.initateProvider 
+
+function initiateProvider(uint256 public_key,
+                              uint256[] ext_info,
+                              string title)
+
+This creates a data provider account. Data provider account consists of public key, name string, array of parameters specific to endpoint* and a pricing model**
+
+
+Uses:
+
+struct ZapOracle {
+        uint256 public_key;          // Public key of the user
+        uint256[] route_keys;       // IPFS routing/other endpoint params
+        string title;                        // Tags (csv)
+        mapping(bytes32 => ZapCurve) curves; // Price vs Supply (contract endpoint)
+   }
+
+
+*Currently we have a smartcontract-oracle-query endpoint ala oraclize.it and an IPFS pub/sub socket subscription endpoint
+
+**Current available pricing models consist of polynomial functions where price is determined on a curve where x-axis denotes total number of access tokens in existence and y-axis denotes cost in ZAP token of 1 access token. We currently support linear, logarithmic, and expontial price vs supply curves
+
+***Dot = Data Provider-specific access token 
+
+function initiateProviderCurve(bytes32 specifier,
+                                   ZapCurveType curveType,
+                                   uint256 curveStart,
+                                   uint256 curveMultiplier)
+                                   public {
+
+This initiates an endpoint specific price vs supply curve. 
+
+Uses:
+
+   enum ZapCurveType {
+        ZapCurveNone,
+        ZapCurveLinear,
+        ZapCurveExponential,
+        ZapCurveLogarithmic
+    }   
+
+    struct ZapCurve {
+        ZapCurveType curveType;
+        uint256 curveStart;
+        uint256 curveMultiplier;
+    }  
+
+getProviderRouteKeys
+getProviderTitle
+getProviderPublicKey
+getProviderCurve
+
+ZapBondage
+
+Solidity:
+https://github.com/zapproject/FeedArbitration/blob/master/src/contracts/ZapBondage.sol
+Wrapper: https://github.com/zapproject/FeedArbitration/blob/master/src/api/contracts/ZapBondage.js
+
+ZapBondage._bond
+
+This moves a pre-approved* quantity of ZAP token into data provider’s** bonding curve specified by endpoint via bytes32 specifier. “Holder” represents holder of ZAP bond. Dots* are allocated to Holder according to state of data provider’s endpoint-specific bonding curve
+
+*ERC20 requires approval before delegated transfer of tokens
+**”data provider” and “oracle” terms used interchangeably
+***aka access tokens 
+
+function _bond(bytes32 specifier,
+                   address holderAddress,
+                   uint numZap,
+                   address oracleAddress)
+
+Depends:
+struct Holder {
+        mapping (bytes32 => mapping(address => uint256)) bonds;
+        mapping (address => bool) initialized;
+        address[] oracleList;//for traversing
+    }
+
+ZapBondage._unbond
+
+This releasing ZAP token to holder’s address according to state of data provider’s endpoint specific bonding curve. Requisite ‘dots’ are burned for requisite ZAP released
+
+function _unbond(bytes32 specifier,
+                   address holderAddress,
+                   uint numDots,
+                   address oracleAddress)
+
+ZapBondage.escrowDots
+
+function escrowDots(bytes32 specifier, 
+                  address holderAddress, 
+      address oracleAddress, 
+      uint256 numDots)
+
+This holds endpoint specific ‘dots’ in escrow specified by bytes32 specifier*
+
+*called by dispatch contract between ZapDispatch.query and ZapDispatch.respondX** and ZapArbiter.initiateSubscription and ZapArbiter.terminateSubscription
+**1,2,3,4 ala number of response parameters
+
+ZapBondage.transferDots
+
+function transferDots(bytes32 specifier,
+                  address holderAddress,
+                  address oracleAddress,
+                  uint256 numDots)
+
+This transfers dots from subscriber to provider on fulfullment of smart contract endpoint query* or socket subscription enpoint termination.**
+
+*called by ZapDispatch
+**called by ZapArbiter
+
+ZapBondage.currentCostOfDot
+
+function currentCostOfDot(address oracleAddress,
+                              bytes32 specifier,
+                              uint _totalBound)
+
+Returns cost of data provider access token, sepecific to endpoint specified via bytes32 specifier 
+
+
+ZapDispatch
+Solidity: https://github.com/zapproject/FeedArbitration/blob/master/src/contracts/ZapDispatch.sol
+Wrapper: https://github.com/zapproject/FeedArbitration/blob/master/src/api/contracts/ZapDispatch.js
+
+ZapDispatch.query
+
+ function query(
+        address oracleAddress,
+        address subscriber,
+        string query,
+        bytes32 endpoint,
+        bytes32[] endpoint_params)
+Called from a client contract, this passes a query string to data provider endpoint speciffied*
+
+*in case of smart contract enpoint, bytes32 specifies the number of parameters for the data provider to return from the query
+
+Depends:
+
+event Incoming(uint256 id, address provider, address recipient, string query, bytes32 endpoint, bytes32[] endpoint_params);
+
+enum Status { Pending, Fulfilled }
+
+
+struct Query {
+        address subscriber;
+        address provider;
+        bytes32 endpoint;
+        Status status;
+    }
+
+ZapDispatch.respond1
+function respond1(uint256 id, 
+string _response) 
+
+ZapArbiter
+
+Solidity:
+https://github.com/zapproject/FeedArbitration/blob/master/src/contracts/ZapArbiter.sol
+Wrapper:
+https://github.com/zapproject/FeedArbitration/blob/master/src/api/contracts/ZapArbiter.js
+
+ZapArbiter.initiateSubscription
+
+Inititate temporal subscription to data provider endpoint specified* by bytes32 endpoint and bytes32[] endpoint_params
+
+*currently only IPFS pubsub socket subscription
+** in socket subscroption endpoint, ipfs address specified in ipfs.swarm.connect ala "/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmSmwDi3AmMm3pFbyvzmRZ3FfLtNAtYv5ie7ispER1kGUB"
+
+
+function initiateSubscription(address provider_address,  // Provider address
+                                  bytes32[] endpoint_params, // Endpoint specific params
+                                  bytes32 endpoint,          // Endpoint specifier
+                                  uint256 public_key,        // Public key of the purchaser
+                                  uint256 blocks) public {   // Number of blocks subscribed, 1block=1dot
+
+
+Depends
+
+struct ZapSubscription {
+        uint dots;          // Cost in dots
+        uint blockstart;    // Block number subscription was initiated
+        uint preblockend;   // Precalculated block end
+}
+
+event ZapDataPurchase(
+        address provider_address,  // Etheruem address of the provider
+        address subscriber,        // Ethereum address of the subscriber
+        uint256 public_key,        // Public key of the subscriber
+        uint256 amount,            // Amount (in 1/100 zap) of ethereum sent
+        bytes32[] endpoint_params, // Endpoint specific( nonce,encrypted_uuid),
+        bytes32 enpoint
+    );
+
+// Used to specify who is the terminator of a contract
+enum ZapSubscriptionTerminator {
+        ZapTermProvider,
+        ZapTermSubscriber
+}
+
+
+
+
+ZapArbiter.endZapSubscription
+
+Ends subscription. Dots escrowed for any time* remaining are refunded to holder/subscriber
+
+function endZapSubscription(bytes32 endpoint,
+                                address provider_address,
+                                address subscriber_address)
+
+*in blocks
+
