@@ -1,17 +1,27 @@
 require('babel-register');
 require('babel-polyfill');
+const fs = require('fs');
+const { promisify } = require('util');
+const readFile = promisify(fs.readFile);
 const ZapOracle = require('../ZapOracle');
 
 class ZapRegistry {
-    constructor(eth) {
+    constructor({ eth, abiPath, contract_address}) {
         this.eth = eth;
-        this.address = '';
+        this.address = contract_address;
         this.contract = '';
+        this.abiPath = abiPath;
     }
 
-    initiateProvider({address, contract}) {
-        this.address = address;
-        this.contract = contract;
+    async initiateProvider() {
+        try {
+            const abiBufferFile = await readFile(this.abiPath);
+            const abiFile = JSON.parse(abiBufferFile);
+            this.contract = this.eth.contract(abiFile).at(this.address);
+            return {success: true};
+        } catch(err) {
+            throw err;
+        }
     }
 
     // get oracle by address
@@ -37,3 +47,5 @@ class ZapRegistry {
 }
 
 module.exports = ZapRegistry;
+module.exports.abiPath = '';
+module.exports.contractPath = '';
