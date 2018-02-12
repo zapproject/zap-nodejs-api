@@ -6,22 +6,14 @@ const readFile = promisify(fs.readFile);
 const ZapOracle = require('../ZapOracle');
 
 class ZapRegistry {
-    constructor({ eth, abiPath, contract_address}) {
+    constructor({ eth, contract_address}) {
         this.eth = eth;
         this.address = contract_address;
         this.contract = '';
-        this.abiPath = abiPath;
     }
 
-    async initiateProvider() {
-        try {
-            const abiBufferFile = await readFile(this.abiPath);
-            const abiFile = JSON.parse(abiBufferFile);
-            this.contract = this.eth.contract(abiFile).at(this.address);
-            return {success: true};
-        } catch(err) {
-            throw err;
-        }
+    initiateProvider(abiFile) {
+        this.contract = this.eth.contract(abiFile).at(this.address);
     }
 
     // get oracle by address
@@ -47,5 +39,3 @@ class ZapRegistry {
 }
 
 module.exports = ZapRegistry;
-module.exports.abiPath = '';
-module.exports.contractPath = '';

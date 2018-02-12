@@ -1,6 +1,7 @@
 
 // Load Ethereum
 const Eth = require('ethjs');
+const fs = require('fs');
 const etheriumEndpoint = 'https://ropsten.infura.io';
 const testEtherium = '127.0.0.1:7545';
 const endpoint = process.env.DEV ? testEtherium : etheriumEndpoint;
@@ -8,24 +9,23 @@ const ZapRegistry = require('./contracts/ZapRegistry');
 const eth = new Eth(new Eth.HttpProvider(endpoint));
 const ZapWrapper = require('./ZapWrapper');
 const address = process.env.ADDRESS || '';
-const abiPath = process.env.ABI_PATH || '';
+const abiPath = '../contracts/abis/ZapRegistry.json';
+const abiBufferFile = fs.readFileSync(abiPath);
+const abiFile = JSON.parse(abiBufferFile);
 
-if (!address || !abiPath) {
-    throw new Error('Didn\'t provide address or abi path');
+if (!address) {
+    throw new Error('Didn\'t provide contact address');
 }
 
 const instanceZapRegistry = new ZapWrapper({
     class: ZapRegistry,
     eth,
     address,
-    abiPath
 });
 
 const zapRegistry = instanceZapRegistry.initClass();
 
-zapRegistry.initiateProvider()
-    .then(data => console.log(data))
-    .catch(err => console.log(err));
+zapRegistry.initiateProvider(abiFile);
 
 // to use ZapWrapper should use that type of request 
 // DEV=true ADDRESS=0x79e036bdde21a4e5e149002d81d3b570ff8df42e 
