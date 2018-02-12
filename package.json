@@ -7,6 +7,10 @@
   "private": true,
   "dependencies": {
     "async": "^2.5.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "bignumber.js": "^4.0.2",
     "bson": "^1.0.4",
     "co": "^4.6.0",

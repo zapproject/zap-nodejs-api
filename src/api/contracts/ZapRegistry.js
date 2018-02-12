@@ -1,40 +1,48 @@
+require('babel-register');
+require('babel-polyfill');
 const ZapOracle = require('../ZapOracle');
-const fs = require('fs');
 
 class ZapRegistry {
-    constructor(eth, network) {
+    constructor(eth) {
         this.eth = eth;
 
-        // Load the Registry ABI
-        const registry_file = fs.readFileSync("../../contracts/abis/ZapRegistry.json");
-        const abi = JSON.parse(registry_file);
+        // // Load the Registry ABI
+        // const registry_file = fs.readFileSync("../../contracts/abis/ZapRegistry.json");
+        // const abi = JSON.parse(registry_file);
 
-        // Load the Registry address
-        const addresses = fs.readFileSync("../../contracts/" + network + "/address.json");
+        // // Load the Registry address
+        // const addresses = fs.readFileSync("../../contracts/" + network + "/address.json");
 
-        this.address = JSON.parse(addresses)['Registry'];
-        this.contract = eth.contract(abi).at(this.address);
+        // this.address = JSON.parse(addresses)['Registry'];
+        // this.contract = eth.contract(abi).at(this.address);
+        this.address = '';
+        this.contract = '';
     }
 
-    // Get oracle by address
-    getOracle(address, callback) {
-        const oracle = new ZapOracle(this);
-        oracle.address = address;
+    initiateProvider({address, contract}) {
+        this.address = address;
+        this.contract = contract;
+    }
 
-        // Get the provider's public getRouteKeys
-        this.contract.getProviderPublicKey(address).then((public_key) => {
+    // get oracle by address
+    async getOracle(address, callback) {
+        try {
+            const oracle = new ZapOracle(this);
+            oracle.address = address;
+
+            // Get the provider's public getRouteKeys
+            const public_key = await this.contract.getProviderPublicKey(address)
             oracle.public_key = public_key;
-
-            // Get the route keys next
-            return this.contract.getRouteKeys();
-        }).then((route_keys) => {
+    
+                // Get the route keys next
+            const route_keys = await this.contract.getRouteKeys();
             oracle.route_keys = route_keys;
-
-            // Output loaded object
+    
+                // Output loaded object
             callback(null, oracle);
-        }).catch((err) => {
+        } catch (err) => {
             callback(err);
-        });
+        };
     }
 }
 
