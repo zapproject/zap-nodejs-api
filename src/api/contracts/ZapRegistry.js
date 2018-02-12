@@ -31,7 +31,7 @@ class ZapRegistry {
             oracle.address = address;
 
             // Get the provider's public getRouteKeys
-            const public_key = await this.contract.getProviderPublicKey(address)
+            const public_key = await this.contract.getProviderPublicKey(address);
             oracle.public_key = public_key;
     
             // Get the route keys next
