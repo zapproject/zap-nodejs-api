@@ -1,5 +1,5 @@
 const ZapArbiter = require('./contracts/ZapArbiter');
-const ZapArbiter = require('./contracts/ZapDispatch');
+const ZapDispatch = require('./contracts/ZapDispatch');
 const EventEmitter = require('event');
 
 class ZapProvider extends EventEmitter {

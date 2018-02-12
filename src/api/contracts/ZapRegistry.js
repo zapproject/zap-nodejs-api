@@ -34,15 +34,15 @@ class ZapRegistry {
             const public_key = await this.contract.getProviderPublicKey(address)
             oracle.public_key = public_key;
     
-                // Get the route keys next
+            // Get the route keys next
             const route_keys = await this.contract.getRouteKeys();
             oracle.route_keys = route_keys;
     
-                // Output loaded object
+            // Output loaded object
             callback(null, oracle);
-        } catch (err) => {
+        } catch (err) {
             callback(err);
-        };
+        }
     }
 }
 
