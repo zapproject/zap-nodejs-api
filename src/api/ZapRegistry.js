@@ -9,9 +9,7 @@ const ZapRegistry = require('./contracts/ZapRegistry');
 const eth = new Eth(new Eth.HttpProvider(endpoint));
 const ZapWrapper = require('./ZapWrapper');
 const address = process.env.ADDRESS || '';
-const abiPath = '../contracts/abis/ZapRegistry.json';
-const abiBufferFile = fs.readFileSync(abiPath);
-const abiFile = JSON.parse(abiBufferFile);
+const abiPath = __dirname + '/../contracts/abis/ZapRegistry.json';
 
 if (!address) {
     throw new Error('Didn\'t provide contact address');
@@ -21,11 +19,12 @@ const instanceZapRegistry = new ZapWrapper({
     class: ZapRegistry,
     eth,
     address,
+    abiPath
 });
 
 const zapRegistry = instanceZapRegistry.initClass();
 
-zapRegistry.initiateProvider(abiFile);
+zapRegistry.initiateProvider();
 
 // to use ZapWrapper should use that type of request 
 // DEV=true ADDRESS=0x79e036bdde21a4e5e149002d81d3b570ff8df42e 

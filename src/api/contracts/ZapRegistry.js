@@ -1,19 +1,17 @@
 require('babel-register');
 require('babel-polyfill');
-const fs = require('fs');
-const { promisify } = require('util');
-const readFile = promisify(fs.readFile);
 const ZapOracle = require('../ZapOracle');
 
 class ZapRegistry {
-    constructor({ eth, contract_address}) {
+    constructor({ eth, contract_address, abiFile}) {
         this.eth = eth;
         this.address = contract_address;
         this.contract = '';
+        this.abiFile = abiFile;
     }
 
-    initiateProvider(abiFile) {
-        this.contract = this.eth.contract(abiFile).at(this.address);
+    initiateProvider() {
+        this.contract = this.eth.contract(this.abiFile).at(this.address);
     }
 
     // get oracle by address
