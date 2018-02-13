@@ -5,7 +5,7 @@ const fs = require('fs');
 const etheriumEndpoint = 'https://ropsten.infura.io';
 const testEtherium = '127.0.0.1:7545';
 const endpoint = process.env.DEV ? testEtherium : etheriumEndpoint;
-const ZapRegistry = require('./contracts/ZapRegistry');
+const instanceClass = require('./contracts/ZapRegistry');
 const eth = new Eth(new Eth.HttpProvider(endpoint));
 const ZapWrapper = require('./ZapWrapper');
 const address = process.env.ADDRESS || '';
@@ -15,14 +15,13 @@ if (!address) {
     throw new Error('Didn\'t provide contact address');
 }
 
-const instanceZapRegistry = new ZapWrapper({
-    class: ZapRegistry,
-    eth,
+const instanceZapRegistry = new ZapWrapper(eth);
+
+const zapRegistry = instanceZapRegistry.initClass({
+    instanceClass,
     address,
     abiPath
 });
-
-const zapRegistry = instanceZapRegistry.initClass();
 
 zapRegistry.initiateProvider();
 

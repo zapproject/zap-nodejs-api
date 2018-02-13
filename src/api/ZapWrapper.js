@@ -1,18 +1,15 @@
 const { readFileSync } = require('fs');
 
 module.exports = class Wrapper {
-    constructor(data) {
-        this.class = data.class;
-        this.eth = data.eth;
-        this.address = data.address;
-        this.abiPath = data.abiPath;
+    constructor(eth) {
+        this.eth = eth;
     }
 
-    initClass() {
-        const abiFile = JSON.parse(readFileSync(this.abiPath));
-        return new this.class({
+    initClass({ instanceClass, address, abiPath}) {
+        const abiFile = JSON.parse(readFileSync(abiPath));
+        return new instanceClass({
             eth: this.eth, 
-            contract_address: this.address,
+            contract_address: address,
             abiFile
         });
     }
