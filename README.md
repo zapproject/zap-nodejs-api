@@ -84,4 +84,4 @@ zapcli set --ws ws://dendritic.network:8546
 
 All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-![ZAP DFD](https://i.imgur.com/IpTjHw6.png)
+![ZAP DFD](https://imgur.com/opxIace)
