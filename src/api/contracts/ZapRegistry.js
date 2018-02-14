@@ -11,25 +11,39 @@ const curveType = {
 };
 
 class ZapRegistry {
-    constructor(eth) {
+    constructor({eth, address, abiFile}) {
         this.eth = eth;
-        this.address = '';
-        this.contract = '';
-    }
-
-    initiateProvider({address, contract}) {
         this.address = address;
-        this.contract = contract;
+        this.abiFile = abiFile;
+        this.contract = eth.contract(abiFile).at(address);
     }
 
-    async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier }) {
-        const curve = curveType[ZapCurveType];
-        return await this.contract.initiateProviderCurve(
-            specifier,
-            curve,
-            curveStart,
-            curveMultiplier
-        );
+    async initiateProvider({publicKey, route_keys, title, from}) {
+        try {
+            return await this.contract.initiateProvider(
+                publicKey, 
+                route_keys, 
+                title, 
+                { from }
+            );
+        } catch(err) {
+            throw err;
+        }
+    }
+
+    async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from }) {
+        try {
+            const curve = curveType[ZapCurveType];
+            return await this.contract.initiateProviderCurve(
+                specifier,
+                curve,
+                curveStart,
+                curveMultiplier,
+                { from }
+            );
+        } catch(err) {
+            throw err;
+        }
     }
 
     // get oracle by address
