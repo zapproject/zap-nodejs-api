@@ -10,8 +10,7 @@ In order to contribute it may be useful to...
 
 In particular, we need help in the following areas:
 
-  * [NatSpec Documentation](https://github.com/ethereum/wiki/wiki/Ethereum-Natural-Specification-Format) 
-  for all contracts and functions, especially `@notice` tags for public and external methods 
+  * Creating [examples](https://github.com/zapproject/FeedArbitration/tree/master/examples) of provider data
   
   
 ## How to Report Issues  
