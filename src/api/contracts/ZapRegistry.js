@@ -9,9 +9,10 @@ class ZapRegistry {
         this.contract = '';
     }
 
-    initiateProvider({address, contract}) {
+    async initiateProvider({address, contract, route_keys, public_key, title }) {
         this.address = address;
         this.contract = contract;
+        return await contract.initiateProvider(route_keys, public_key, title);
     }
 
     // get oracle by address
