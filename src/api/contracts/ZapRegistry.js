@@ -1,17 +1,49 @@
+// @flow
 require('babel-register');
 require('babel-polyfill');
 const ZapOracle = require('../ZapOracle');
 
+const curveType = {
+    "ZapCurveNone": 0,
+    "ZapCurveLinear": 1,
+    "ZapCurveExponential": 2,
+    "ZapCurveLogarithmic": 3
+};
+
 class ZapRegistry {
-    constructor({ eth, contract_address, abiFile}) {
+    constructor({eth, address, abiFile}) {
         this.eth = eth;
-        this.address = contract_address;
-        this.contract = '';
+        this.address = address;
         this.abiFile = abiFile;
+        this.contract = eth.contract(abiFile).at(address);
     }
 
-    initiateProvider() {
-        this.contract = this.eth.contract(this.abiFile).at(this.address);
+    async initiateProvider({publicKey, route_keys, title, from}) {
+        try {
+            return await this.contract.initiateProvider(
+                publicKey, 
+                route_keys, 
+                title, 
+                { from }
+            );
+        } catch(err) {
+            throw err;
+        }
+    }
+
+    async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from }) {
+        try {
+            const curve = curveType[ZapCurveType];
+            return await this.contract.initiateProviderCurve(
+                specifier,
+                curve,
+                curveStart,
+                curveMultiplier,
+                { from }
+            );
+        } catch(err) {
+            throw err;
+        }
     }
 
     // get oracle by address

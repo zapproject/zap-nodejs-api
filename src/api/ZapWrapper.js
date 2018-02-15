@@ -13,4 +13,8 @@ module.exports = class Wrapper {
             abiFile
         });
     }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> feature/task-15103
