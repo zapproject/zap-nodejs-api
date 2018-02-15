@@ -3,16 +3,24 @@ require('babel-polyfill');
 const ZapOracle = require('../ZapOracle');
 
 class ZapRegistry {
-    constructor(eth) {
+    constructor({eth, address, abiFile}) {
         this.eth = eth;
-        this.address = '';
-        this.contract = '';
+        this.address = address;
+        this.abiFile = abiFile;
+        this.contract = eth.contract(abiFile).at(address);
     }
 
-    async initiateProvider({address, contract, route_keys, public_key, title }) {
-        this.address = address;
-        this.contract = contract;
-        return await contract.initiateProvider(route_keys, public_key, title);
+    async initiateProvider({ route_keys, public_key, title, from  }) {
+        try {
+            return await this.contract.initiateProvider(
+                route_keys,
+                public_key,
+                title,
+                { from }
+            );
+        } catch(err) {
+            throw err;
+        }
     }
 
     // get oracle by address
