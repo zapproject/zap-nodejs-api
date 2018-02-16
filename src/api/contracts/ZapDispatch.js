@@ -1,3 +1,4 @@
+require('babel-register');
 const Eth = require('ethjs');
 const fs = require('fs');
 
