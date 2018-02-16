@@ -13,6 +13,7 @@
     "babel-preset-env": "^1.6.1",
     "bignumber.js": "^4.0.2",
     "bson": "^1.0.4",
+    "chai-bignumber": "^2.0.2",
     "co": "^4.6.0",
     "co-prompt": "^1.0.0",
     "commander": "^2.12.2",
@@ -22,11 +23,14 @@
     "elliptic": "^6.4.0",
     "ethereumjs-wallet": "^0.6.0",
     "ethjs": "^0.3.1",
+    "ganache-core": "^2.0.2",
     "ipfs": "^0.27.6",
     "ipfs-pubsub-room": "^1.1.5",
     "js-ipfs": "*",
     "level-filesystem": "github:zapproject/level-filesystem",
     "libp2p-webrtc-star": "^0.13.2",
+    "mocha": "^5.0.1",
+    "nyc": "^11.4.1",
     "readline": "^1.3.0",
     "solc": "^0.4.19",
     "vorpal": "^1.12.0",
@@ -34,6 +38,8 @@
     "wrtc": "0.0.65"
   },
   "scripts": {
+    "test": "TEST=1 ./node_modules/.bin/mocha",
+    "coverage": "./node_modules/.bin/nyc report clover",
     "bundle": "browserify src/account.js src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -t brfs -o build/bundle.js",
     "generateABI": "cd src/contracts && node generateABIs.js && cd ../../"
   },
