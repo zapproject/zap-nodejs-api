@@ -1,33 +1,65 @@
+// web3 interface
 const Web3 = require('web3');
+// import server and provider for our test environment
 const { provider, server } = require('ganache-cli');
+// import method that will deploy our contracts
+const migrate = require('../node_modules/truffle-core/lib/commands/migrate');
+// method that helps to resolve paths 
 const path = require('path');
+// method that helps as get promise with out callback function
+const contract = require('truffle-contract');
+
+const { promisify } = require('util');
+const asyncMigrate = promisify(migrate.run);
+
 const {
     endpoint,
     port,
     protocol,
-    network
+    network,
+    zaRegistryPath: abiPath,
+    contractsBuildDirectory,
+    contractsDirectory
 } = require('../config');
+// initiate and run ganache server;
 var ganacheServer = server();
-ganacheServer.listen(port, function(err, data) {
+
+ganacheServer.listen(port, function (err, data) {
     console.log(err);
     console.log(data);
 });
-const abiPath = '../src/contracts/abis/ZapRegistry.json';
 const abiJSON = require(path.join(__dirname, abiPath));
-const web3 = new Web3(new Web3.providers.HttpProvider(`${protocol}${endpoint}:${port}`));
+const webProvider = new Web3(new Web3.providers.HttpProvider(`${protocol}${endpoint}:${port}`));
 const launchProvider = provider();
-web3.setProvider(launchProvider);
-const migrate = require('../node_modules/truffle-core/lib/commands/migrate');
-const options = {
-    logger: console,
-    "contracts_build_directory": path.join(__dirname, '../ZapContracts'),
-    "contracts_directory": path.join(__dirname, '../ZapContracts/contracts'),
-    network: network,
-    provider: launchProvider
-};
-migrate.run(options, (err, res) => {
-    console.log('err',err);
-    console.log('res',res);
-});
 
+
+webProvider.setProvider(launchProvider);
+const zapToken = contract({ abi: abiJSON });
+zapToken.setProvider(webProvider);
+
+let accounts = [];
+webProvider.eth.getAccounts()
+    .then(data => accounts = data)
+    .catch(err => console.log('webProvider', err));
+
+async function migrateContracts() {
+    const options = {
+        logger: console,
+        "contracts_build_directory": path.join(__dirname, contractsBuildDirectory),
+        "contracts_directory": path.join(__dirname, contractsDirectory),
+        network: network,
+        provider: launchProvider
+    };
+    try {
+        const data = await asyncMigrate(options);
+        console.log(data);
+    } catch(err) {
+        console.log(err);
+        throw err;
+    }
+}
+
+migrateContracts()
+    .then(data => console.log(data))
+    .catch(err => console.log(err));
 require('chai').should();
