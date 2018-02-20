@@ -8,6 +8,9 @@ const migrate = require('../node_modules/truffle-core/lib/commands/migrate');
 const path = require('path');
 // method that helps as get promise with out callback function
 const contract = require('truffle-contract');
+const { serverOptions } = require('../config/server.js');
+
+// get instance of our ganache serve
 const server = require('./server');
 
 // const  access = fs.createWriteStream(__dirname + '/node.access.log', { flags: 'a' });
@@ -27,15 +30,6 @@ const {
     network_id
 } = require('../config');
 // initiate and run ganache server;
-
-const serverOptions = {
-    "hostname":"127.0.0.1",
-    "mnemonic":"candy maple cake sugar pudding cream honey rich smooth crumble sweet treat",
-    "network_id":5777,
-    "port":7545,
-    "total_accounts":10,
-    "unlocked_accounts":[]
-};
 
 const webProvider = new Web3();
 const ganacheProvider = provider(serverOptions);
