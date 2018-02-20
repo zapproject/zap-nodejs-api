@@ -23,7 +23,7 @@
     "elliptic": "^6.4.0",
     "ethereumjs-wallet": "^0.6.0",
     "ethjs": "^0.3.1",
-    "ganache-cli": "^6.0.3",
+    "ganache-core": "^2.0.2",
     "ipfs": "^0.27.6",
     "ipfs-pubsub-room": "^1.1.5",
     "js-ipfs": "*",
