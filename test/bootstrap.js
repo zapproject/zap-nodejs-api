@@ -19,15 +19,15 @@ const server = require('./server');
 const { networks } = require('../truffle.js');
 const { promisify } = require('util');
 const asyncMigrate = promisify(migrate.run);
-
 const {
     endpoint,
     port,
-    protocol,
     network,
     contractsBuildDirectory,
     contractsDirectory,
-    network_id
+    network_id,
+    migrationsDirectory,
+    zapTokenAbi
 } = require('../config');
 // initiate and run ganache server;
 
@@ -39,21 +39,20 @@ webProvider.setProvider(ganacheProvider);
 async function migrateContracts() {
     const options = {
         logger: console,
-        "contracts_build_directory": path.join(__dirname, '../ZapContracts/build/contracts'),
+        "contracts_build_directory": path.join(__dirname, contractsBuildDirectory),
         "contracts_directory": path.join(__dirname, contractsDirectory),
         network: network,
         networks,
         provider: ganacheProvider,
         dryRun: true,
-        "migrations_directory": path.join(__dirname, '../ZapContracts/migrations'),
-        "network_id":5777,
-        "hostname":"127.0.0.1",
-        "port":7545,
+        "migrations_directory": path.join(__dirname, migrationsDirectory),
+        "network_id":network_id,
+        "hostname":endpoint,
+        "port":port,
     };
     try {
         await asyncMigrate(options);
-        const abiPath = '../ZapContracts/build/contracts/ZapToken.json';
-        const abiJSON = require(path.join(__dirname, abiPath));
+        const abiJSON = require(path.join(__dirname, zapTokenAbi));
         const zapToken = contract(abiJSON);
         zapToken.setProvider(ganacheProvider);
         const deplZapToken = await zapToken.deployed();
@@ -61,10 +60,11 @@ async function migrateContracts() {
         const data = await deplZapToken.mint(deplZapToken.address, 140000, {from: accounts[0]});
         const balance = await deplZapToken.balanceOf(deplZapToken.address);
         console.log(balance.toString());
-        closeServer();
     } catch(err) {
         console.log('errrrrr=====?>>>>>>',err);
         throw err;
+    } finally {
+        closeServer();
     }
 }
 
