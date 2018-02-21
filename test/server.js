@@ -13,4 +13,8 @@ ganacheServer.listen(7545, (err, log) => {
     }
 });
 
-module.exports = ganacheServer;
+function closeServer() {
+    ganacheServer.close();
+}
+
+global.closeServer = closeServer;
