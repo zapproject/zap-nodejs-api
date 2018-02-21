@@ -8,6 +8,6 @@ module.exports = {
     contractsDirectory: '../ZapContracts/contracts',
     network_id: 5777,
     migrationsDirectory: '../ZapContracts/migrations',
-    zapTokenAbi: '../ZapContracts/build/contracts/ZapToken.json',
+    zapTokenAbi: '../../ZapContracts/build/contracts/ZapToken.json',
     runMigrationTimeOut: 5000
 };

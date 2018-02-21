@@ -30,7 +30,7 @@ webProvider.setProvider(ganacheProvider);
 
 async function migrateContracts() {
     const options = {
-        logger: console,
+        // logger: console,
         "contracts_build_directory": path.join(__dirname, contractsBuildDirectory),
         "contracts_directory": path.join(__dirname, contractsDirectory),
         network: network,
@@ -60,4 +60,4 @@ require('chai')
     .use(require('chai-as-promised'))
     .use(require('chai-bignumber'))
     .should();
-require('./zapTokenTest');
+require('./bootstrap/zapTokenTest');
