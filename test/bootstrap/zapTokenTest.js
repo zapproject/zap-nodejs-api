@@ -6,7 +6,6 @@ const {
     webProvider
 } = require('../bootstrap');
 const { 
-    runMigrationTimeOut,
     zapTokenAbi
 } = require('../../config');
 const contract = require('truffle-contract');
