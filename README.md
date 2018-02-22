@@ -6,15 +6,15 @@
 
 All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-### tests
-`git clone --recurse-submodules -j8 https://github.com/zapproject/FeedArbitration.git`
+### Tests
+    git clone --recurse-submodules -j8 https://github.com/zapproject/FeedArbitration.git
 
-`git submodule update --init --recursive`
-
-
-#### then run command
-`yarn install`
+    git submodule update --init --recursive
 
 
-#### for run test
-`yarn test`
+  #### then run command
+    yarn install
+
+
+  #### for run test
+    yarn test

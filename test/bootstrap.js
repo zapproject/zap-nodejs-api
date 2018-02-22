@@ -36,7 +36,6 @@ async function migrateContracts() {
         network: network,
         networks,
         provider: ganacheProvider,
-        // dryRun: true,
         "migrations_directory": path.join(__dirname, migrationsDirectory),
         "network_id":network_id,
         "hostname":endpoint,
@@ -60,4 +59,4 @@ require('chai')
     .use(require('chai-as-promised'))
     .use(require('chai-bignumber'))
     .should();
-require('./bootstrap/zapTokenTest');
+require('./tests/zapTokenTest');

@@ -16,7 +16,8 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
     let accounts = [];
     let deployedZapToken;
 
-    before(async () => {
+    before(async function() {
+        this.timeout(60000);
         const data = await migrateContracts();
         assert.equal(data, 'done');
         const abiJSON = require(path.join(__dirname, zapTokenAbi));
