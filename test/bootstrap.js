@@ -36,7 +36,7 @@ async function migrateContracts() {
         network: network,
         networks,
         provider: ganacheProvider,
-        dryRun: true,
+        // dryRun: true,
         "migrations_directory": path.join(__dirname, migrationsDirectory),
         "network_id":network_id,
         "hostname":endpoint,
