@@ -9,6 +9,8 @@ All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MER
 ### tests
 `git clone --recurse-submodules -j8 https://github.com/zapproject/FeedArbitration.git`
 
+`git submodule update --init --recursive`
+
 
 #### then run command
 `yarn install`
