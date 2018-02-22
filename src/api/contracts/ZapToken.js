@@ -1,48 +1,33 @@
 const Eth = require('ethjs');
-const fs = require('fs');
 
 class ZapToken {
-    constructor(eth, network) {
+    constructor({eth, contract_address, abiFile}) {
         this.eth = eth;
-
-        const token_abi_file = fs.readFileSync('../../contracts/abis/ZapToken.json');
-        const token_abi_json = JSON.parse(token_abi_file);
-
-        const addresses = fs.readFileSync('../../contracts/' + network + '/address.json');
-        const token_address = JSON.parse(addresses)['Token'];
-
-        this.token_contract = eth.contract(token_abi_json).at(token_address);
+        this.token_address = contract_address;
+        this.abiFile = abiFile;
+        this.token_contract = eth.contract(abiFile).at(this.token_address);
     }
 
     // Get our address
-    getAddress(callback) {
-        this.eth.accounts().then((accounts) => {
-            if ( accounts.length == 0 ) {
-                callback(new Error("No accounts loaded"));
-                return;
+    async getAddress() {
+        try{
+            const accounts = await this.eth.accounts();
+            if(!accounts.length) {
+                throw new Error('No accounts loaded');
             }
-
-            const account = accounts[0];
-            callback(null, account);
-        }).catch((err) => {
-            callback(err);
-        });
+            return accounts[0];
+        } catch(err) {
+            throw err;
+        }
     }
-
-    // Get Balance in Zap
-    getBalance(callback) {
-        this.getAddress((err, address) => {
-            if ( err ) {
-                callback(err);
-                return;
-            }
-
-            this.token_contract.balanceOf(address).then((balance) => {
-                callback(null, balance);
-            }).catch((err) => {
-                callback(err);
-            });
-        });
+    
+    async getBalance() {
+        try {
+            const address = await this.getAddress();
+            return  await this.token_contract.balanceOf(address);
+        } catch(err) {
+            throw err;
+        }
     }
 
     // Send Zap around

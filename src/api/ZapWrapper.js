@@ -6,7 +6,12 @@ module.exports = class Wrapper {
     }
 
     initClass({ instanceClass, address, abiPath}) {
-        const abiFile = JSON.parse(readFileSync(abiPath));
+        let abiFile;
+        if (typeof abiPath === 'object') {
+            abiFile = abiPath;
+        } else {
+            abiFile = JSON.parse(readFileSync(abiPath));
+        }
         return new instanceClass({
             eth: this.eth, 
             contract_address: address,
