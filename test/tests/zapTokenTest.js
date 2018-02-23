@@ -24,6 +24,7 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
     let deployedZapToken;
     let zapToken;
     let abiJSON;
+    let zapTokenWrapper;
 
     before(async function() {
         this.timeout(60000);
@@ -47,7 +48,7 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
 
         it('should initiate wrapper', () => {
             const wrapper = new ZapWrapper(eth);
-            zapToken = wrapper.initClass({
+            zapTokenWrapper = wrapper.initClass({
                 instanceClass,
                 address: addressZapToken,
                 abiPath: abiJSON.abi
@@ -55,19 +56,19 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
         });
 
         it('Should get zapToken address from wrapper', async () => {
-            const account = await zapToken.getAddress();
+            const account = await zapTokenWrapper.getAddress();
             assert.equal(account, accounts[0].toLowerCase());
             assert.equal(account.length, accounts[0].length);
         });
 
         it('should get balance of zapToken from wrapper', async () => {
-            const { balance } = await zapToken.getBalance();
+            const { balance } = await zapTokenWrapper.getBalance();
             assert.equal(balance.toString(), 0);
         });
 
     });
 
-    after(() => {
-        closeServer();
-    });
+    // after(() => {
+    //     closeServer();
+    // });
 });

@@ -42,7 +42,7 @@
     "wrtc": "0.0.65"
   },
   "scripts": {
-    "test": "TEST=1 ./node_modules/.bin/mocha",
+    "test": "JUNIT_REPORT_PATH=report.xml TEST=1 nyc --reporter=clover ./node_modules/.bin/mocha",
     "coverage": "./node_modules/.bin/nyc report clover",
     "bundle": "browserify src/account.js src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -t brfs -o build/bundle.js",
     "generateABI": "cd src/contracts && node generateABIs.js && cd ../../"
