@@ -18,12 +18,15 @@ class ZapRegistry {
         this.contract = eth.contract(abiFile).at(address);
     }
 
-    async initiateProvider({publicKey, route_keys, title, from}) {
+
+    // for example initiate Provider should get (43254352345, "spaceoracle", 'none', [ ]) in arguments
+    async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from}) {
         try {
             return await this.contract.initiateProvider(
-                publicKey, 
-                route_keys, 
+                public_key, 
                 title, 
+                endpoint_specifier,
+                endpoint_params,
                 { from }
             );
         } catch(err) {
@@ -39,6 +42,18 @@ class ZapRegistry {
                 curve,
                 curveStart,
                 curveMultiplier,
+                { from }
+            );
+        } catch(err) {
+            throw err;
+        }
+    }
+
+    async setEndpointParams({ specifier, endpoint_params,from  }) {
+        try {
+            return await this.contract.setEndpointParams(
+                specifier,
+                endpoint_params,
                 { from }
             );
         } catch(err) {
