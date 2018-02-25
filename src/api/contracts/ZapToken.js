@@ -31,14 +31,13 @@ class ZapToken {
     }
 
     // Send Zap around
-    send(destination, amount, callback) {
-        amount = Eth.toBN(amount);
-
-        this.token_contract.transfer(destination, amount).then((success) => {
-            callback(null, success);
-        }).catch((err) => {
-            callback(err);
-        });
+    async send(destination, amount) {
+        try {
+            amount = Eth.toBN(amount);
+            return await this.token_contract.transfer(destination, amount);
+        } catch(err) {
+            throw err;
+        }
     }
 
     // Approve a certain amount of zap to be sent

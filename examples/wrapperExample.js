@@ -8,18 +8,25 @@
 // To use other network edit const testEtherium
 const Eth = require('ethjs');
 const fs = require('fs');
+const {
+    port,
+    protocol,
+    endpoint
+} = require('../config');
 const etheriumEndpoint = 'https://ropsten.infura.io';
-const testEtherium = 'http://127.0.0.1:7545';
-const endpoint = process.env.DEV ? testEtherium : etheriumEndpoint;
-const eth = new Eth(new Eth.HttpProvider(endpoint));
+const testEtherium = `${protocol}${endpoint}:${port}`;
+const ethEndpoint = process.env.DEV ? testEtherium : etheriumEndpoint;
+const eth = new Eth(new Eth.HttpProvider(ethEndpoint));
 const ZapWrapper = require('../src/api/ZapWrapper');
 const address = process.env.ADDRESS || '';
+const path = require('path');
 // in this example we were using Zapregistry smart contract
 // if you are going to use another contract please review path to your abis json file
-const abiPath = __dirname + '../src/contracts/abis/ZapRegistry.json';
+const abiFile = require(path.join(__dirname, '../ZapContracts/build/contracts/ZapRegistry.json'));
+// const abiPath = __dirname + '../src/contracts/abis/ZapRegistry.json';
 // Also if you try to test another wrapper for smart contract is different than ZapRegistry
 // Specify way to your wrapper
-const instanceClass = require('./contracts/ZapRegistry');
+const instanceClass = require('../src/api/contracts/ZapRegistry');
 
 if (!address) {
     throw new Error('Didn\'t provide contact address');
@@ -30,13 +37,14 @@ const instanceZapRegistry = new ZapWrapper(eth);
 const zapRegistry = instanceZapRegistry.initClass({
     instanceClass,
     address,
-    abiPath
+    abiPath: abiFile.abi
 });
 
 zapRegistry.initiateProvider({
-    publicKey: 111,
-    route_keys: [1], 
-    title: 'test',
+    public_key: 43254352345,
+    title: 'spaceoracle',
+    endpoint_specifier: '0xb5ba53bc5ca7cdd6c97be54f7d4e82a5d923be7665deef14398f34a108fb3b89',
+    endpoint_params: [],
     from: '0x627306090abaB3A6e1400e9345bC60c78a8BEf57'
 })
     .then(data => console.log('initiateProvider',data))
@@ -51,6 +59,14 @@ zapRegistry.initiateProviderCurve({
 })
     .then(data => console.log('initiateProviderCurve',data))
     .catch(err => console.log('initiateProviderCurve err',err));
+
+zapRegistry.setEndpointParams({
+    specifier: '0xb5ba53bc5ca7cdd6c97be54f7d4e82a5d923be7665deef14398f34a108fb3b89',
+    endpoint_params: ['0xb5ba53bc5ca7cdd6c97be54f7d4e82a5d923be7665deef14398f34a108fb3b89'],
+    from: '0x627306090abaB3A6e1400e9345bC60c78a8BEf57'
+})
+    .then(data => console.log('setEndpointsParams ==>>', data))
+    .catch(err => console.log('setEndpointsParams err ==>>', err));
 
 // to use ZapWrapper should use that type of request 
 // DEV=true ADDRESS=0x79e036bdde21a4e5e149002d81d3b570ff8df42e 
