@@ -17,4 +17,8 @@ All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MER
 
 
   #### for run test
-    yarn test
+    yarn run test
+
+
+  #### for code coverage
+    yarn run coverage
