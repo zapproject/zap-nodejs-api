@@ -5,3 +5,4 @@ ipfs/
 src/.synapseprovider
 src/.synapsesubscriber
 .nyc_output
+coverage/
