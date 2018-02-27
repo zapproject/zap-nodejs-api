@@ -19,6 +19,7 @@
     "co": "^4.6.0",
     "co-prompt": "^1.0.0",
     "commander": "^2.12.2",
+    "coveralls": "^3.0.0",
     "crypto-js": "^3.1.9-1",
     "datastore-fs": "^0.3.0",
     "deasync": "^0.1.11",
@@ -32,6 +33,7 @@
     "level-filesystem": "github:zapproject/level-filesystem",
     "libp2p-webrtc-star": "^0.13.2",
     "mocha": "^5.0.1",
+    "mocha-lcov-reporter": "^1.3.0",
     "nyc": "^11.4.1",
     "readline": "^1.3.0",
     "solc": "^0.4.19",
@@ -42,7 +44,8 @@
     "wrtc": "0.0.65"
   },
   "scripts": {
-    "test": "JUNIT_REPORT_PATH=report.xml TEST=1 nyc --reporter=clover ./node_modules/.bin/mocha",
+    "test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha && nyc report --reporter=text-lcov | coveralls",
+    "test_local": "JUNIT_REPORT_PATH=report.xml TEST=1 nyc --reporter=clover ./node_modules/.bin/mocha",
     "coverage": "./node_modules/.bin/nyc report clover",
     "bundle": "browserify src/account.js src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -t brfs -o build/bundle.js",
     "generateABI": "cd src/contracts && node generateABIs.js && cd ../../"
