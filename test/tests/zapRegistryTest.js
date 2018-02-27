@@ -1,7 +1,6 @@
 const instanceClass = require('../../src/api/contracts/ZapRegistry');
 const assert = require("chai").assert;
 const {
-    migrateContracts,
     ganacheProvider,
     webProvider
 } = require('../bootstrap');
@@ -17,6 +16,8 @@ const Eth = require('ethjs');
 const endpointTest = `${protocol}${endpoint}:${port}`;
 const eth = new Eth(new Eth.HttpProvider(endpointTest));
 const ZapWrapper = require('../../src/api/ZapWrapper');
+
+const specifier = new String("test-linear-specifier");
 
 describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
     let addressZapRegistry;
@@ -49,21 +50,52 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
 
         it('Should initiate provider in zap registry contract', async () => {
             await zapRegistryWrapper.initiateProvider({
-                publicKey: 111,
-                route_keys: [1],
+                public_key: 43254352345,
                 title: 'test',
+                endpoint_specifier: specifier.valueOf(),
+                endpoint_params: [],
                 from: accounts[0]
             });
         });
 
         it('Should initiate Provider curve in zap registry contract', async () => {
             await zapRegistryWrapper.initiateProviderCurve({
-                specifier: '0xb5ba53bc5ca7cdd6c97be54f7d4e82a5d923be7665deef14398f34a108fb3b89',
-                ZapCurveType: 'ZapCurveNone',
+                specifier: specifier.valueOf(),
+                ZapCurveType: 'ZapCurveLinear',
                 curveStart: 1,
                 curveMultiplier: 2,
                 from: accounts[0]
             });
         });
+
+        it('Should set endpoint params in zap registry contract', async () => {
+            try {
+                await zapRegistryWrapper.setEndpointParams({ 
+                    specifier: specifier.valueOf(), 
+                    endpoint_params: [
+                        'urn:ed2k:354B15E68FB8F36D7CD88FF94116CDC1',
+                        'urn:tree:tiger:7N5OAMRNGMSSEUE3ORHOKWN4WWIQ5X4EBOOTLJY',
+                        'urn:btih:QHQXPYWMACKDWKP47RRVIV7VOURXFE5Q',
+                        'xl=10826029&dn=mediawiki-1.15.1.tar.gz'
+                    ], 
+                    from: accounts[0]
+                });
+            } catch(err) {
+                if (err.value && err.value.message && ~err.value.message.indexOf('invalid opcode')) {
+                    assert.ok(true);
+                } else {
+                    throw err;
+                }
+            }
+        });
+
+        it('Should ger oracle in zap registry contract', async () => {
+            try {
+                const oracle = await zapRegistryWrapper.getOracle({address: accounts[0], from: accounts[0]});
+                console.log(oracle);
+            } catch(err) {
+                console.log(err);
+            }
+        }); 
     });
 });

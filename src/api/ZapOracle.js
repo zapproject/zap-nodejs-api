@@ -1,7 +1,7 @@
 const ZapCurve = require('./ZapCurve');
 
 class ZapOracle {
-    consructor(registry) {
+    constructor(registry) {
         this.registry = registry;
 
         // Empty default

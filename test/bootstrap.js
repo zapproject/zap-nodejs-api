@@ -28,6 +28,14 @@ const ganacheProvider = provider(serverOptions);
 //connect our provider with ganache-core
 webProvider.setProvider(ganacheProvider);
 
+process.on('unhandledRejection', (reason, p) => {
+    console.log('Unhandled Rejection at: Promise');
+    // console.log( //eslint-disable-line
+    //     `Unhandled Rejection at: Promise', ${p}, 
+    //     'reason:', ${reason}`
+    // );
+});
+
 async function migrateContracts() {
     const options = {
         // logger: console,
