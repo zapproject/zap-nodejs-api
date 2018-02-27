@@ -65,6 +65,7 @@ zapRegistry.initiateProviderCurve({
 zapRegistry.setEndpointParams({
     specifier: specifier.valueOf(),
     endpoint_params: [
+        // specifier.valueOf()
         'urn:ed2k:354B15E68FB8F36D7CD88FF94116CDC1',
         'urn:tree:tiger:7N5OAMRNGMSSEUE3ORHOKWN4WWIQ5X4EBOOTLJY',
         'urn:btih:QHQXPYWMACKDWKP47RRVIV7VOURXFE5Q',
@@ -75,9 +76,9 @@ zapRegistry.setEndpointParams({
     .then(data => console.log('setEndpointsParams ==>>', data))
     .catch(err => console.log('setEndpointsParams err ==>>', err));
 
-zapRegistry.getOracle('0x627306090abaB3A6e1400e9345bC60c78a8BEf57')
-    .then(data => console.log('getOracle', data))
-    .catch(err => console.log('getOracle err ==>>', err));
+// zapRegistry.getOracle('0x627306090abaB3A6e1400e9345bC60c78a8BEf57')
+//     .then(data => console.log('getOracle', data))
+//     .catch(err => console.log('getOracle err ==>>', err));
 // to use ZapWrapper should use that type of request 
 // DEV=true ADDRESS=0x79e036bdde21a4e5e149002d81d3b570ff8df42e 
 // ABI_PATH=../contracts/abis/ZapRegistry.json 

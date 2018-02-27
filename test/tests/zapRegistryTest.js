@@ -68,7 +68,7 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
                 from: accounts[0]
             });
         });
-
+        
         it('Should set endpoint params in zap registry contract', async () => {
             try {
                 await zapRegistryWrapper.setEndpointParams({ 
@@ -82,21 +82,22 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
                     from: accounts[0]
                 });
             } catch(err) {
-                if (err.value && err.value.message && ~err.value.message.indexOf('invalid opcode')) {
-                    assert.ok(true);
-                } else {
-                    throw err;
-                }
+                throw err;
+                // if (err.value && err.value.message && ~err.value.message.indexOf('invalid opcode')) {
+                //     assert.ok(true);
+                // } else {
+                    
+                // }
             }
         });
 
-        // it('Should ger oracle in zap registry contract', async () => {
-        //     try {
-        //         const oracle = await zapRegistryWrapper.getOracle({address: accounts[0], from: accounts[0]});
-        //         console.log(oracle);
-        //     } catch(err) {
-        //         console.log(err);
-        //     }
-        // }); 
+        it('Should ger oracle in zap registry contract', async () => {
+            try {
+                const oracle = await zapRegistryWrapper.getOracle({address: accounts[0]});
+                console.log(oracle);
+            } catch(err) {
+                console.log('err===>>>>>',err);
+            }
+        }); 
     });
 });

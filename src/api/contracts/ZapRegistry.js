@@ -3,7 +3,9 @@ require('babel-register');
 require('babel-polyfill');
 const ZapOracle = require('../ZapOracle');
 const {
+    getHexString,
     getHexBuffer,
+    toHex
 } = require('../utils');
 
 const curveType = {
@@ -28,7 +30,7 @@ class ZapRegistry {
     // for example initiate Provider should get (43254352345, "spaceoracle", 'none', [ ]) in arguments
     async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from}) {
         try {
-            const specifier = getHexBuffer(endpoint_specifier);
+            const specifier = getHexString(endpoint_specifier);
             return await this.contract.initiateProvider(
                 public_key, 
                 title, 
@@ -44,7 +46,7 @@ class ZapRegistry {
     async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from }) {
         try {
             const curve = curveType[ZapCurveType];
-            const bufferSpecifier = getHexBuffer(specifier);
+            const bufferSpecifier = getHexString(specifier);
             return await this.contract.initiateProviderCurve(
                 bufferSpecifier,
                 curve,
@@ -59,9 +61,9 @@ class ZapRegistry {
 
     async setEndpointParams({ specifier, endpoint_params, from }) {
         try {
-            specifier = getHexBuffer(specifier);
+            specifier = getHexString(specifier);
             let params = [];
-            endpoint_params.forEach(el => params.push(getHexBuffer(el)));
+            endpoint_params.forEach(el => params.push(getHexString(el)));
             return await this.contract.setEndpointParams(
                 specifier,
                 params,
@@ -73,20 +75,20 @@ class ZapRegistry {
     }
 
     // get oracle by address
-    async getOracle({ address, from }) {
+    async getOracle({ address }) {
         try {
             const oracle = new ZapOracle(this);
             oracle.address = address;
 
             // Get the provider's public getRouteKeys
-            const public_key = await this.contract.getProviderPublicKey( address, { from });
+            const public_key = await this.contract.getProviderPublicKey( address );
             oracle.public_key = public_key;
     
-            // Get the route keys next
-            const route_keys = await this.contract.getRouteKeys( address, { from });
-            oracle.route_keys = route_keys;
+            // // Get the route keys next
+            // const route_keys = await this.contract.getRouteKeys( address, { from });
+            // oracle.route_keys = route_keys;
     
-            // Output loaded object
+            // // Output loaded object
             return oracle;
         } catch (err) {
             throw err;
