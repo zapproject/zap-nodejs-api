@@ -1,31 +1,72 @@
 [
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [
 			{
-				"name": "spender",
-				"type": "address"
+				"name": "specifier",
+				"type": "bytes32"
 			},
 			{
-				"name": "value",
+				"name": "numDots",
+				"type": "uint256"
+			},
+			{
+				"name": "oracleAddress",
+				"type": "address"
+			}
+		],
+		"name": "calcZapForDots",
+		"outputs": [
+			{
+				"name": "_numZap",
 				"type": "uint256"
 			}
 		],
-		"name": "approve",
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_arbiterAddress",
+				"type": "address"
+			}
+		],
+		"name": "setArbiterAddress",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "oracleAddress",
+				"type": "address"
+			},
+			{
+				"name": "endpoint",
+				"type": "bytes32"
+			}
+		],
+		"name": "getZapBound",
 		"outputs": [
 			{
 				"name": "",
-				"type": "bool"
+				"type": "uint256"
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "totalSupply",
+		"name": "decimals",
 		"outputs": [
 			{
 				"name": "",
@@ -40,23 +81,49 @@
 		"constant": false,
 		"inputs": [
 			{
-				"name": "from",
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "fromProviderHolder",
 				"type": "address"
 			},
 			{
-				"name": "to",
+				"name": "toOracleHolder",
 				"type": "address"
 			},
 			{
-				"name": "value",
+				"name": "numDots",
 				"type": "uint256"
 			}
 		],
-		"name": "transferFrom",
+		"name": "releaseDots",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "numZap",
+				"type": "uint256"
+			},
+			{
+				"name": "oracleAddress",
+				"type": "address"
+			}
+		],
+		"name": "bond",
 		"outputs": [
 			{
 				"name": "",
-				"type": "bool"
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -67,14 +134,18 @@
 		"constant": true,
 		"inputs": [
 			{
-				"name": "who",
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "oracleAddress",
 				"type": "address"
 			}
 		],
-		"name": "balanceOf",
+		"name": "getDotsIssued",
 		"outputs": [
 			{
-				"name": "",
+				"name": "dots",
 				"type": "uint256"
 			}
 		],
@@ -86,18 +157,93 @@
 		"constant": false,
 		"inputs": [
 			{
-				"name": "to",
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "numDots",
+				"type": "uint256"
+			},
+			{
+				"name": "oracleAddress",
+				"type": "address"
+			}
+		],
+		"name": "unbond",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "oracleAddress",
 				"type": "address"
 			},
 			{
-				"name": "value",
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "numZap",
 				"type": "uint256"
 			}
 		],
-		"name": "transfer",
+		"name": "calcZap",
 		"outputs": [
 			{
-				"name": "",
+				"name": "_numZap",
+				"type": "uint256"
+			},
+			{
+				"name": "_numDots",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_dispatchAddress",
+				"type": "address"
+			}
+		],
+		"name": "setDispatchAddress",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "holderAddress",
+				"type": "address"
+			},
+			{
+				"name": "oracleAddress",
+				"type": "address"
+			},
+			{
+				"name": "numDots",
+				"type": "uint256"
+			}
+		],
+		"name": "escrowDots",
+		"outputs": [
+			{
+				"name": "success",
 				"type": "bool"
 			}
 		],
@@ -109,18 +255,22 @@
 		"constant": true,
 		"inputs": [
 			{
-				"name": "owner",
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "holderAddress",
 				"type": "address"
 			},
 			{
-				"name": "spender",
+				"name": "oracleAddress",
 				"type": "address"
 			}
 		],
-		"name": "allowance",
+		"name": "getDots",
 		"outputs": [
 			{
-				"name": "",
+				"name": "dots",
 				"type": "uint256"
 			}
 		],
@@ -129,47 +279,18 @@
 		"type": "function"
 	},
 	{
-		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": true,
-				"name": "owner",
+				"name": "tokenAddress",
 				"type": "address"
 			},
 			{
-				"indexed": true,
-				"name": "spender",
+				"name": "registryAddress",
 				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "value",
-				"type": "uint256"
 			}
 		],
-		"name": "Approval",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Transfer",
-		"type": "event"
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
 	}
 ]

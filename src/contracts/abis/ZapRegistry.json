@@ -1,175 +1,201 @@
 [
-      {
-        "inputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "public_key",
-            "type": "uint256"
-          },
-          {
-            "name": "ext_info",
-            "type": "uint256[]"
-          },
-          {
-            "name": "title",
-            "type": "string"
-          }
-        ],
-        "name": "initiateProvider",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "specifier",
-            "type": "bytes32"
-          },
-          {
-            "name": "curveType",
-            "type": "uint8"
-          },
-          {
-            "name": "curveStart",
-            "type": "uint256"
-          },
-          {
-            "name": "curveMultiplier",
-            "type": "uint256"
-          }
-        ],
-        "name": "initiateProviderCurve",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "provider",
-            "type": "address"
-          }
-        ],
-        "name": "getProviderRouteKeys",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256[]"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "provider",
-            "type": "address"
-          }
-        ],
-        "name": "getProviderTitle",
-        "outputs": [
-          {
-            "name": "",
-            "type": "string"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "provider",
-            "type": "address"
-          }
-        ],
-        "name": "getProviderPublicKey",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "provider",
-            "type": "address"
-          },
-          {
-            "name": "specifier",
-            "type": "bytes32"
-          }
-        ],
-        "name": "getProviderCurve",
-        "outputs": [
-          {
-            "name": "curveType",
-            "type": "uint8"
-          },
-          {
-            "name": "curveStart",
-            "type": "uint256"
-          },
-          {
-            "name": "curveMultiplier",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "index",
-            "type": "uint256"
-          }
-        ],
-        "name": "getNextProvider",
-        "outputs": [
-          {
-            "name": "nextIndex",
-            "type": "uint256"
-          },
-          {
-            "name": "oracleAddress",
-            "type": "address"
-          },
-          {
-            "name": "public_key",
-            "type": "uint256"
-          },
-          {
-            "name": "title",
-            "type": "string"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ]
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "public_key",
+				"type": "uint256"
+			},
+			{
+				"name": "title",
+				"type": "string"
+			},
+			{
+				"name": "endpoint_specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "endpoint_params",
+				"type": "bytes32[]"
+			}
+		],
+		"name": "initiateProvider",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "curveType",
+				"type": "uint8"
+			},
+			{
+				"name": "curveStart",
+				"type": "uint256"
+			},
+			{
+				"name": "curveMultiplier",
+				"type": "uint256"
+			}
+		],
+		"name": "initiateProviderCurve",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "endpoint_params",
+				"type": "bytes32[]"
+			}
+		],
+		"name": "setEndpointParams",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "provider",
+				"type": "address"
+			},
+			{
+				"name": "specifier",
+				"type": "bytes32"
+			}
+		],
+		"name": "getProviderRouteKeys",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes32[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "provider",
+				"type": "address"
+			}
+		],
+		"name": "getProviderTitle",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "provider",
+				"type": "address"
+			}
+		],
+		"name": "getProviderPublicKey",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "provider",
+				"type": "address"
+			},
+			{
+				"name": "specifier",
+				"type": "bytes32"
+			}
+		],
+		"name": "getProviderCurve",
+		"outputs": [
+			{
+				"name": "curveType",
+				"type": "uint8"
+			},
+			{
+				"name": "curveStart",
+				"type": "uint256"
+			},
+			{
+				"name": "curveMultiplier",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getNextProvider",
+		"outputs": [
+			{
+				"name": "nextIndex",
+				"type": "uint256"
+			},
+			{
+				"name": "oracleAddress",
+				"type": "address"
+			},
+			{
+				"name": "public_key",
+				"type": "uint256"
+			},
+			{
+				"name": "title",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
