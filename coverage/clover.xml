@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1519663755880" clover="3.2.0">
-  <project timestamp="1519663755880" name="All files">
-    <metrics statements="113" coveredstatements="65" conditionals="9" coveredconditionals="2" methods="24" coveredmethods="13" elements="146" coveredelements="80" complexity="0" loc="113" ncloc="113" packages="4" files="9" classes="9">
+<coverage generated="1519720475300" clover="3.2.0">
+  <project timestamp="1519720475301" name="All files">
+    <metrics statements="112" coveredstatements="54" conditionals="9" coveredconditionals="2" methods="24" coveredmethods="11" elements="145" coveredelements="67" complexity="0" loc="112" ncloc="112" packages="4" files="9" classes="9">
       <package name="FeedArbitration">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <file name="truffle.js" path="/Users/vsevolodgrudina/project/zap/FeedArbitration/truffle.js">
@@ -22,7 +22,7 @@
         </file>
       </package>
       <package name="FeedArbitration.src.api">
-        <metrics statements="47" coveredstatements="18" conditionals="5" coveredconditionals="1" methods="11" coveredmethods="4"/>
+        <metrics statements="47" coveredstatements="13" conditionals="5" coveredconditionals="1" methods="11" coveredmethods="3"/>
         <file name="ZapCurve.js" path="/Users/vsevolodgrudina/project/zap/FeedArbitration/src/api/ZapCurve.js">
           <metrics statements="14" coveredstatements="1" conditionals="3" coveredconditionals="0" methods="1" coveredmethods="0"/>
           <line num="2" count="0" type="stmt"/>
@@ -41,13 +41,13 @@
           <line num="30" count="1" type="stmt"/>
         </file>
         <file name="ZapOracle.js" path="/Users/vsevolodgrudina/project/zap/FeedArbitration/src/api/ZapOracle.js">
-          <metrics statements="15" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="1"/>
+          <metrics statements="15" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="0"/>
           <line num="1" count="1" type="stmt"/>
-          <line num="4" count="1" type="stmt"/>
-          <line num="5" count="1" type="stmt"/>
-          <line num="8" count="1" type="stmt"/>
-          <line num="9" count="1" type="stmt"/>
-          <line num="10" count="1" type="stmt"/>
+          <line num="4" count="0" type="stmt"/>
+          <line num="5" count="0" type="stmt"/>
+          <line num="8" count="0" type="stmt"/>
+          <line num="9" count="0" type="stmt"/>
+          <line num="10" count="0" type="stmt"/>
           <line num="15" count="0" type="stmt"/>
           <line num="17" count="0" type="stmt"/>
           <line num="18" count="0" type="stmt"/>
@@ -84,9 +84,9 @@
         </file>
       </package>
       <package name="FeedArbitration.src.api.contracts">
-        <metrics statements="62" coveredstatements="43" conditionals="4" coveredconditionals="1" methods="13" coveredmethods="9"/>
+        <metrics statements="61" coveredstatements="37" conditionals="4" coveredconditionals="1" methods="13" coveredmethods="8"/>
         <file name="ZapRegistry.js" path="/Users/vsevolodgrudina/project/zap/FeedArbitration/src/api/contracts/ZapRegistry.js">
-          <metrics statements="36" coveredstatements="30" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="6"/>
+          <metrics statements="35" coveredstatements="24" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="5"/>
           <line num="2" count="1" type="stmt"/>
           <line num="3" count="1" type="stmt"/>
           <line num="4" count="1" type="stmt"/>
@@ -112,17 +112,16 @@
           <line num="64" count="4" type="stmt"/>
           <line num="65" count="1" type="stmt"/>
           <line num="71" count="1" type="stmt"/>
-          <line num="77" count="1" type="stmt"/>
-          <line num="78" count="1" type="stmt"/>
-          <line num="79" count="1" type="stmt"/>
-          <line num="80" count="1" type="stmt"/>
-          <line num="83" count="1" type="stmt"/>
-          <line num="84" count="0" type="stmt"/>
+          <line num="77" count="0" type="stmt"/>
+          <line num="78" count="0" type="stmt"/>
+          <line num="79" count="0" type="stmt"/>
+          <line num="82" count="0" type="stmt"/>
+          <line num="83" count="0" type="stmt"/>
+          <line num="86" count="0" type="stmt"/>
           <line num="87" count="0" type="stmt"/>
-          <line num="88" count="0" type="stmt"/>
-          <line num="91" count="0" type="stmt"/>
-          <line num="93" count="1" type="stmt"/>
-          <line num="98" count="1" type="stmt"/>
+          <line num="90" count="0" type="stmt"/>
+          <line num="92" count="0" type="stmt"/>
+          <line num="97" count="1" type="stmt"/>
         </file>
         <file name="ZapToken.js" path="/Users/vsevolodgrudina/project/zap/FeedArbitration/src/api/contracts/ZapToken.js">
           <metrics statements="26" coveredstatements="13" conditionals="4" coveredconditionals="1" methods="7" coveredmethods="3"/>

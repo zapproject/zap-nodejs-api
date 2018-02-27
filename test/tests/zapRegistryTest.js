@@ -16,6 +16,7 @@ const Eth = require('ethjs');
 const endpointTest = `${protocol}${endpoint}:${port}`;
 const eth = new Eth(new Eth.HttpProvider(endpointTest));
 const ZapWrapper = require('../../src/api/ZapWrapper');
+const zapRegistryAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapRegistry.json'));
 
 const specifier = new String("test-linear-specifier");
 
@@ -44,7 +45,7 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             zapRegistryWrapper = wrapper.initClass({
                 instanceClass,
                 address: addressZapRegistry,
-                abiPath: abiJSON.abi
+                abiPath: zapRegistryAbiFile
             });
         });
 
@@ -89,13 +90,13 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             }
         });
 
-        it('Should ger oracle in zap registry contract', async () => {
-            try {
-                const oracle = await zapRegistryWrapper.getOracle({address: accounts[0], from: accounts[0]});
-                console.log(oracle);
-            } catch(err) {
-                console.log(err);
-            }
-        }); 
+        // it('Should ger oracle in zap registry contract', async () => {
+        //     try {
+        //         const oracle = await zapRegistryWrapper.getOracle({address: accounts[0], from: accounts[0]});
+        //         console.log(oracle);
+        //     } catch(err) {
+        //         console.log(err);
+        //     }
+        // }); 
     });
 });

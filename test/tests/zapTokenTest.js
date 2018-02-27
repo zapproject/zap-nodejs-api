@@ -17,6 +17,7 @@ const Eth = require('ethjs');
 const endpointTest = `${protocol}${endpoint}:${port}`;
 const eth = new Eth(new Eth.HttpProvider(endpointTest));
 const ZapWrapper = require('../../src/api/ZapWrapper');
+const zapTokenAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapToken.json'));
 
 describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
     let addressZapToken;
@@ -51,7 +52,7 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
             zapTokenWrapper = wrapper.initClass({
                 instanceClass,
                 address: addressZapToken,
-                abiPath: abiJSON.abi
+                abiPath: zapTokenAbiFile
             });
         });
 
