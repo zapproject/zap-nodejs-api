@@ -37,7 +37,6 @@ process.on('unhandledRejection', (reason, p) => {
 
 async function migrateContracts() {
     const options = {
-        debug: true,
         // logger: console,
         "contracts_build_directory": path.join(__dirname, contractsBuildDirectory),
         "contracts_directory": path.join(__dirname, contractsDirectory),

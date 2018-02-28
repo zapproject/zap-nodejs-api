@@ -10,6 +10,7 @@ const getHexBuffer = (specifier) => new Buffer(specifier, 'hex');
 
 const getHexString = (str) => {
     const data = new Buffer(str);
+    console.log(data.byteLength)
     const hex = data.toString('hex');
     return `0x${hex}`;
 };

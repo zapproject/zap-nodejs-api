@@ -45,7 +45,7 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             zapRegistryWrapper = wrapper.initClass({
                 instanceClass,
                 address: addressZapRegistry,
-                abiPath: zapRegistryAbiFile
+                abiPath: abiJSON.abi
             });
         });
 
@@ -73,11 +73,11 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             try {
                 await zapRegistryWrapper.setEndpointParams({ 
                     specifier: specifier.valueOf(), 
-                    endpoint_params: [
-                        'urn:ed2k:354B15E68FB8F36D7CD88FF94116CDC1',
-                        'urn:tree:tiger:7N5OAMRNGMSSEUE3ORHOKWN4WWIQ5X4EBOOTLJY',
-                        'urn:btih:QHQXPYWMACKDWKP47RRVIV7VOURXFE5Q',
-                        'xl=10826029&dn=mediawiki-1.15.1.tar.gz'
+                    params: [
+                        '54B15E68FB8F36D7CD88FF94116CDC1',
+                        'GMSSEUE3ORHOKWN4WWIQ5X4EBOOTLJY',
+                        'HQXPYWMACKDWKP47RRVIV7VOURXFE5Q',
+                        '6029&dn=mediawiki-1.15.1.tar.gz'
                     ], 
                     from: accounts[0]
                 });
@@ -91,13 +91,13 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             }
         });
 
-        it('Should ger oracle in zap registry contract', async () => {
-            try {
-                const oracle = await zapRegistryWrapper.getOracle({address: accounts[0]});
-                console.log(oracle);
-            } catch(err) {
-                console.log('err===>>>>>',err);
-            }
-        }); 
+        // it('Should ger oracle in zap registry contract', async () => {
+        //     try {
+        //         const oracle = await zapRegistryWrapper.getOracle( accounts[0] );
+        //         console.log(oracle);
+        //     } catch(err) {
+        //         console.log('err===>>>>>',err);
+        //     }
+        // }); 
     });
 });

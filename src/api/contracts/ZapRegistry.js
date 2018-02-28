@@ -28,13 +28,20 @@ class ZapRegistry {
 
 
     // for example initiate Provider should get (43254352345, "spaceoracle", 'none', [ ]) in arguments
+    // uint256 public_key,
+    //     string title,
+    //     bytes32 endpoint_specifier,
+    //     bytes32[] endpoint_params
     async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from}) {
         try {
-            const specifier = getHexString(endpoint_specifier);
+            endpoint_specifier = getHexString(endpoint_specifier);
+            console.log('-----------------------------------------')
+            console.log(public_key, title, endpoint_specifier, endpoint_params, from)
+            console.log('-----------------------------------------')
             return await this.contract.initiateProvider(
                 public_key, 
                 title, 
-                specifier,
+                endpoint_specifier,
                 endpoint_params,
                 { from }
             );
@@ -43,12 +50,20 @@ class ZapRegistry {
         }
     }
 
+    // bytes32 specifier,
+    //     LibInterface.ZapCurveType curveType,
+    //     uint256 curveStart,
+    //     uint256 curveMultiplier
+
     async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from }) {
         try {
             const curve = curveType[ZapCurveType];
-            const bufferSpecifier = getHexString(specifier);
+            specifier = getHexString(specifier);
+            console.log('------------------------------------')
+            console.log(specifier, curve, curveStart, curveMultiplier, from)
+            console.log('------------------------------------')
             return await this.contract.initiateProviderCurve(
-                bufferSpecifier,
+                specifier,
                 curve,
                 curveStart,
                 curveMultiplier,
@@ -59,14 +74,19 @@ class ZapRegistry {
         }
     }
 
-    async setEndpointParams({ specifier, endpoint_params, from }) {
+    // bytes32 specifier, bytes32[] endpoint_params
+
+    async setEndpointParams({ specifier, params, from }) {
         try {
             specifier = getHexString(specifier);
-            let params = [];
-            endpoint_params.forEach(el => params.push(getHexString(el)));
+            let endpoint_params = [];
+            params.forEach(el => endpoint_params.push(getHexString(el)));
+            console.log('-----------------------------------')
+            console.log(typeof specifier, specifier, endpoint_params, from)
+            console.log('-----------------------------------')
             return await this.contract.setEndpointParams(
                 specifier,
-                params,
+                endpoint_params,
                 { from }
             );
         } catch(err) {
