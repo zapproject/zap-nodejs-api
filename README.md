@@ -16,5 +16,11 @@ All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MER
     yarn install
 
 
-  #### for run test
-    yarn test
+  #### for run test with coveralls.io
+    yarn run test
+
+  #### for run test locally
+    yarn run test_local
+
+  #### for code coverage
+    yarn run coverage
