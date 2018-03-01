@@ -47,6 +47,10 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
 
     describe('zapTokenWrapper', function () {
 
+        beforeEach(function(done) {
+            setTimeout(() => done(), 500); 
+        });
+
         it('should initiate wrapper', () => {
             const wrapper = new ZapWrapper(eth);
             zapTokenWrapper = wrapper.initClass({
@@ -68,8 +72,4 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
         });
 
     });
-
-    // after(() => {
-    //     closeServer();
-    // });
 });

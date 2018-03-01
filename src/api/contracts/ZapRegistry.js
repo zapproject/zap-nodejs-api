@@ -2,11 +2,7 @@
 require('babel-register');
 require('babel-polyfill');
 const ZapOracle = require('../ZapOracle');
-const {
-    getHexString,
-    getHexBuffer,
-    toHex
-} = require('../utils');
+const { fromAscii } = require('ethjs');
 
 const curveType = {
     "ZapCurveNone": 0,
@@ -16,58 +12,44 @@ const curveType = {
 };
 
 
-
 class ZapRegistry {
-    constructor({eth, address, abiFile}) {
+    constructor({eth, contract_address, abiFile}) {
         this.eth = eth;
-        this.address = address;
+        this.address = contract_address;
         this.abiFile = abiFile;
-        this.contract = eth.contract(abiFile).at(address);
+        this.contract = eth.contract(abiFile).at(this.address);
         this.getOracle = this.getOracle.bind(this);
     }
 
-
-    // for example initiate Provider should get (43254352345, "spaceoracle", 'none', [ ]) in arguments
-    // uint256 public_key,
-    //     string title,
-    //     bytes32 endpoint_specifier,
-    //     bytes32[] endpoint_params
-    async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from}) {
+    async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from, gas}) {
         try {
-            endpoint_specifier = getHexString(endpoint_specifier);
-            console.log('-----------------------------------------')
-            console.log(public_key, title, endpoint_specifier, endpoint_params, from)
-            console.log('-----------------------------------------')
             return await this.contract.initiateProvider(
                 public_key, 
                 title, 
-                endpoint_specifier,
+                fromAscii(endpoint_specifier),
                 endpoint_params,
-                { from }
+                {
+                    'from': from,
+                    'gas': gas
+                }
             );
         } catch(err) {
             throw err;
         }
     }
 
-    // bytes32 specifier,
-    //     LibInterface.ZapCurveType curveType,
-    //     uint256 curveStart,
-    //     uint256 curveMultiplier
-
-    async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from }) {
+    async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from, gas }) {
         try {
             const curve = curveType[ZapCurveType];
-            specifier = getHexString(specifier);
-            console.log('------------------------------------')
-            console.log(specifier, curve, curveStart, curveMultiplier, from)
-            console.log('------------------------------------')
             return await this.contract.initiateProviderCurve(
-                specifier,
+                fromAscii(specifier),
                 curve,
                 curveStart,
                 curveMultiplier,
-                { from }
+                {
+                    'from': from,
+                    'gas': gas
+                }
             );
         } catch(err) {
             throw err;
@@ -76,18 +58,17 @@ class ZapRegistry {
 
     // bytes32 specifier, bytes32[] endpoint_params
 
-    async setEndpointParams({ specifier, params, from }) {
+    async setEndpointParams({ specifier, params, from, gas }) {
         try {
-            specifier = getHexString(specifier);
             let endpoint_params = [];
-            params.forEach(el => endpoint_params.push(getHexString(el)));
-            console.log('-----------------------------------')
-            console.log(typeof specifier, specifier, endpoint_params, from)
-            console.log('-----------------------------------')
+            params.forEach(el => endpoint_params.push(fromAscii(el)));
             return await this.contract.setEndpointParams(
-                specifier,
+                fromAscii(specifier),
                 endpoint_params,
-                { from }
+                {
+                    'from': from,
+                    'gas': gas
+                }
             );
         } catch(err) {
             throw err;
@@ -95,7 +76,7 @@ class ZapRegistry {
     }
 
     // get oracle by address
-    async getOracle({ address }) {
+    async getOracle({ address, specifier }) {
         try {
             const oracle = new ZapOracle(this);
             oracle.address = address;
@@ -105,8 +86,11 @@ class ZapRegistry {
             oracle.public_key = public_key;
     
             // // Get the route keys next
-            // const route_keys = await this.contract.getRouteKeys( address, { from });
-            // oracle.route_keys = route_keys;
+            const endpoint_params = await this.contract.getProviderRouteKeys( 
+                address,
+                fromAscii(specifier)
+            );
+            oracle.endpoint_params = endpoint_params;
     
             // // Output loaded object
             return oracle;
