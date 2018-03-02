@@ -5,7 +5,7 @@ const serverOptions = {
     "port":7545,
     "total_accounts":10,
     "unlocked_accounts":[],
-    // logger: console
+    logger: console
 };
 
 module.exports = {
