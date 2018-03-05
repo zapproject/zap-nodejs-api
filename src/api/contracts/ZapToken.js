@@ -31,28 +31,28 @@ class ZapToken {
     }
 
     // Send Zap around
-    async send(destination, amount) {
+    async send({ destination, amount, from }) {
         try {
             amount = Eth.toBN(amount);
-            return await this.token_contract.transfer(destination, amount);
+            return await this.token_contract.transfer(destination, amount, { from });
         } catch(err) {
             throw err;
         }
     }
 
     // Approve a certain amount of zap to be sent
-    approve(address, amount, callback) {
+    async approve({ address, amount, from }) {
         // Approve to the token contract the spending
-        this.token_contract.approve(this.bondage.address, amount).then((success) => {
+        try {
+            amount = Eth.toBN(amount);
+            const success = await this.token_contract.approve(address, amount, { from });
             if ( !success ) {
-                callback(new Error("Failed to approve Bondage transfer"));
-                return;
+                throw new Error("Failed to approve Bondage transfer");
             }
-
-            callback(null);
-        }).catch((err) => {
-            callback(err);
-        });
+            return success;
+        } catch(err) {
+            throw err;
+        }
     }
 }
 

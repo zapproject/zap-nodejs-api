@@ -2,6 +2,7 @@
 require('babel-register');
 require('babel-polyfill');
 const ZapOracle = require('../ZapOracle');
+const { fromAscii } = require('ethjs');
 
 const curveType = {
     "ZapCurveNone": 0,
@@ -10,51 +11,64 @@ const curveType = {
     "ZapCurveLogarithmic": 3
 };
 
+
 class ZapRegistry {
-    constructor({eth, address, abiFile}) {
+    constructor({eth, contract_address, abiFile}) {
         this.eth = eth;
-        this.address = address;
+        this.address = contract_address;
         this.abiFile = abiFile;
-        this.contract = eth.contract(abiFile).at(address);
+        this.contract = eth.contract(abiFile).at(this.address);
+        this.getOracle = this.getOracle.bind(this);
     }
 
-
-    // for example initiate Provider should get (43254352345, "spaceoracle", 'none', [ ]) in arguments
-    async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from}) {
+    async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from, gas}) {
         try {
             return await this.contract.initiateProvider(
                 public_key, 
                 title, 
-                endpoint_specifier,
+                fromAscii(endpoint_specifier),
                 endpoint_params,
-                { from }
+                {
+                    'from': from,
+                    'gas': gas
+                }
             );
         } catch(err) {
             throw err;
         }
     }
 
-    async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from }) {
+    async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from, gas }) {
         try {
             const curve = curveType[ZapCurveType];
             return await this.contract.initiateProviderCurve(
-                specifier,
+                fromAscii(specifier),
                 curve,
                 curveStart,
                 curveMultiplier,
-                { from }
+                {
+                    'from': from,
+                    'gas': gas
+                }
             );
         } catch(err) {
             throw err;
         }
     }
 
-    async setEndpointParams({ specifier, endpoint_params,from  }) {
+    // bytes32 specifier, bytes32[] endpoint_params
+
+    async setEndpointParams({ specifier, params, from, gas }) {
         try {
+            let endpoint_params = [];
+            params.forEach(el => endpoint_params.push(fromAscii(el)));
             return await this.contract.setEndpointParams(
-                specifier,
+                fromAscii(specifier),
                 endpoint_params,
-                { from }
+                {
+                    'from': from,
+                    'gas': gas
+                }
             );
         } catch(err) {
             throw err;
@@ -62,23 +76,26 @@ class ZapRegistry {
     }
 
     // get oracle by address
-    async getOracle(address, callback) {
+    async getOracle({ address, specifier }) {
         try {
             const oracle = new ZapOracle(this);
             oracle.address = address;
 
             // Get the provider's public getRouteKeys
-            const public_key = await this.contract.getProviderPublicKey(address);
+            const public_key = await this.contract.getProviderPublicKey( address );
             oracle.public_key = public_key;
     
-            // Get the route keys next
-            const route_keys = await this.contract.getRouteKeys();
-            oracle.route_keys = route_keys;
+            // // Get the route keys next
+            const endpoint_params = await this.contract.getProviderRouteKeys( 
+                address,
+                fromAscii(specifier)
+            );
+            oracle.endpoint_params = endpoint_params;
     
-            // Output loaded object
-            callback(null, oracle);
+            // // Output loaded object
+            return oracle;
         } catch (err) {
-            callback(err);
+            throw err;
         }
     }
 }

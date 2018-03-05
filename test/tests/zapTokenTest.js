@@ -17,6 +17,8 @@ const Eth = require('ethjs');
 const endpointTest = `${protocol}${endpoint}:${port}`;
 const eth = new Eth(new Eth.HttpProvider(endpointTest));
 const ZapWrapper = require('../../src/api/ZapWrapper');
+const zapTokenAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapToken.json'));
+const BigNumber = require('bignumber.js');
 
 describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
     let addressZapToken;
@@ -24,6 +26,7 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
     let deployedZapToken;
     let zapToken;
     let abiJSON;
+    let zapTokenWrapper;
 
     before(async function() {
         this.timeout(60000);
@@ -45,29 +48,59 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
 
     describe('zapTokenWrapper', function () {
 
+        const tokensForOwner = new BigNumber("1e24");
+        const allocateAccount = 300000;
+
+        beforeEach(function(done) {
+            setTimeout(() => done(), 500); 
+        });
+
         it('should initiate wrapper', () => {
             const wrapper = new ZapWrapper(eth);
-            zapToken = wrapper.initClass({
+            zapTokenWrapper = wrapper.initClass({
                 instanceClass,
                 address: addressZapToken,
-                abiPath: abiJSON.abi
+                abiPath: zapTokenAbiFile
             });
         });
 
         it('Should get zapToken address from wrapper', async () => {
-            const account = await zapToken.getAddress();
+            const account = await zapTokenWrapper.getAddress();
             assert.equal(account, accounts[0].toLowerCase());
             assert.equal(account.length, accounts[0].length);
         });
 
         it('should get balance of zapToken from wrapper', async () => {
-            const { balance } = await zapToken.getBalance();
+            const { balance } = await zapTokenWrapper.getBalance();
             assert.equal(balance.toString(), 0);
         });
 
-    });
+        it('Should update balance, and get updated balance of zap token', async () => {
+            await zapTokenWrapper.token_contract.allocate(
+                accounts[0],
+                tokensForOwner,
+                { from: accounts[0] }
+            );
+            const { balance } = await zapTokenWrapper.getBalance();
+            assert.equal(+tokensForOwner.toString(), balance.toString());
+        });
+        
+        it('Should make transfer to another account', async () => {
+            await zapTokenWrapper.send({ 
+                destination: accounts[1],
+                amount: allocateAccount,
+                from: accounts[0]
+            });
+            const { balance } = await zapTokenWrapper.token_contract.balanceOf(accounts[1]);
+            assert.equal(balance.toString(), allocateAccount);
+        });
 
-    after(() => {
-        closeServer();
+        it('Should approve to transfer from one to the another account', async () => {
+            await zapTokenWrapper.approve({
+                address: accounts[2],
+                amount: allocateAccount, 
+                from: accounts[0]
+            });
+        });
     });
 });

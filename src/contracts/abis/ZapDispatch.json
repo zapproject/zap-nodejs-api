@@ -3,81 +3,11 @@
 		"constant": false,
 		"inputs": [
 			{
-				"name": "specifier",
-				"type": "bytes32"
-			},
-			{
-				"name": "holderAddress",
-				"type": "address"
-			},
-			{
-				"name": "oracleAddress",
+				"name": "_bondageAddress",
 				"type": "address"
 			}
 		],
-		"name": "_getDots",
-		"outputs": [
-			{
-				"name": "dots",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "oracleAddress",
-				"type": "address"
-			},
-			{
-				"name": "specifier",
-				"type": "bytes32"
-			},
-			{
-				"name": "numZap",
-				"type": "uint256"
-			}
-		],
-		"name": "calcZapForDots",
-		"outputs": [
-			{
-				"name": "_numZap",
-				"type": "uint256"
-			},
-			{
-				"name": "_numDots",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "specifier",
-				"type": "bytes32"
-			},
-			{
-				"name": "holderAddress",
-				"type": "address"
-			},
-			{
-				"name": "oracleAddress",
-				"type": "address"
-			},
-			{
-				"name": "numDots",
-				"type": "uint256"
-			}
-		],
-		"name": "escrowDots",
+		"name": "setBondageAddress",
 		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
@@ -87,26 +17,197 @@
 		"constant": false,
 		"inputs": [
 			{
-				"name": "specifier",
-				"type": "bytes32"
-			},
-			{
-				"name": "holderAddress",
-				"type": "address"
-			},
-			{
-				"name": "oracleAddress",
-				"type": "address"
-			},
-			{
-				"name": "numDots",
+				"name": "id",
 				"type": "uint256"
+			},
+			{
+				"name": "_response1",
+				"type": "string"
+			},
+			{
+				"name": "_response2",
+				"type": "string"
+			},
+			{
+				"name": "_response3",
+				"type": "string"
+			},
+			{
+				"name": "_response4",
+				"type": "string"
 			}
 		],
-		"name": "transferDots",
-		"outputs": [],
+		"name": "respond4",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"name": "_response1",
+				"type": "string"
+			},
+			{
+				"name": "_response2",
+				"type": "string"
+			},
+			{
+				"name": "_response3",
+				"type": "string"
+			}
+		],
+		"name": "respond3",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"name": "_response",
+				"type": "string"
+			}
+		],
+		"name": "respond1",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "provider",
+				"type": "address"
+			},
+			{
+				"name": "subscriber",
+				"type": "address"
+			},
+			{
+				"name": "query",
+				"type": "string"
+			},
+			{
+				"name": "endpoint",
+				"type": "bytes32"
+			},
+			{
+				"name": "endpoint_params",
+				"type": "bytes32[]"
+			}
+		],
+		"name": "query",
+		"outputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "ZapDataProxyDispatch",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"name": "_response1",
+				"type": "string"
+			},
+			{
+				"name": "_response2",
+				"type": "string"
+			}
+		],
+		"name": "respond2",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "provider",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "query",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"name": "endpoint",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "endpoint_params",
+				"type": "bytes32[]"
+			}
+		],
+		"name": "Incoming",
+		"type": "event"
 	}
 ]
