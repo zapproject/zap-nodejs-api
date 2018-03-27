@@ -76,4 +76,4 @@ require('chai')
 require('./tests/zapTokenTest');
 require('./tests/zapRegistryTest');
 require('./tests/zapArbiterTest');
-// require('./tests/closeServer');
+require('./tests/closeServer');
