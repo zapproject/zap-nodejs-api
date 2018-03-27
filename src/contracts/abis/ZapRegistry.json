@@ -1,9 +1,68 @@
 [
 	{
+		"constant": false,
 		"inputs": [],
+		"name": "kill",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"name": "storageAddress",
+				"type": "address"
+			}
+		],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
 	},
 	{
 		"constant": false,
@@ -14,7 +73,7 @@
 			},
 			{
 				"name": "title",
-				"type": "string"
+				"type": "bytes32"
 			},
 			{
 				"name": "endpoint_specifier",
@@ -26,7 +85,12 @@
 			}
 		],
 		"name": "initiateProvider",
-		"outputs": [],
+		"outputs": [
+			{
+				"name": "success",
+				"type": "bool"
+			}
+		],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -44,11 +108,11 @@
 			},
 			{
 				"name": "curveStart",
-				"type": "uint256"
+				"type": "uint128"
 			},
 			{
 				"name": "curveMultiplier",
-				"type": "uint256"
+				"type": "uint128"
 			}
 		],
 		"name": "initiateProviderCurve",
@@ -81,17 +145,13 @@
 			{
 				"name": "provider",
 				"type": "address"
-			},
-			{
-				"name": "specifier",
-				"type": "bytes32"
 			}
 		],
-		"name": "getProviderRouteKeys",
+		"name": "getProviderPublicKey",
 		"outputs": [
 			{
 				"name": "",
-				"type": "bytes32[]"
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -123,13 +183,25 @@
 			{
 				"name": "provider",
 				"type": "address"
+			},
+			{
+				"name": "specifier",
+				"type": "bytes32"
+			},
+			{
+				"name": "index",
+				"type": "uint256"
 			}
 		],
-		"name": "getProviderPublicKey",
+		"name": "getNextEndpointParam",
 		"outputs": [
 			{
-				"name": "",
+				"name": "nextIndex",
 				"type": "uint256"
+			},
+			{
+				"name": "endpoint_param",
+				"type": "bytes32"
 			}
 		],
 		"payable": false,
@@ -156,11 +228,11 @@
 			},
 			{
 				"name": "curveStart",
-				"type": "uint256"
+				"type": "uint128"
 			},
 			{
 				"name": "curveMultiplier",
-				"type": "uint256"
+				"type": "uint128"
 			}
 		],
 		"payable": false,
@@ -182,7 +254,7 @@
 				"type": "uint256"
 			},
 			{
-				"name": "oracleAddress",
+				"name": "oracle_address",
 				"type": "address"
 			},
 			{

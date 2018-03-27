@@ -1,26 +1,25 @@
 const instanceClass = require('../../src/api/contracts/ZapRegistry');
+const ZapWrapper = require('../../src/api/ZapWrapper');
 const assert = require("chai").assert;
 const {
     ganacheProvider,
-    webProvider
+    webProvider,
+    eth
 } = require('../bootstrap');
 const { 
     zapRegistryAbi,
-    port,
+    network_id,
+    zapRegistryStorageAbi,
     protocol,
     endpoint,
-    network_id
+    port
 } = require('../../config');
-const contract = require('truffle-contract');
 const path = require('path');
-const Eth = require('ethjs');
-const endpointTest = `${protocol}${endpoint}:${port}`;
-const eth = new Eth(new Eth.HttpProvider(endpointTest));
-const ZapWrapper = require('../../src/api/ZapWrapper');
 const zapRegistryAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapRegistry.json'));
 const { fromAscii } = require('ethjs');
-
-const specifier = new String("test-linear-specifier");
+// const Eth = require('ethjs');
+// const endpointTest = `${protocol}${endpoint}:${port}`;
+// const eth = new Eth(new Eth.HttpProvider(endpointTest));
 
 const curveType = {
     "ZapCurveNone": 0,
@@ -36,14 +35,16 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
     let zapRegistry;
     let abiJSON;
     let zapRegistryWrapper;
+    let addressZapRegistryStorage;
+    let deployedStorage;
 
     before(async () => {
         abiJSON = require(path.join(__dirname, zapRegistryAbi));
-        zapRegistry = contract(abiJSON);
-        zapRegistry.setProvider(ganacheProvider);
-        zapRegistry.setNetwork(network_id);
-        deployedZapRegistry = await zapRegistry.deployed();
-        addressZapRegistry = zapRegistry.address;
+        abiJSONStorage = require(path.join(__dirname, zapRegistryStorageAbi));
+        addressZapRegistry = abiJSON.networks[network_id].address;
+        addressZapRegistryStorage = abiJSONStorage.networks[network_id].address;
+        deployedZapRegistry = eth.contract(abiJSON.abi).at(addressZapRegistry);
+        deployedStorage = eth.contract(abiJSONStorage.abi).at(addressZapRegistryStorage);
         accounts = await webProvider.eth.getAccounts();
         assert.ok(true);
     });
@@ -53,6 +54,7 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
         const providerTitle = "test";
         const providerPublicKey = 43254352345;
         const ZapCurveType = 'ZapCurveLinear';
+        const specifier = "test-specifier";
         const curveStart = 1;
         const curveMultiplier = 2;
         const params = [
@@ -62,8 +64,8 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             "6029&dn=mediawiki-1.15.1.tar.g"
         ];
 
-        beforeEach(function(done) {
-            setTimeout(() => done(), 500); 
+        beforeEach((done) => {
+            setTimeout(() => done(), 500);
         });
 
         it('Should initiate zapRegistry wrapper', async () => {
@@ -75,17 +77,32 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             });
         });
 
+        it('should bind registry storage', async () => {
+            await deployedStorage.transferOwnership(addressZapRegistry, {from: accounts[0], gas: 6000000})
+            const data = await deployedStorage.owner({from: accounts[0], gas: 6000000})
+            assert.equal(data['0'], addressZapRegistry)
+        })
+
         it('Should initiate provider in zap registry contract', async () => {
-            await zapRegistryWrapper.initiateProvider({
-                public_key: providerPublicKey,
-                title: providerTitle,
-                endpoint_specifier: specifier.valueOf(),
-                endpoint_params: [],
-                from: accounts[0],
-                gas: 300000
-            });
-            const title = await zapRegistryWrapper.contract.getProviderTitle(accounts[0]);
-            assert.equal(title['0'], providerTitle);
+            try{
+                await zapRegistryWrapper.initiateProvider({
+                    public_key: providerPublicKey,
+                    title: providerTitle,
+                    endpoint_specifier: specifier.valueOf(),
+                    endpoint_params: [],
+                    from: accounts[0],
+                    gas: 600000
+                });
+                const title = await zapRegistryWrapper.contract.getProviderTitle(accounts[0]);
+                if (~title['0'].indexOf(providerTitle)) {
+                    assert.ok(true)
+                } else {
+                    assert.ok(false)
+                };
+            } catch(err) {
+                console.log(err)
+                throw err
+            }
         });
 
         it('Should initiate Provider curve in zap registry contract', async () => {
@@ -102,7 +119,7 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             assert.equal(provider.curveStart.toString(), curveStart);
             assert.equal(provider.curveMultiplier.toString(), curveMultiplier);
         });
-        
+        // specifier, newParams, { from: owner }
         it('Should set endpoint params in zap registry contract', async () => {
             await zapRegistryWrapper.setEndpointParams({ 
                 specifier: specifier.valueOf(), 
@@ -110,20 +127,20 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
                 from: accounts[0],
                 gas: 300000
             });
-            const endpointParams = await zapRegistryWrapper.contract.getProviderRouteKeys(
+            const endpointsSize = await deployedStorage.getEndpointIndexSize(
                 accounts[0], 
                 fromAscii(specifier.valueOf())
             );
-            assert.equal(endpointParams['0'].length, params.length);
+            assert.equal(endpointsSize['0'].toNumber(), params.length);
         });
 
-        it('Should ger oracle in zap registry contract', async () => {
+        it('Should get oracle in zap registry contract', async () => {
             const oracle = await zapRegistryWrapper.getOracle({
                 address: accounts[0],
                 specifier: specifier.valueOf()
             });
             assert.equal(oracle.public_key['0'].toString(), providerPublicKey);
-            assert.equal(oracle.endpoint_params['0'].length, params.length);
+            assert.equal(oracle.endpoint_params.length, params.length);
         }); 
     });
 });

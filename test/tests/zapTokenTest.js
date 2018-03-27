@@ -1,24 +1,25 @@
 const instanceClass = require('../../src/api/contracts/ZapToken');
+const ZapWrapper = require('../../src/api/ZapWrapper');
+const BigNumber = require('bignumber.js');
+const Web3 = require('web3');
 const assert = require("chai").assert;
 const {
     migrateContracts,
     ganacheProvider,
-    webProvider
+    webProvider,
+    eth
 } = require('../bootstrap');
-const { 
+const {
     zapTokenAbi,
     port,
     protocol,
-    endpoint
+    endpoint,
+    network_id
 } = require('../../config');
 const contract = require('truffle-contract');
 const path = require('path');
-const Eth = require('ethjs');
-const endpointTest = `${protocol}${endpoint}:${port}`;
-const eth = new Eth(new Eth.HttpProvider(endpointTest));
-const ZapWrapper = require('../../src/api/ZapWrapper');
 const zapTokenAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapToken.json'));
-const BigNumber = require('bignumber.js');
+
 
 describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
     let addressZapToken;
@@ -28,22 +29,21 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
     let abiJSON;
     let zapTokenWrapper;
 
-    before(async function() {
+    before(async function () {
+
         this.timeout(60000);
         const data = await migrateContracts();
         assert.equal(data, 'done');
         abiJSON = require(path.join(__dirname, zapTokenAbi));
-        zapToken = contract(abiJSON);
-        zapToken.setProvider(ganacheProvider);
-        deployedZapToken = await zapToken.deployed();
-        addressZapToken = deployedZapToken.address;
+        addressZapToken = abiJSON.networks[network_id].address
+        deployedZapToken = eth.contract(abiJSON.abi).at(addressZapToken)
         accounts = await webProvider.eth.getAccounts();
         assert.ok(true);
     });
 
     it('should get balance of zapToken', async () => {
-        const data  = await deployedZapToken.balanceOf.call(accounts[0], { from: accounts[0] });
-        assert.equal(parseInt(data.toString()), 0);
+        const { balance } = await deployedZapToken.balanceOf( accounts[0], { from: accounts[0], gas: new BigNumber('6e6') });
+        assert.equal(parseInt(balance.toString()), 0);
     });
 
     describe('zapTokenWrapper', function () {
@@ -51,8 +51,8 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
         const tokensForOwner = new BigNumber("1e24");
         const allocateAccount = 300000;
 
-        beforeEach(function(done) {
-            setTimeout(() => done(), 500); 
+        beforeEach(function (done) {
+            setTimeout(() => done(), 500);
         });
 
         it('should initiate wrapper', () => {
@@ -84,7 +84,7 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
             const { balance } = await zapTokenWrapper.getBalance();
             assert.equal(+tokensForOwner.toString(), balance.toString());
         });
-        
+
         it('Should make transfer to another account', async () => {
             await zapTokenWrapper.send({ 
                 destination: accounts[1],

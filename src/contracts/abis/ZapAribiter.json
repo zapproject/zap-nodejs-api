@@ -1,12 +1,49 @@
 [
 	{
+		"constant": false,
+		"inputs": [],
+		"name": "kill",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
 		"inputs": [
 			{
-				"name": "_bondageAddress",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"name": "storageAddress",
 				"type": "address"
 			},
 			{
-				"name": "_registryAddress",
+				"name": "bondageAddress",
 				"type": "address"
 			}
 		],
@@ -19,7 +56,7 @@
 		"inputs": [
 			{
 				"indexed": false,
-				"name": "provider_address",
+				"name": "provider",
 				"type": "address"
 			},
 			{
@@ -48,7 +85,7 @@
 				"type": "bytes32"
 			}
 		],
-		"name": "ZapDataPurchase",
+		"name": "LogDataPurchase",
 		"type": "event"
 	},
 	{
@@ -61,7 +98,7 @@
 			},
 			{
 				"indexed": false,
-				"name": "subsriber",
+				"name": "subscriber",
 				"type": "address"
 			},
 			{
@@ -70,14 +107,45 @@
 				"type": "uint8"
 			}
 		],
-		"name": "ZapDataSubscriptionEnd",
+		"name": "LogDataSubscriptionEnd",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
 		"type": "event"
 	},
 	{
 		"constant": false,
 		"inputs": [
 			{
-				"name": "provider_address",
+				"name": "bondageAddress",
+				"type": "address"
+			}
+		],
+		"name": "setBondageAddress",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "providerAddress",
 				"type": "address"
 			},
 			{
@@ -94,7 +162,7 @@
 			},
 			{
 				"name": "blocks",
-				"type": "uint256"
+				"type": "uint64"
 			}
 		],
 		"name": "initiateSubscription",
@@ -104,28 +172,72 @@
 		"type": "function"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [
+			{
+				"name": "providerAddress",
+				"type": "address"
+			},
+			{
+				"name": "subscriberAddress",
+				"type": "address"
+			},
 			{
 				"name": "endpoint",
 				"type": "bytes32"
-			},
-			{
-				"name": "provider_address",
-				"type": "address"
-			},
-			{
-				"name": "subscriber_address",
-				"type": "address"
 			}
 		],
-		"name": "endZapSubscription",
+		"name": "getSubscription",
 		"outputs": [
 			{
-				"name": "",
-				"type": "bool"
+				"name": "dots",
+				"type": "uint64"
+			},
+			{
+				"name": "blockStart",
+				"type": "uint96"
+			},
+			{
+				"name": "preBlockEnd",
+				"type": "uint96"
 			}
 		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "subscriberAddress",
+				"type": "address"
+			},
+			{
+				"name": "endpoint",
+				"type": "bytes32"
+			}
+		],
+		"name": "endSubscriptionProvider",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "providerAddress",
+				"type": "address"
+			},
+			{
+				"name": "endpoint",
+				"type": "bytes32"
+			}
+		],
+		"name": "endSubscriptionSubscriber",
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"

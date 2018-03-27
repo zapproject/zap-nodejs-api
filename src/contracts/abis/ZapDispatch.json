@@ -1,103 +1,120 @@
 [
 	{
 		"constant": false,
-		"inputs": [
-			{
-				"name": "_bondageAddress",
-				"type": "address"
-			}
-		],
-		"name": "setBondageAddress",
+		"inputs": [],
+		"name": "kill",
 		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"name": "_response1",
-				"type": "string"
-			},
-			{
-				"name": "_response2",
-				"type": "string"
-			},
-			{
-				"name": "_response3",
-				"type": "string"
-			},
-			{
-				"name": "_response4",
-				"type": "string"
-			}
-		],
-		"name": "respond4",
+		"constant": true,
+		"inputs": [],
+		"name": "owner",
 		"outputs": [
 			{
 				"name": "",
-				"type": "bool"
+				"type": "address"
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"constant": false,
 		"inputs": [
 			{
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"name": "_response1",
-				"type": "string"
-			},
-			{
-				"name": "_response2",
-				"type": "string"
-			},
-			{
-				"name": "_response3",
-				"type": "string"
+				"name": "newOwner",
+				"type": "address"
 			}
 		],
-		"name": "respond3",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
+		"name": "transferOwnership",
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [
 			{
+				"name": "storageAddress",
+				"type": "address"
+			},
+			{
+				"name": "bondageAddress",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
 				"name": "id",
 				"type": "uint256"
 			},
 			{
-				"name": "_response",
-				"type": "string"
-			}
-		],
-		"name": "respond1",
-		"outputs": [
+				"indexed": false,
+				"name": "provider",
+				"type": "address"
+			},
 			{
-				"name": "",
-				"type": "bool"
+				"indexed": false,
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "query",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"name": "endpoint",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "endpoint_params",
+				"type": "bytes32[]"
 			}
 		],
+		"name": "LogIncoming",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "bondageAddress",
+				"type": "address"
+			}
+		],
+		"name": "setBondageAddress",
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -138,12 +155,26 @@
 		"type": "function"
 	},
 	{
-		"constant": true,
-		"inputs": [],
-		"name": "ZapDataProxyDispatch",
-		"outputs": [],
+		"constant": false,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"name": "response",
+				"type": "string"
+			}
+		],
+		"name": "respond1",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"payable": false,
-		"stateMutability": "view",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -154,11 +185,11 @@
 				"type": "uint256"
 			},
 			{
-				"name": "_response1",
+				"name": "response1",
 				"type": "string"
 			},
 			{
-				"name": "_response2",
+				"name": "response2",
 				"type": "string"
 			}
 		],
@@ -174,40 +205,69 @@
 		"type": "function"
 	},
 	{
-		"anonymous": false,
+		"constant": false,
 		"inputs": [
 			{
-				"indexed": false,
 				"name": "id",
 				"type": "uint256"
 			},
 			{
-				"indexed": false,
-				"name": "provider",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "recipient",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "query",
+				"name": "response1",
 				"type": "string"
 			},
 			{
-				"indexed": false,
-				"name": "endpoint",
-				"type": "bytes32"
+				"name": "response2",
+				"type": "string"
 			},
 			{
-				"indexed": false,
-				"name": "endpoint_params",
-				"type": "bytes32[]"
+				"name": "response3",
+				"type": "string"
 			}
 		],
-		"name": "Incoming",
-		"type": "event"
+		"name": "respond3",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"name": "response1",
+				"type": "string"
+			},
+			{
+				"name": "response2",
+				"type": "string"
+			},
+			{
+				"name": "response3",
+				"type": "string"
+			},
+			{
+				"name": "response4",
+				"type": "string"
+			}
+		],
+		"name": "respond4",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ]

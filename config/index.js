@@ -7,8 +7,14 @@ module.exports = {
     contractsBuildDirectory: '../ZapContracts/build/contracts',
     contractsDirectory: '../ZapContracts/contracts',
     network_id: 5777,
+    runMigrationTimeOut: 5000,
     migrationsDirectory: '../ZapContracts/migrations',
-    zapTokenAbi: '../../ZapContracts/build/contracts/ZapToken.json',
-    zapRegistryAbi: '../../ZapContracts/build/contracts/ZapRegistry.json',
-    runMigrationTimeOut: 5000
+    zapTokenAbi: '../../ZapContracts/build/contracts/TheToken.json',
+    zapRegistryAbi: '../../ZapContracts/build/contracts/Registry.json',
+    zapArbiterAbi: '../../ZapContracts/build/contracts/Arbiter.json',
+    zapBondageAbi: '../../ZapContracts/build/contracts/Bondage.json',
+    zapRegistryStorageAbi: '../../ZapContracts/build/contracts/RegistryStorage.json',
+    arbiterStorageAbi: '../../ZapContracts/build/contracts/ArbiterStorage.json',
+    bondageStorageAbi: '../../ZapContracts/build/contracts/BondageStorage.json',
+    currentCostAbi: '../../ZapContracts/build/contracts/CurrentCost.json'
 };
