@@ -6,11 +6,11 @@ const { promisify } = require('util');
 function parseZapParameters(params) {
     const output = [];
 
-    for ( let i = 0; i < params.length; i++ ) {
+    for (let i = 0; i < params.length; i++) {
         const param = params[i];
 
-        if ( typeof param == 'string' ) {
-            if ( param.startsWith('0x') ) {
+        if (typeof param == 'string') {
+            if (param.startsWith('0x')) {
                 // Already in hex
                 output.push(param);
             }
@@ -20,12 +20,12 @@ function parseZapParameters(params) {
             }
 
         }
-        else if ( typeof param == 'number' ) {
+        else if (typeof param == 'number') {
             // Parse numbers to big nums
             output.push(Eth.toBN(param));
         }
-        else if ( typeof param == 'object' ) {
-            if ( param.constructor.name == 'BN' ) {
+        else if (typeof param == 'object') {
+            if (param.constructor.name == 'BN') {
                 // Bignums are fine
                 output.push(param);
             }
@@ -42,7 +42,7 @@ function parseZapParameters(params) {
 }
 
 class ZapArbiter {
-    constructor({eth, contract_address, abiFile}) {
+    constructor({ eth, contract_address, abiFile }) {
         this.eth = eth;
         this.address = contract_address;
         this.abiFile = abiFile;
@@ -50,14 +50,14 @@ class ZapArbiter {
     }
 
     // Initiate a subscription
-    async initiateSubscription({oracleAddress, endpoint, js_params, dots, publicKey, from, gas}) {
+    async initiateSubscription({ oracleAddress, endpoint, js_params, dots, publicKey, from, gas }) {
         try {
             const params = parseZapParameters(js_params);
             // Make sure we could parse it correctly
-            if ( params instanceof Error ) {
+            if (params instanceof Error) {
                 throw params;
             }
-    
+
             return await this.contract.initiateSubscription(
                 oracleAddress,
                 params,
@@ -66,7 +66,7 @@ class ZapArbiter {
                 dots,
                 { from: from, gas: gas }
             );
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
@@ -74,38 +74,33 @@ class ZapArbiter {
     // Listen for initiate events
     async listen() {
         try {
-            const accounts = await this.eth.accounts();
+            const accounts = await this.eth.accounts()
             // const zapDataPurchaseAsyncNew = promisify(this.contract.ZapDataPurchase().new)
-            if ( accounts.length == 0 ) {
+            if (accounts.length == 0) {
                 throw new Error("No accounts loaded");
             }
 
             const account = accounts[0];
+            console.log(account)
+            this.filter = await this.contract.ZapDataPurchase()
             // Create the Event filter
-            this.filter = this.contract.filters();
-            // this.contract.filters.filter.allEvents({ fromBlock: 0, toBlock: 'latest' });
-            // this.filter = await this.contract.allEvents({ fromBlock: 0, toBlock: 'latest' });
-            console.log(this.filter);
+            // this.filter = await zapDataPurchaseAsyncNew();
+            console.log(this.filter)
             // Watch the event filter
-            const result = await this.filter.watch((err, res) => {
-                return new Promise((resolve, reject) => {
-                    if (err) return reject(err);
-                    if (res) return resolve(res);
-                });
-            });
-            console.log(result);
+            const result = await this.filter.watch()
+            console.log(result)
             // Sanity check
-            if ( result.length != 6 ) {
+            if (result.length != 6) {
                 throw new Error("Received invalid ZapDataPurchase event");
             }
 
             // Make sure it is us
-            if ( result[0] != account || result[1] != account ) {
+            if (result[0] != account || result[1] != account) {
                 return;
             }
 
             // Get the block number
-            const blockNumber = await this.eth.blockNumber();
+            const blockNumber = await this.eth.blockNumber()
             // Emit event
             return {
                 provider: result[0],
@@ -115,7 +110,7 @@ class ZapArbiter {
                 endpoint_params: result[4],
                 endpoint: result[5]
             };
-        } catch(err) {
+        } catch (err) {
             console.log(err);
             throw err;
         }
@@ -123,7 +118,7 @@ class ZapArbiter {
 
     // Close the connection
     close() {
-        if ( this.filter ) {
+        if (this.filter) {
             this.filter.stopWatching();
             delete this.filter;
         }
