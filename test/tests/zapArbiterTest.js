@@ -2,7 +2,6 @@ const instanceClass = require('../../src/api/contracts/ZapArbiter');
 const ZapWrapper = require('../../src/api/ZapWrapper');
 const assert = require("chai").assert;
 const {
-    ganacheProvider,
     webProvider,
     eth
 } = require('../bootstrap');
@@ -11,7 +10,6 @@ const {
     zapTokenAbi,
     zapRegistryAbi,
     zapBondageAbi,
-    network_id,
     arbiterStorageAbi,
     zapRegistryStorageAbi,
     bondageStorageAbi,
@@ -21,19 +19,24 @@ const path = require('path');
 const { fromAscii, toBN } = require('ethjs');
 const BigNumber = require('bignumber.js');
 const {
-    getInstanceOfSmartContract,
     getNewArbiterContract,
     getNewBondageContract,
     getNewSmartContract,
-    getNewRegistryContract
-} = require('../utils')
+    getNewRegistryContract,
+    curveType,
+    providerTitle,
+    providerPublicKey,
+    ZapCurveType,
+    curveStart,
+    curveMultiplier,
+    params,
+    // specifier,
+    oracleEndpoint,
+    tokensForOracle,
+    tokensForOwner,
+    gasTransaction
+} = require('../utils');
 
-const curveType = {
-    "ZapCurveNone": 0,
-    "ZapCurveLinear": 1,
-    "ZapCurveExponential": 2,
-    "ZapCurveLogarithmic": 3
-};
 
 describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
     let addressZapArbiter;
@@ -58,20 +61,6 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
     });
 
     describe('ZapArbiterWrapper', function () {
-
-        const providerTitle = fromAscii("test");
-        const providerPublicKey = 111;
-        const ZapCurveType = 'ZapCurveLinear';
-        const curveStart = 1;
-        const curveMultiplier = 1;
-        const param1 = new String("p1");
-        const param2 = new String("p2");
-        const params = [fromAscii(param1.valueOf()), fromAscii(param2.valueOf())];
-        const specifier = "test-linear-specifier";
-        const oracleEndpoint = fromAscii(specifier.valueOf());
-        const gasTransaction = toBN(3000000);
-        const tokensForOwner = new BigNumber("1e30");
-        const tokensForOracle = new BigNumber('1e24');
 
         beforeEach(function (done) {
             setTimeout(() => done(), 500);
@@ -120,21 +109,21 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
                     bondageStorage.transferOwnership(deployedZapBondage.address, { from: accounts[0], gas: 6000000 }),
                     registryStorage.transferOwnership(deployedZapRegistry.address, { from: accounts[0], gas: 6000000 }),
                     arbiterStorage.transferOwnership(deployedZapArbiter.address, { from: accounts[0], gas: 6000000 }),
-                ])
+                ]);
 
                 const data = await Promise.all([
                     bondageStorage.owner({ from: accounts[0], gas: 6000000 }),
                     registryStorage.owner({ from: accounts[0], gas: 6000000 }),
                     arbiterStorage.owner({ from: accounts[0], gas: 6000000 })
-                ])
+                ]);
 
-                assert.equal(data[0]['0'], deployedZapBondage.address)
-                assert.equal(data[1]['0'], deployedZapRegistry.address)
-                assert.equal(data[2]['0'], deployedZapArbiter.address)
+                assert.equal(data[0]['0'], deployedZapBondage.address);
+                assert.equal(data[1]['0'], deployedZapRegistry.address);
+                assert.equal(data[2]['0'], deployedZapArbiter.address);
             } catch (err) {
-                throw err
+                throw err;
             }
-        })
+        });
 
         it('Should initiate zapArbiter wrapper', async function() {
             const wrapper = new ZapWrapper(eth);
@@ -174,7 +163,7 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
                 await deployedZapToken.allocate(
                     deployedZapBondage.address,
                     tokensForOracle,
-                    { from: accounts[0], gas: gasTransaction })
+                    { from: accounts[0], gas: gasTransaction });
 
                 await deployedZapToken.approve(
                     deployedZapBondage.address,
@@ -195,15 +184,15 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
                     publicKey: providerPublicKey,
                     from: accounts[0],
                     gas: gasTransaction
-                })
+                });
             } catch (err) {
-                throw err
+                throw err;
             }
-        })
+        });
 
-        // it('Should initiate listen in zapArbiter', async () => {
-        //     const data = await zapArbiterWrapper.listen()
-        //     console.log(data)
-        // })
+        it('Should initiate listen in zapArbiter', async () => {
+            const data = await zapArbiterWrapper.listen();
+            console.log(data);
+        });
     });
 });

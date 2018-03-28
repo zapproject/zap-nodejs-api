@@ -12,9 +12,9 @@ module.exports = {
     zapTokenAbi: '../../ZapContracts/build/contracts/TheToken.json',
     zapRegistryAbi: '../../ZapContracts/build/contracts/Registry.json',
     zapArbiterAbi: '../../ZapContracts/build/contracts/Arbiter.json',
-    zapBondageAbi: '../../ZapContracts/build/contracts/Bondage.json',
     zapRegistryStorageAbi: '../../ZapContracts/build/contracts/RegistryStorage.json',
     arbiterStorageAbi: '../../ZapContracts/build/contracts/ArbiterStorage.json',
     bondageStorageAbi: '../../ZapContracts/build/contracts/BondageStorage.json',
+    zapBondageAbi:     '../../ZapContracts/build/contracts/Bondage.json',
     currentCostAbi: '../../ZapContracts/build/contracts/CurrentCost.json'
 };

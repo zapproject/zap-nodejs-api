@@ -1,6 +1,6 @@
 const Eth = require('ethjs');
 const fs = require('fs');
-const { promisify } = require('util')
+const { promisify } = require('util');
 
 // Parse JavaScript parameters into something ethjs can use
 function parseZapParameters(params) {
@@ -65,43 +65,48 @@ class ZapArbiter {
                 publicKey,
                 dots,
                 { from: from, gas: gas }
-            )
+            );
         } catch(err) {
-            throw err
+            throw err;
         }
     }
 
     // Listen for initiate events
     async listen() {
         try {
-            const accounts = await this.eth.accounts()
+            const accounts = await this.eth.accounts();
             // const zapDataPurchaseAsyncNew = promisify(this.contract.ZapDataPurchase().new)
             if ( accounts.length == 0 ) {
                 throw new Error("No accounts loaded");
             }
 
             const account = accounts[0];
-            console.log(account)
-            this.filter = await this.contract.ZapDataPurchase()
             // Create the Event filter
-            // this.filter = await zapDataPurchaseAsyncNew();
-            console.log(this.filter)
+            this.filter = this.contract.filters();
+            // this.contract.filters.filter.allEvents({ fromBlock: 0, toBlock: 'latest' });
+            // this.filter = await this.contract.allEvents({ fromBlock: 0, toBlock: 'latest' });
+            console.log(this.filter);
             // Watch the event filter
-            const result = await this.filter.watch()
-            console.log(result)
+            const result = await this.filter.watch((err, res) => {
+                return new Promise((resolve, reject) => {
+                    if (err) return reject(err);
+                    if (res) return resolve(res);
+                });
+            });
+            console.log(result);
             // Sanity check
             if ( result.length != 6 ) {
                 throw new Error("Received invalid ZapDataPurchase event");
             }
 
-                // Make sure it is us
+            // Make sure it is us
             if ( result[0] != account || result[1] != account ) {
                 return;
             }
 
-                // Get the block number
-            const blockNumber = await this.eth.blockNumber()
-                // Emit event
+            // Get the block number
+            const blockNumber = await this.eth.blockNumber();
+            // Emit event
             return {
                 provider: result[0],
                 subscriber: result[1],
@@ -111,8 +116,8 @@ class ZapArbiter {
                 endpoint: result[5]
             };
         } catch(err) {
-            console.log(err)
-            throw err
+            console.log(err);
+            throw err;
         }
     }
 
