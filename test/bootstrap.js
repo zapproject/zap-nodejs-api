@@ -74,7 +74,7 @@ require('chai')
     .use(require('chai-bignumber'))
     .should();
 require('./tests/zapTokenTest');
-// require('./tests/zapRegistryTest');
-// require('./tests/zapBondageTest');
+require('./tests/zapRegistryTest');
+require('./tests/zapBondageTest');
 require('./tests/zapArbiterTest');
-// require('./tests/closeServer'); 
+require('./tests/closeServer'); 

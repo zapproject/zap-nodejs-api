@@ -190,9 +190,9 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
             }
         });
 
-        it('Should initiate listen in zapArbiter', async () => {
-            const data = await zapArbiterWrapper.listen();
-            console.log(data);
-        });
+        // it('Should initiate listen in zapArbiter', async () => {
+        //     const data = await zapArbiterWrapper.listen();
+        //     console.log(data);
+        // });
     });
 });
