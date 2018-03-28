@@ -57,11 +57,11 @@ class ZapArbiter {
             if (params instanceof Error) {
                 throw params;
             }
-
+            
             return await this.contract.initiateSubscription(
                 oracleAddress,
-                params,
                 endpoint,
+                params,
                 publicKey,
                 dots,
                 { from: from, gas: gas }
@@ -100,7 +100,7 @@ class ZapArbiter {
             }
 
             // Get the block number
-            const blockNumber = await this.eth.blockNumber()
+            const blockNumber = await this.eth.blockNumber();
             // Emit event
             return {
                 provider: result[0],

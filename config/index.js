@@ -16,5 +16,7 @@ module.exports = {
     arbiterStorageAbi: '../../ZapContracts/build/contracts/ArbiterStorage.json',
     bondageStorageAbi: '../../ZapContracts/build/contracts/BondageStorage.json',
     zapBondageAbi:     '../../ZapContracts/build/contracts/Bondage.json',
-    currentCostAbi: '../../ZapContracts/build/contracts/CurrentCost.json'
+    currentCostAbi: '../../ZapContracts/build/contracts/CurrentCost.json',
+    addressSpacePointerAbi: '../../ZapContracts/build/contracts/AddressSpacePointer.json',
+    addressSpace: '../../ZapContracts/build/contracts/AddressSpace.json'
 };

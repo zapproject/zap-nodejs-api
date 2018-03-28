@@ -9,13 +9,10 @@ const {
 const {
     zapRegistryAbi,
     network_id,
-    zapRegistryStorageAbi,
-    protocol,
-    endpoint,
-    port
+    zapRegistryStorageAbi
 } = require('../../config');
 const path = require('path');
-const zapRegistryAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapRegistry.json'));
+// const zapRegistryAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapRegistry.json'));
 const { fromAscii } = require('ethjs');
 const {
     curveType,
@@ -66,8 +63,7 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             });
         });
 
-        it('should bind registry storage', async () => {
-            await deployedStorage.transferOwnership(addressZapRegistry, { from: accounts[0], gas: 6000000 });
+        it('should check bind registry storage', async () => {
             const data = await deployedStorage.owner({ from: accounts[0], gas: 6000000 });
             assert.equal(data['0'], addressZapRegistry);
         });

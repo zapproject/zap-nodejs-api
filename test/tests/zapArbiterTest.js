@@ -13,7 +13,8 @@ const {
     arbiterStorageAbi,
     zapRegistryStorageAbi,
     bondageStorageAbi,
-    currentCostAbi
+    currentCostAbi,
+    addressSpacePointerAbi
 } = require('../../config');
 const path = require('path');
 const { fromAscii, toBN } = require('ethjs');
@@ -30,11 +31,12 @@ const {
     curveStart,
     curveMultiplier,
     params,
-    // specifier,
+    getNewCurrentCostContract,
     oracleEndpoint,
     tokensForOracle,
     tokensForOwner,
-    gasTransaction
+    gasTransaction,
+    getInstanceOfSmartContract
 } = require('../utils');
 
 
@@ -72,33 +74,46 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
                 let tokenAbi = require(path.join(__dirname, zapTokenAbi));
                 let registryAbi = require(path.join(__dirname, zapRegistryAbi));
                 let bondageAbi = require(path.join(__dirname, zapBondageAbi));
+                
+                const spacePointer = getInstanceOfSmartContract(
+                    require(path.join(__dirname, addressSpacePointerAbi ))
+                );
 
                 [
                     bondageStorage,
                     registryStorage,
                     arbiterStorage,
-                    currentCostStorage
+                    deployedZapToken
                 ] = await Promise.all([
                     getNewSmartContract(require(path.join(__dirname, bondageStorageAbi))),
                     getNewSmartContract(require(path.join(__dirname, zapRegistryStorageAbi))),
                     getNewSmartContract(require(path.join(__dirname, arbiterStorageAbi))),
-                    getNewSmartContract(require(path.join(__dirname, currentCostAbi)))
+                    getNewSmartContract(tokenAbi)
                 ]);
                 
-                deployedZapToken = await getNewSmartContract(tokenAbi);
                 
-                deployedZapRegistry = await getNewRegistryContract({ abiFile: registryAbi, regStoreAddress: registryStorage.address });
+                deployedZapRegistry = await getNewRegistryContract({
+                    abiFile: registryAbi,
+                    regStoreAddress: registryStorage.address
+                });
+
+                currentCostStorage = await getNewCurrentCostContract({
+                    abiFile: require(path.join(__dirname, currentCostAbi)),
+                    pointerAddress: spacePointer.address,
+                    registryAddress: deployedZapRegistry.address
+                });
                
                 deployedZapBondage = await getNewBondageContract({ 
-                    abiFile: bondageAbi, 
+                    abiFile: bondageAbi,
+                    pointerAddress: spacePointer.address,
                     bondStoreAddress: bondageStorage.address,
-                    registryAddress: deployedZapRegistry.address,
                     tokenAddress: deployedZapToken.address,
                     currentCostAddress: currentCostStorage.address
                 });
-               
+                
                 deployedZapArbiter = await getNewArbiterContract({
                     abiFile: arbiterAbi,
+                    pointerAddress: spacePointer.address,
                     arbiterStoreAddress: arbiterStorage.address,
                     bondageAddress: deployedZapBondage.address
                 });
@@ -180,8 +195,8 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
                     oracleAddress: accounts[2],
                     endpoint: oracleEndpoint,
                     js_params: params,
-                    dots: 4,
                     publicKey: providerPublicKey,
+                    dots: 4,
                     from: accounts[0],
                     gas: gasTransaction
                 });

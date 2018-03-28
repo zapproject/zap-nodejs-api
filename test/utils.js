@@ -22,11 +22,11 @@ async function getNewRegistryContract({ abiFile, regStoreAddress }) {
     return eth.contract(abiFile.abi).at(contractAddress);
 }
 
-async function getNewBondageContract({ abiFile, bondStoreAddress, registryAddress, tokenAddress, currentCostAddress }) {
+async function getNewBondageContract({ abiFile, pointerAddress, bondStoreAddress, tokenAddress, currentCostAddress }) {
     const contract = getEthContract(abiFile);
     const txHash = await contract.new(
+        pointerAddress,
         bondStoreAddress,
-        registryAddress,
         tokenAddress,
         currentCostAddress,
         objectToCreate
@@ -35,9 +35,10 @@ async function getNewBondageContract({ abiFile, bondStoreAddress, registryAddres
     return eth.contract(abiFile.abi).at(contractAddress);
 }
 
-async function getNewArbiterContract({ abiFile, arbiterStoreAddress, bondageAddress }) {
+async function getNewArbiterContract({ abiFile, pointerAddress, arbiterStoreAddress, bondageAddress }) {
     const contract = getEthContract(abiFile);
     const txHash = await contract.new(
+        pointerAddress,
         arbiterStoreAddress,
         bondageAddress,
         objectToCreate
@@ -59,6 +60,17 @@ async function getNewDispatchContract({ abiFile, dispatchStoreAddress, bondageAd
 
 function getEthContract({ abi, bytecode }) {
     return eth.contract(abi, bytecode);
+}
+
+async function getNewCurrentCostContract({ abiFile, pointerAddress, registryAddress }) {
+    const contract = getEthContract(abiFile);
+    const txHash = await contract.new(
+        pointerAddress,
+        registryAddress,
+        objectToCreate
+    );
+    const { contractAddress } = await eth.getTransactionReceipt(txHash);
+    return eth.contract(abiFile.abi).at(contractAddress);
 }
 
 const curveType = {
@@ -103,5 +115,8 @@ module.exports = {
     gasTransaction,
     tokensForOwner,
     tokensForOracle,
-    allocateAccount
+    allocateAccount,
+    getNewCurrentCostContract,
+    param1,
+    param2
 };
