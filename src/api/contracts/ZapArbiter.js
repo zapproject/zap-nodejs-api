@@ -1,7 +1,5 @@
 const Eth = require('ethjs');
-const fs = require('fs');
-const { promisify } = require('util');
-
+// const EthFilter = require('ethjs-filter');
 // Parse JavaScript parameters into something ethjs can use
 function parseZapParameters(params) {
     const output = [];
@@ -47,6 +45,7 @@ class ZapArbiter {
         this.address = contract_address;
         this.abiFile = abiFile;
         this.contract = eth.contract(abiFile).at(this.address);
+        // this.filters = new EthFilter(eth);
     }
 
     // Initiate a subscription
@@ -57,7 +56,7 @@ class ZapArbiter {
             if (params instanceof Error) {
                 throw params;
             }
-            
+
             return await this.contract.initiateSubscription(
                 oracleAddress,
                 endpoint,
@@ -74,28 +73,41 @@ class ZapArbiter {
     // Listen for initiate events
     async listen() {
         try {
-            const accounts = await this.eth.accounts()
-            // const zapDataPurchaseAsyncNew = promisify(this.contract.ZapDataPurchase().new)
+            const accounts = await this.eth.accounts();
             if (accounts.length == 0) {
                 throw new Error("No accounts loaded");
             }
-
             const account = accounts[0];
-            console.log(account)
-            this.filter = await this.contract.ZapDataPurchase()
+
             // Create the Event filter
-            // this.filter = await zapDataPurchaseAsyncNew();
-            console.log(this.filter)
+            this.filter = new this.contract.filters.Filter({ delay: 500 });
+            await this.filter.new({ toBlock: 'latest' });
+
             // Watch the event filter
-            const result = await this.filter.watch()
-            console.log(result)
+            const result = await new Promise((resolve, reject) => {
+                this.filter.watch((err, res) => {
+                    console.log(err, res);
+                    if (err) return reject(err);
+                    if (res && res.length) return resolve(res);
+                });
+            });
+
             // Sanity check
-            if (result.length != 6) {
-                throw new Error("Received invalid ZapDataPurchase event");
+            if (result.length !== 6) {
+                throw new Error("Received invalid event");
             }
 
+            const [
+                provider,
+                subscriber,
+                public_key,
+                endBlock,
+                endpoint_params,
+                endpoint
+            ] = result;
+
             // Make sure it is us
-            if (result[0] != account || result[1] != account) {
+            if (provider != account || subscriber != account) {
                 return;
             }
 
@@ -103,15 +115,14 @@ class ZapArbiter {
             const blockNumber = await this.eth.blockNumber();
             // Emit event
             return {
-                provider: result[0],
-                subscriber: result[1],
-                public_key: result[2],
-                endblock: result[3] + blockNumber.toNumber(),
-                endpoint_params: result[4],
-                endpoint: result[5]
+                provider,
+                subscriber,
+                public_key,
+                endblock: endBlock + blockNumber.toNumber(),
+                endpoint_params,
+                endpoint,
             };
         } catch (err) {
-            console.log(err);
             throw err;
         }
     }
@@ -119,7 +130,7 @@ class ZapArbiter {
     // Close the connection
     close() {
         if (this.filter) {
-            this.filter.stopWatching();
+            this.filter.uninstall();
             delete this.filter;
         }
     }
