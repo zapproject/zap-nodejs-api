@@ -1,3 +1,3 @@
 require('babel-register');
-require('./server');
+// require('./server');
 require('./bootstrap');

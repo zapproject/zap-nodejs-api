@@ -31,6 +31,7 @@
     "ipfs": "^0.27.6",
     "ipfs-pubsub-room": "^1.1.5",
     "js-ipfs": "*",
+    "js-sha3": "^0.7.0",
     "level-filesystem": "github:zapproject/level-filesystem",
     "libp2p-webrtc-star": "^0.13.2",
     "mocha": "^5.0.1",

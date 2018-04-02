@@ -47,9 +47,10 @@ async function getNewArbiterContract({ abiFile, pointerAddress, arbiterStoreAddr
     return eth.contract(abiFile.abi).at(contractAddress);
 }
 
-async function getNewDispatchContract({ abiFile, dispatchStoreAddress, bondageAddress }) {
+async function getNewDispatchContract({ abiFile, pointerAddress, dispatchStoreAddress, bondageAddress }) {
     const contract = getEthContract(abiFile);
     const txHash = await contract.new(
+        pointerAddress,
         dispatchStoreAddress,
         bondageAddress,
         objectToCreate
@@ -94,6 +95,7 @@ const gasTransaction = toBN(3000000);
 const tokensForOwner = new BigNumber("1e30");
 const tokensForOracle = new BigNumber('1e24');
 const allocateAccount = 300000;
+const query = "Why?";
 
 
 module.exports = {
@@ -118,5 +120,6 @@ module.exports = {
     allocateAccount,
     getNewCurrentCostContract,
     param1,
-    param2
+    param2,
+    query
 };

@@ -79,25 +79,23 @@ class ZapArbiter {
             }
             const account = accounts[0];
 
+            
             // Create the Event filter
-            console.log(1);
-            this.filter = await this.contract.DataPurchase();
-            // this.filter = new this.contract.filters.Filter({ delay: 500 });
-            // await this.filter.new({ toBlock: 'latest' });
-            console.log(this.filter);
+            this.filter = this.contract.DataPurchase();
+            this.filter.new({ toBlock: 'latest' }, (err, res) => {
+                if (err) throw err;
+            });
+
             // Watch the event filter
             const result = await new Promise((resolve, reject) => {
                 this.filter.watch((err, res) => {
-                    console.log(err, res);
                     if (err) return reject(err);
                     if (res && res.length) return resolve(res);
                 });
             });
 
             // Sanity check
-            console.log(result.length, result)
             if (result.length !== 6) {
-                console.log('herer')
                 throw new Error("Received invalid event");
             }
 
