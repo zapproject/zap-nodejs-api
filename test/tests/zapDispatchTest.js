@@ -10,7 +10,9 @@ const {
 // const { keccak_256, keccak256 } = require('js-sha3');
 // const js_sha = require('js-sha3');
 // const keccak256 = require('js-sha3').keccak256;
-const { toBN, keccak256 } = require('ethjs');
+const Web3 = require('web3');
+const web3 = new Web3( new Web3.providers.HttpProvider('http://127.0.0.1:7545') )
+const { toBN, keccak256, toAscii } = require('ethjs');
 const { join } = require('path');
 const {
     getInstanceOfSmartContract,
@@ -45,7 +47,8 @@ const {
     arbiterStorageAbi: zapArbiterStorageAbi,
     zapRegistryStorageAbi,
     bondageStorageAbi: zapBondageStorageAbi,
-    currentCostAbi: zapCurrentCostAbi
+    currentCostAbi: zapCurrentCostAbi,
+    queryCallerAbi
 } = require('../../config');
 
 describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
@@ -62,6 +65,7 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
         deployedZapArbiter,
         addressZapDispatch,
         zapDispatchWrapper,
+        queryCaller,
         dispatchAbi;
 
     before(async () => {
@@ -89,6 +93,10 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
 
                 const spacePointer = getInstanceOfSmartContract(
                     require(join(__dirname, addressSpacePointerAbi))
+                );
+
+                queryCaller = getInstanceOfSmartContract(
+                    require(join(__dirname, queryCallerAbi))
                 );
 
                 [
@@ -209,6 +217,12 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     { from: accounts[0], gas: gasTransaction }
                 );
 
+                await deployedZapToken.approve(
+                    addressZapDispatch,
+                    tokensForOracle,
+                    { from: accounts[2], gas: gasTransaction }
+                );
+
                 await deployedZapBondage.bond(
                     accounts[2],
                     oracleEndpoint,
@@ -224,6 +238,7 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     4,
                     { from: accounts[0], gas: gasTransaction }
                 );
+                console.log('---------------------------------------------------------------')
                 const { dots } = await deployedZapBondage.getDots(
                     accounts[0],
                     accounts[2],
@@ -231,8 +246,9 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     { from: accounts[0], gas: gasTransaction }
                 );
 
-                if(!dots.toNumber()) assert.ok(false);
+                if (!dots.toNumber()) assert.ok(false);
 
+                console.log('---------------------------------------------------------------')
                 const txHash = await deployedZapDispatch.query(
                     accounts[2],
                     query,
@@ -240,28 +256,50 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     params,
                     { from: accounts[0], gas: gasTransaction }
                 );
-                console.log(txHash)
-                const r = await eth.getTransactionReceipt(txHash);
-                console.log(r)
-                const { blockNumber, blockHash } = r
-                const t = await eth.getBlockByHash(blockHash, true);
-                console.log(t)
-                const { timestamp } = t
-                const id = keccak256(blockNumber.toString(), timestamp, query, accounts[0]);
+                
+                // console.log(txHash);
+                // const { blockNumber } = await web3.eth.getTransaction(txHash);
+                // const { timestamp } = await web3.eth.getBlock(blockNumber);
+                console.log(addressZapDispatch);
+                console.log('---------------------------------------------------------------')
+                const { blockNumber, blockHash } = await eth.getTransactionReceipt(txHash);
+                const { timestamp } = await eth.getBlockByHash(blockHash, true);
+                
+                let id = await queryCaller.calculateId( 
+                    blockNumber,
+                    timestamp,
+                    query,
+                    { from: accounts[2], gas: gasTransaction }
+                );
+                console.log('id==>>>',id);
+                id = toBN(id);
+                console.log('id==>>>',id);
+                let balance = await deployedZapToken.balanceOf(accounts[2]);
+                console.log('balance',balance.balance.toString());
+                // balance = await deployedZapToken.balanceOf(accounts[0]);
+                // console.log('balance', balance.balance.toString());
+                // // console.log(addressZapDispatch)
+           
+                let u = await dispatchStorage.getProvider(id);
+                let status = await dispatchStorage.getStatus(id);
+                let subscr = await dispatchStorage.getSubscriber(id);
 
-                console.log(id);
-                const newId = webProvider.utils.sha3(blockNumber.toString(), timestamp, query, accounts[0]);
-                console.log(newId)
-                // const data = await zapDispatchWrapper.respond({
-                //     queryId: id,
-                //     responseParams: ['some string to check'],
-                //     from: accounts[0],
-                //     gas: gasTransaction
-                // });
+                console.log(u)
+                console.log(status)
+                console.log(subscr)
+                const list = await dispatchStorage.getQueryList();
+                console.log(list['0'][0]);
+                
+                u = await dispatchStorage.getProvider(list['0'][0]);
+                status = await dispatchStorage.getStatus(list['0'][0]);
+                subscr = await dispatchStorage.getSubscriber(list['0'][0]);
+                console.log(u)
+                console.log(status)
+                console.log(subscr)
                 const data = await deployedZapDispatch.respond1(
-                    id,
-                    'some string to check',
-                    { 'from': accounts[0], gas: gasTransaction }
+                    list['0'][0],
+                    'trum tim tum',
+                    { from: accounts[2], gas: gasTransaction }
                 );
                 console.log(data);
             } catch (err) {

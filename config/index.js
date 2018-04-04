@@ -20,5 +20,6 @@ module.exports = {
     addressSpacePointerAbi: '../../ZapContracts/build/contracts/AddressSpacePointer.json',
     addressSpace: '../../ZapContracts/build/contracts/AddressSpace.json',
     zapDispatchAbi: '../../ZapContracts/build/contracts/Dispatch.json',
-    zapDispatchStorageAbi: '../../ZapContracts/build/contracts/DispatchStorage.json'
+    zapDispatchStorageAbi: '../../ZapContracts/build/contracts/DispatchStorage.json',
+    queryCallerAbi: '../../ZapContracts/build/contracts/QueryCaller.json'
 };

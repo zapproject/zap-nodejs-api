@@ -79,4 +79,4 @@ require('./tests/zapTokenTest');
 // require('./tests/zapBondageTest');
 // require('./tests/zapArbiterTest');
 require('./tests/zapDispatchTest');
-require('./tests/closeServer');
+// require('./tests/closeServer');
