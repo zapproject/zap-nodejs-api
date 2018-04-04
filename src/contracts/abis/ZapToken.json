@@ -239,24 +239,6 @@
 		"constant": false,
 		"inputs": [
 			{
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "allocate",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
 				"name": "_spender",
 				"type": "address"
 			},
@@ -396,5 +378,23 @@
 		],
 		"name": "Transfer",
 		"type": "event"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "allocate",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ]

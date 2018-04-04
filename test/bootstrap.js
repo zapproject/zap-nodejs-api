@@ -20,8 +20,12 @@ const {
     contractsDirectory,
     network_id,
     migrationsDirectory,
+    protocol
 } = require('../config');
 // initiate and run ganache server;
+const Eth = require('ethjs');
+const endpointTest = `${protocol}${endpoint}:${port}`;
+const eth = new Eth(new Eth.HttpProvider(endpointTest));
 
 const webProvider = new Web3();
 const ganacheProvider = provider(serverOptions);
@@ -47,6 +51,8 @@ async function migrateContracts() {
         "network_id":network_id,
         "hostname":endpoint,
         "port":port,
+        gas: "6721975",
+        gasPrice: "10000000"
     };
     try {
         await asyncMigrate(options);
@@ -59,7 +65,8 @@ async function migrateContracts() {
 module.exports = {
     migrateContracts,
     ganacheProvider,
-    webProvider
+    webProvider,
+    eth
 };
 
 require('chai')
@@ -67,5 +74,7 @@ require('chai')
     .use(require('chai-bignumber'))
     .should();
 require('./tests/zapTokenTest');
-// require('./tests/zapRegistryTest');
-require('./tests/closeServer');
+require('./tests/zapRegistryTest');
+require('./tests/zapBondageTest');
+require('./tests/zapArbiterTest');
+require('./tests/closeServer'); 

@@ -1,33 +1,30 @@
 const instanceClass = require('../../src/api/contracts/ZapRegistry');
+const ZapWrapper = require('../../src/api/ZapWrapper');
 const assert = require("chai").assert;
 const {
     ganacheProvider,
-    webProvider
+    webProvider,
+    eth
 } = require('../bootstrap');
-const { 
+const {
     zapRegistryAbi,
-    port,
-    protocol,
-    endpoint,
-    network_id
+    network_id,
+    zapRegistryStorageAbi
 } = require('../../config');
-const contract = require('truffle-contract');
 const path = require('path');
-const Eth = require('ethjs');
-const endpointTest = `${protocol}${endpoint}:${port}`;
-const eth = new Eth(new Eth.HttpProvider(endpointTest));
-const ZapWrapper = require('../../src/api/ZapWrapper');
-const zapRegistryAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapRegistry.json'));
+// const zapRegistryAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapRegistry.json'));
 const { fromAscii } = require('ethjs');
+const {
+    curveType,
+    providerTitle,
+    providerPublicKey,
+    ZapCurveType,
+    specifier,
+    curveStart,
+    curveMultiplier,
+    params
+} = require('../utils');
 
-const specifier = new String("test-linear-specifier");
-
-const curveType = {
-    "ZapCurveNone": 0,
-    "ZapCurveLinear": 1,
-    "ZapCurveExponential": 2,
-    "ZapCurveLogarithmic": 3
-};
 
 describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
     let addressZapRegistry;
@@ -36,34 +33,25 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
     let zapRegistry;
     let abiJSON;
     let zapRegistryWrapper;
+    let addressZapRegistryStorage;
+    let deployedStorage;
+    let abiJSONStorage;
 
     before(async () => {
         abiJSON = require(path.join(__dirname, zapRegistryAbi));
-        zapRegistry = contract(abiJSON);
-        zapRegistry.setProvider(ganacheProvider);
-        zapRegistry.setNetwork(network_id);
-        deployedZapRegistry = await zapRegistry.deployed();
-        addressZapRegistry = zapRegistry.address;
+        abiJSONStorage = require(path.join(__dirname, zapRegistryStorageAbi));
+        addressZapRegistry = abiJSON.networks[network_id].address;
+        addressZapRegistryStorage = abiJSONStorage.networks[network_id].address;
+        deployedZapRegistry = eth.contract(abiJSON.abi).at(addressZapRegistry);
+        deployedStorage = eth.contract(abiJSONStorage.abi).at(addressZapRegistryStorage);
         accounts = await webProvider.eth.getAccounts();
         assert.ok(true);
     });
 
     describe('ZapRegistryWrapper', function () {
 
-        const providerTitle = "test";
-        const providerPublicKey = 43254352345;
-        const ZapCurveType = 'ZapCurveLinear';
-        const curveStart = 1;
-        const curveMultiplier = 2;
-        const params = [
-            "54B15E68FB8F36D7CD88FF94116CDC1",
-            "GMSSEUE3ORHOKWN4WWIQ5X4EBOOTLJY",
-            "HQXPYWMACKDWKP47RRVIV7VOURXFE5Q",
-            "6029&dn=mediawiki-1.15.1.tar.g"
-        ];
-
-        beforeEach(function(done) {
-            setTimeout(() => done(), 500); 
+        beforeEach((done) => {
+            setTimeout(() => done(), 500);
         });
 
         it('Should initiate zapRegistry wrapper', async () => {
@@ -75,6 +63,11 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             });
         });
 
+        it('should check bind registry storage', async () => {
+            const data = await deployedStorage.owner({ from: accounts[0], gas: 6000000 });
+            assert.equal(data['0'], addressZapRegistry);
+        });
+
         it('Should initiate provider in zap registry contract', async () => {
             await zapRegistryWrapper.initiateProvider({
                 public_key: providerPublicKey,
@@ -82,10 +75,14 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
                 endpoint_specifier: specifier.valueOf(),
                 endpoint_params: [],
                 from: accounts[0],
-                gas: 300000
+                gas: 600000
             });
             const title = await zapRegistryWrapper.contract.getProviderTitle(accounts[0]);
-            assert.equal(title['0'], providerTitle);
+            if (~title['0'].indexOf(providerTitle)) {
+                assert.ok(true);
+            } else {
+                assert.ok(false);
+            }
         });
 
         it('Should initiate Provider curve in zap registry contract', async () => {
@@ -102,28 +99,28 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
             assert.equal(provider.curveStart.toString(), curveStart);
             assert.equal(provider.curveMultiplier.toString(), curveMultiplier);
         });
-        
+
         it('Should set endpoint params in zap registry contract', async () => {
-            await zapRegistryWrapper.setEndpointParams({ 
-                specifier: specifier.valueOf(), 
-                params, 
+            await zapRegistryWrapper.setEndpointParams({
+                specifier: specifier.valueOf(),
+                params,
                 from: accounts[0],
                 gas: 300000
             });
-            const endpointParams = await zapRegistryWrapper.contract.getProviderRouteKeys(
-                accounts[0], 
+            const endpointsSize = await deployedStorage.getEndpointIndexSize(
+                accounts[0],
                 fromAscii(specifier.valueOf())
             );
-            assert.equal(endpointParams['0'].length, params.length);
+            assert.equal(endpointsSize['0'].toNumber(), params.length);
         });
 
-        it('Should ger oracle in zap registry contract', async () => {
+        it('Should get oracle in zap registry contract', async () => {
             const oracle = await zapRegistryWrapper.getOracle({
                 address: accounts[0],
                 specifier: specifier.valueOf()
             });
             assert.equal(oracle.public_key['0'].toString(), providerPublicKey);
-            assert.equal(oracle.endpoint_params['0'].length, params.length);
-        }); 
+            assert.equal(oracle.endpoint_params.length, params.length);
+        });
     });
 });

@@ -25,7 +25,7 @@ class ZapRegistry {
         try {
             return await this.contract.initiateProvider(
                 public_key, 
-                title, 
+                fromAscii(title), 
                 fromAscii(endpoint_specifier),
                 endpoint_params,
                 {
@@ -86,12 +86,26 @@ class ZapRegistry {
             oracle.public_key = public_key;
     
             // // Get the route keys next
-            const endpoint_params = await this.contract.getProviderRouteKeys( 
-                address,
-                fromAscii(specifier)
-            );
+            // getNextEndpointParam address provider, bytes32 specifier, uint256 index
+            let i = 0;
+            let endpoint_params = [];
+            while(true) {
+                try {
+                    if (i >= 50) break;
+                    const { nextIndex, endpoint_param } = await this.contract.getNextEndpointParam(
+                        address,
+                        fromAscii(specifier),
+                        i
+                    )
+                    endpoint_params.push(endpoint_param)
+                    if(!nextIndex.toNumber()) break;
+                    i++
+                } catch(err) {
+                    console.log(err)
+                    break;
+                }
+            }
             oracle.endpoint_params = endpoint_params;
-    
             // // Output loaded object
             return oracle;
         } catch (err) {
