@@ -63,9 +63,6 @@ class ZapDispatch {
     }
 
     async respond({ queryId, responseParams, from, gas }) {
-        console.log('--------------------------------------------')
-        console.log(queryId, responseParams, from, gas)
-        console.log('--------------------------------------------')
         switch (responseParams.length) {
             case 1: {
                 return this.contract.respond1(

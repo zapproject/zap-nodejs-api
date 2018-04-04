@@ -9,8 +9,8 @@ const {
 } = require('../bootstrap');
 // const { keccak_256, keccak256 } = require('js-sha3');
 // const js_sha = require('js-sha3');
-const keccak256 = require('js-sha3').keccak256;
-const { toBN } = require('ethjs');
+// const keccak256 = require('js-sha3').keccak256;
+const { toBN, keccak256 } = require('ethjs');
 const { join } = require('path');
 const {
     getInstanceOfSmartContract,
@@ -224,6 +224,14 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     4,
                     { from: accounts[0], gas: gasTransaction }
                 );
+                const { dots } = await deployedZapBondage.getDots(
+                    accounts[0],
+                    accounts[2],
+                    oracleEndpoint,
+                    { from: accounts[0], gas: gasTransaction }
+                );
+
+                if(!dots.toNumber()) assert.ok(false);
 
                 const txHash = await deployedZapDispatch.query(
                     accounts[2],
@@ -232,24 +240,29 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     params,
                     { from: accounts[0], gas: gasTransaction }
                 );
-                // uint256(keccak256(block.number, now, userQuery, msg.sender))
-                const { timestamp } = await webProvider.eth.getBlock('latest');
-                const { blockNumber } = await eth.getTransactionByHash(txHash);
-                console.log(timestamp, blockNumber, blockNumber.toNumber());
-                const id = keccak256.create(blockNumber.toString(), `${timestamp}`, query, accounts[0]);
+                console.log(txHash)
+                const r = await eth.getTransactionReceipt(txHash);
+                console.log(r)
+                const { blockNumber, blockHash } = r
+                const t = await eth.getBlockByHash(blockHash, true);
+                console.log(t)
+                const { timestamp } = t
+                const id = keccak256(blockNumber.toString(), timestamp, query, accounts[0]);
 
-                console.log(`0x${id}`);
-                // await deployedZapDispatch.fulfillQuery(
-                //     id,
-                //     { from: accounts[0], gas: gasTransaction }
-                // );
-                // queryId, responseParams, from, gas
-                const data = await zapDispatchWrapper.respond({
-                    queryId: `0x${id}`,
-                    responseParams: ['some string to check'],
-                    from: accounts[0],
-                    gas: gasTransaction
-                });
+                console.log(id);
+                const newId = webProvider.utils.sha3(blockNumber.toString(), timestamp, query, accounts[0]);
+                console.log(newId)
+                // const data = await zapDispatchWrapper.respond({
+                //     queryId: id,
+                //     responseParams: ['some string to check'],
+                //     from: accounts[0],
+                //     gas: gasTransaction
+                // });
+                const data = await deployedZapDispatch.respond1(
+                    id,
+                    'some string to check',
+                    { 'from': accounts[0], gas: gasTransaction }
+                );
                 console.log(data);
             } catch (err) {
                 throw err;
