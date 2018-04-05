@@ -11,8 +11,8 @@ const {
 // const js_sha = require('js-sha3');
 // const keccak256 = require('js-sha3').keccak256;
 const Web3 = require('web3');
-const web3 = new Web3( new Web3.providers.HttpProvider('http://127.0.0.1:7545') )
-const { toBN, keccak256, toAscii } = require('ethjs');
+const web3 = new Web3( new Web3.providers.WebsocketProvider('http://127.0.0.1:7545') );
+const { toBN, keccak256, fromAscii } = require('ethjs');
 const { join } = require('path');
 const {
     getInstanceOfSmartContract,
@@ -48,7 +48,7 @@ const {
     zapRegistryStorageAbi,
     bondageStorageAbi: zapBondageStorageAbi,
     currentCostAbi: zapCurrentCostAbi,
-    queryCallerAbi
+    // queryCallerAbi
 } = require('../../config');
 
 describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
@@ -65,7 +65,7 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
         deployedZapArbiter,
         addressZapDispatch,
         zapDispatchWrapper,
-        queryCaller,
+        // queryCaller,
         dispatchAbi;
 
     before(async () => {
@@ -95,9 +95,9 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     require(join(__dirname, addressSpacePointerAbi))
                 );
 
-                queryCaller = getInstanceOfSmartContract(
-                    require(join(__dirname, queryCallerAbi))
-                );
+                // queryCaller = getInstanceOfSmartContract(
+                //     require(join(__dirname, queryCallerAbi))
+                // );
 
                 [
                     bondageStorage,
@@ -188,7 +188,7 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     providerTitle,
                     oracleEndpoint,
                     params,
-                    { from: accounts[2], gas: gasTransaction }
+                    { from: accounts[2], gas: gasTransaction } // from provider
                 );
 
                 await deployedZapRegistry.initiateProviderCurve(
@@ -196,7 +196,7 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     curveType[ZapCurveType],
                     curveStart,
                     curveMultiplier,
-                    { from: accounts[2], gas: gasTransaction }
+                    { from: accounts[2], gas: gasTransaction } // from provider
                 );
 
                 await deployedZapToken.allocate(
@@ -238,7 +238,7 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     4,
                     { from: accounts[0], gas: gasTransaction }
                 );
-                console.log('---------------------------------------------------------------')
+
                 const { dots } = await deployedZapBondage.getDots(
                     accounts[0],
                     accounts[2],
@@ -248,60 +248,51 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
 
                 if (!dots.toNumber()) assert.ok(false);
 
-                console.log('---------------------------------------------------------------')
-                const txHash = await deployedZapDispatch.query(
+                const contract = new web3.eth.Contract(dispatchAbi.abi, addressZapDispatch);
+                const filter = new Promise((resolve, reject) => {
+                    contract.events.Incoming({ fromBlock: 0, toBlock: 'latest' }, (err, res) => {
+                        if (err) return reject(err);
+                        if (res) return resolve(res);
+                    });
+                });
+
+                const txHash = deployedZapDispatch.query(
                     accounts[2],
                     query,
                     oracleEndpoint,
                     params,
                     { from: accounts[0], gas: gasTransaction }
                 );
-                
-                // console.log(txHash);
-                // const { blockNumber } = await web3.eth.getTransaction(txHash);
-                // const { timestamp } = await web3.eth.getBlock(blockNumber);
-                console.log(addressZapDispatch);
-                console.log('---------------------------------------------------------------')
-                const { blockNumber, blockHash } = await eth.getTransactionReceipt(txHash);
-                const { timestamp } = await eth.getBlockByHash(blockHash, true);
-                
-                let id = await queryCaller.calculateId( 
-                    blockNumber,
-                    timestamp,
-                    query,
-                    { from: accounts[2], gas: gasTransaction }
-                );
-                console.log('id==>>>',id);
-                id = toBN(id);
-                console.log('id==>>>',id);
-                let balance = await deployedZapToken.balanceOf(accounts[2]);
-                console.log('balance',balance.balance.toString());
-                // balance = await deployedZapToken.balanceOf(accounts[0]);
-                // console.log('balance', balance.balance.toString());
-                // // console.log(addressZapDispatch)
-           
-                let u = await dispatchStorage.getProvider(id);
-                let status = await dispatchStorage.getStatus(id);
-                let subscr = await dispatchStorage.getSubscriber(id);
 
-                console.log(u)
-                console.log(status)
-                console.log(subscr)
-                const list = await dispatchStorage.getQueryList();
-                console.log(list['0'][0]);
-                
-                u = await dispatchStorage.getProvider(list['0'][0]);
-                status = await dispatchStorage.getStatus(list['0'][0]);
-                subscr = await dispatchStorage.getSubscriber(list['0'][0]);
-                console.log(u)
-                console.log(status)
-                console.log(subscr)
-                const data = await deployedZapDispatch.respond1(
-                    list['0'][0],
-                    'trum tim tum',
-                    { from: accounts[2], gas: gasTransaction }
+                const promises = await Promise.all([
+                    filter,
+                    txHash
+                ]);
+                const [
+                    {
+                        returnValues: data,
+                        event
+                    }
+                ] = promises;
+
+                // console.log(data)
+
+                const temp = await Promise.all([
+                    dispatchStorage.getProvider(data.id),
+                    dispatchStorage.getSubscriber(data.id),
+                    dispatchStorage.getStatus(data.id),
+                ]);
+
+                // console.log(temp)
+
+                if(event !== 'Incoming') assert.ok(false);
+                const res = await deployedZapDispatch.respond2(
+                    data.id,
+                    'pum-tum-pum',
+                    'qwerqwer',
+                    { from: data.provider } // from provider
                 );
-                console.log(data);
+                console.log(res);
             } catch (err) {
                 throw err;
             }
