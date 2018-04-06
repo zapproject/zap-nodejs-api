@@ -275,24 +275,12 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
                     }
                 ] = promises;
 
-                // console.log(data)
-
-                const temp = await Promise.all([
-                    dispatchStorage.getProvider(data.id),
-                    dispatchStorage.getSubscriber(data.id),
-                    dispatchStorage.getStatus(data.id),
-                ]);
-
-                // console.log(temp)
-
                 if(event !== 'Incoming') assert.ok(false);
-                const res = await deployedZapDispatch.respond2(
+                await deployedZapDispatch.respond1(
                     data.id,
                     'pum-tum-pum',
-                    'qwerqwer',
                     { from: data.provider } // from provider
                 );
-                console.log(res);
             } catch (err) {
                 throw err;
             }
