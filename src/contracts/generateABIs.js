@@ -1,5 +1,6 @@
 const fs = require('fs');
 const solc = require('solc');
+const file = require('file');
 
 // Compile the source code using solcjs
 function compileContracts(source_files) {
@@ -36,19 +37,29 @@ function compileContracts(source_files) {
     return result;
 }
 
-const results = compileContracts([
-    "ZapArbiter.sol",
-    "ZapBondage.sol",
-    "ZapRegistry.sol",
-    "ZapToken.sol"
-]);
+path = "../../../ZapContracts/contracts";
+
+const contracts = [];
+
+file.walkSync(path, function (dirPath, dirs, files) {
+    files.forEach(file => {
+        contracts.push(`${dirPath}/${file}`);    
+    })
+})
+
+const results = compileContracts(contracts);
+const irrelevant = "Migrations,ERC20,ERC20Basic,Destructible,Ownable,Updatable,UpdatableContract,Faucet,Token,BasicToken,MintableToken,StandardToken,SafeMath".split(',');
+
 
 for ( const result in results ) {
-    // Ignore irrelevant things
-    if ( !result.startsWith("Zap") ) {
+    //Ignore irrelevant things
+    if ( result.startsWith("Client") 
+    || result.endsWith("Interface") 
+    || irrelevant.includes(result)
+    ) {
         continue;
     }
-
-    console.log("Saving the", result, "ABI");
-    fs.writeFileSync("abis/" + result + ".json", JSON.stringify(results[result].abi, 0, 4));
+    
+    console.log(`Saving the ${result} ABI`);
+    fs.writeFileSync(`abis/${result}.json`, JSON.stringify(results[result].abi, 0, 4));
 }
