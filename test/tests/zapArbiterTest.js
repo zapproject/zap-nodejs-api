@@ -17,8 +17,6 @@ const {
     addressSpacePointerAbi
 } = require('../../config');
 const path = require('path');
-const { fromAscii, toBN } = require('ethjs');
-const BigNumber = require('bignumber.js');
 const {
     getNewArbiterContract,
     getNewBondageContract,
@@ -59,7 +57,7 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
 
         accounts = await webProvider.eth.getAccounts();
         assert.ok(true);
-        
+
     });
 
     describe('ZapArbiterWrapper', function () {
@@ -68,15 +66,15 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
             setTimeout(() => done(), 500);
         });
 
-        it('should get instances of smart contracts, their storages and bind owners', async function() {
+        it('should get instances of smart contracts, their storages and bind owners', async function () {
             try {
                 arbiterAbi = require(path.join(__dirname, zapArbiterAbi));
                 let tokenAbi = require(path.join(__dirname, zapTokenAbi));
                 let registryAbi = require(path.join(__dirname, zapRegistryAbi));
                 let bondageAbi = require(path.join(__dirname, zapBondageAbi));
-                
+
                 const spacePointer = getInstanceOfSmartContract(
-                    require(path.join(__dirname, addressSpacePointerAbi ))
+                    require(path.join(__dirname, addressSpacePointerAbi))
                 );
 
                 [
@@ -90,8 +88,8 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
                     getNewSmartContract(require(path.join(__dirname, arbiterStorageAbi))),
                     getNewSmartContract(tokenAbi)
                 ]);
-                
-                
+
+
                 deployedZapRegistry = await getNewRegistryContract({
                     abiFile: registryAbi,
                     regStoreAddress: registryStorage.address
@@ -102,15 +100,15 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
                     pointerAddress: spacePointer.address,
                     registryAddress: deployedZapRegistry.address
                 });
-               
-                deployedZapBondage = await getNewBondageContract({ 
+
+                deployedZapBondage = await getNewBondageContract({
                     abiFile: bondageAbi,
                     pointerAddress: spacePointer.address,
                     bondStoreAddress: bondageStorage.address,
                     tokenAddress: deployedZapToken.address,
                     currentCostAddress: currentCostStorage.address
                 });
-                
+
                 deployedZapArbiter = await getNewArbiterContract({
                     abiFile: arbiterAbi,
                     pointerAddress: spacePointer.address,
@@ -140,7 +138,7 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
             }
         });
 
-        it('Should initiate zapArbiter wrapper', async function() {
+        it('Should initiate zapArbiter wrapper', async function () {
             const wrapper = new ZapWrapper(eth);
             zapArbiterWrapper = wrapper.initClass({
                 instanceClass,
@@ -149,65 +147,90 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
             });
         });
 
-        it('Should initiate subscription', async function() {
-            try {
-                await deployedZapRegistry.initiateProvider(
-                    providerPublicKey,
-                    providerTitle,
-                    oracleEndpoint,
-                    params,
-                    { from: accounts[2], gas: gasTransaction });
+        it('Should initiate subscription', async function () {
+            await deployedZapRegistry.initiateProvider(
+                providerPublicKey,
+                providerTitle,
+                oracleEndpoint,
+                params,
+                { from: accounts[2], gas: gasTransaction });
 
-                await deployedZapRegistry.initiateProviderCurve(
-                    oracleEndpoint,
-                    curveType[ZapCurveType],
-                    curveStart,
-                    curveMultiplier,
-                    { from: accounts[2], gas: gasTransaction });
+            await deployedZapRegistry.initiateProviderCurve(
+                oracleEndpoint,
+                curveType[ZapCurveType],
+                curveStart,
+                curveMultiplier,
+                { from: accounts[2], gas: gasTransaction });
 
-                await deployedZapToken.allocate(
-                    accounts[0],
-                    tokensForOwner,
-                    { from: accounts[0], gas: gasTransaction });
+            await deployedZapToken.allocate(
+                accounts[0],
+                tokensForOwner,
+                { from: accounts[0], gas: gasTransaction });
 
-                await deployedZapToken.allocate(
-                    accounts[2],
-                    tokensForOracle,
-                    { from: accounts[0], gas: gasTransaction });
+            await deployedZapToken.allocate(
+                accounts[2],
+                tokensForOracle,
+                { from: accounts[0], gas: gasTransaction });
 
-                await deployedZapToken.allocate(
-                    deployedZapBondage.address,
-                    tokensForOracle,
-                    { from: accounts[0], gas: gasTransaction });
+            await deployedZapToken.allocate(
+                deployedZapBondage.address,
+                tokensForOracle,
+                { from: accounts[0], gas: gasTransaction });
 
-                await deployedZapToken.approve(
-                    deployedZapBondage.address,
-                    tokensForOracle,
-                    { from: accounts[0], gas: gasTransaction });
+            await deployedZapToken.approve(
+                deployedZapBondage.address,
+                tokensForOracle,
+                { from: accounts[0], gas: gasTransaction });
 
-                await deployedZapBondage.bond(
-                    accounts[2],
-                    oracleEndpoint,
-                    8,
-                    { from: accounts[0], gas: gasTransaction });  
+            await deployedZapBondage.bond(
+                accounts[2],
+                oracleEndpoint,
+                8,
+                { from: accounts[0], gas: gasTransaction });
 
-                await zapArbiterWrapper.initiateSubscription({
-                    oracleAddress: accounts[2],
-                    endpoint: oracleEndpoint,
-                    js_params: params,
-                    publicKey: providerPublicKey,
-                    dots: 4,
-                    from: accounts[0],
-                    gas: gasTransaction
-                });
-            } catch (err) {
-                throw err;
-            }
+            await zapArbiterWrapper.initiateSubscription({
+                oracleAddress: accounts[2],
+                endpoint: oracleEndpoint,
+                js_params: params,
+                publicKey: providerPublicKey,
+                dots: 4,
+                from: accounts[0],
+                gas: gasTransaction
+            });
         });
 
-        // it('Should initiate listen in zapArbiter', async () => {
-        //     const data = await zapArbiterWrapper.listen();
-        //     console.log(data);
+        // that test doesn\'t worl correct
+        // need to add moch for listen event from smart contract
+        // it('Should initiate listen in zapArbiter', async function (done) {
+        //     try {
+        //         zapArbiterWrapper.listen()
+        //             .then(data => {
+        //                 console.log(data);
+        //                 done();
+        //             })
+        //             .catch(err => {
+        //                 zapArbiterWrapper.close();
+        //                 console.log('errrr', err);
+        //                 throw err;
+        //             });
+                
+        //         await new Promise((resolve) => {
+        //             setTimeout(() => resolve('done'), 500);
+        //         });
+                
+        //         await zapArbiterWrapper.initiateSubscription({
+        //             oracleAddress: accounts[3],
+        //             endpoint: oracleEndpoint,
+        //             js_params: params,
+        //             publicKey: providerPublicKey,
+        //             dots: 4,
+        //             from: accounts[0],
+        //             gas: gasTransaction
+        //         });
+        //     } catch (err) {
+        //         console.log(err);
+        //         throw err;
+        //     }
         // });
     });
 });

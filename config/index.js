@@ -18,5 +18,8 @@ module.exports = {
     zapBondageAbi:     '../../ZapContracts/build/contracts/Bondage.json',
     currentCostAbi: '../../ZapContracts/build/contracts/CurrentCost.json',
     addressSpacePointerAbi: '../../ZapContracts/build/contracts/AddressSpacePointer.json',
-    addressSpace: '../../ZapContracts/build/contracts/AddressSpace.json'
+    addressSpace: '../../ZapContracts/build/contracts/AddressSpace.json',
+    zapDispatchAbi: '../../ZapContracts/build/contracts/Dispatch.json',
+    zapDispatchStorageAbi: '../../ZapContracts/build/contracts/DispatchStorage.json',
+    queryCallerAbi: '../../ZapContracts/build/contracts/QueryCaller.json'
 };

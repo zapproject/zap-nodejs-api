@@ -1,110 +1,106 @@
-require('babel-register');
-const Eth = require('ethjs');
-const fs = require('fs');
-
 class ZapDispatch {
-    constructor(eth, network) {
+    constructor({ eth, contract_address, abiFile }) {
         this.eth = eth;
-
-        const dispatch_abi_file = fs.readFileSync('../../contracts/abis/ZapDispatch.json');
-        const dispatch_abi_json = JSON.parse(dispatch_abi_file);
-
-        const addresses = fs.readFileSync('../../contracts/' + network + '/address.json');
-        const dispatch_address = JSON.parse(addresses)['Dispatch'];
-
-        this.dispatch_contract = eth.contract(dispatch_abi_json).at(dispatch_address);
+        this.address = contract_address;
+        this.abiFile = abiFile;
+        this.contract = eth.contract(this.abiFile).at(this.address);
     }
 
     // Listen for oracle queries 
-    listen(callback) {
-        this.eth.accounts().then((accounts) => {
-            if ( accounts.length == 0 ) {
-                callback(new Error("No accounts loaded"));
-                return;
+    async listen() {
+        try {
+            const accounts = await this.eth.accounts();
+            if (accounts.length == 0) {
+                throw new Error("No accounts loaded");
             }
 
             const account = accounts[0];
 
             // Create the Event filter
-            this.filter = this.contract.Incoming().new((err, res) => {
-                if ( err ) {
-                    callback(err);
-                }
+            this.filter = this.contract.Incoming();
+            // this.filter = new this.contract.filters.Filter({ delay: 500 });
+            this.filter.new({ fromBlock: 0, toBlock: 'latest' }, (err, res) => {
+                if (err) throw err;
             });
 
             // Watch the event filter
-            this.filter.watch().then((result) => {
-                // Sanity check
-                if ( result.length != 5 ) {
-                    callback(new Error("Received invalid ZapDataPurchase event"));
-                    return;
-                }
-
-                // Make sure it is us
-                if ( result[1] != account ) {
-                    return;
-                }
-
-                // Emit event
-                callback(null, {
-                    id: result[0],
-                    provider: result[1],
-                    recipient: result[2],
-                    query: result[3],
-                    endpoint: result[4],
-                    endpoint_params: result[5]
+            const result = await new Promise((resolve, reject) => {
+                this.filter.watch((err, res) => {
+                    if (err) return reject(err);
+                    if (res) return resolve(res);
                 });
-
-            }).catch((err) => {
-                callback(err);
             });
-        });
+            // Sanity check
+            if (result.length != 5) {
+                throw new Error("Received invalid ZapDataPurchase event");
+            }
+            const [id, provider, recipient, query, endpoint, endpoint_params] = result;
+            // Make sure it is us
+            if (provider !== account) {
+                return;
+            }
+
+            // Emit event
+            return {
+                id,
+                provider,
+                recipient,
+                query,
+                endpoint,
+                endpoint_params
+            };
+        } catch (err) {
+            throw err;
+        }
     }
 
     // Close the connection
     close() {
-        if ( this.filter ) {
+        if (this.filter) {
             this.filter.stopWatching();
             delete this.filter;
         }
     }
 
-    respond(queryId, responseParams, callback) {
-        switch(responseParams.length){
-            case 1:
-                this.dispatch_contract.respond1(queryId, responseParam1).then((success) =>{
-                    callback(null, success);
-
-                }).catch((err) => {
-                    callback(err);
-                });
-                break;
-            case 2:
-                this.dispatch_contract.respond2(queryId, responseParam1, repsonseParam2).then((success) =>{
-                    callback(null, success);
-
-                }).catch((err) => {
-                    callback(err);
-                });
-                break;
-            case 3:
-                this.dispatch_contract.respond3(queryId, responseParam1, repsonseParam2, repsonseParam3).then((success) =>{
-                    callback(null, success);
-
-                }).catch((err) => {
-                    callback(err);
-                });
-                break;
-            case 4:
-                this.dispatch_contract.respond4(queryId, responseParam1, repsonseParam2, repsonseParam3, responseParam4).then((success) =>{
-                    callback(null, success);
-
-                }).catch((err) => {
-                    callback(err);
-                });
-                break;
-            default:
-                callback("Invalid number of response parameters");            
+    async respond({ queryId, responseParams, from, gas }) {
+        switch (responseParams.length) {
+            case 1: {
+                return this.contract.respond1(
+                    queryId,
+                    responseParams[0],
+                    { 'from': from, 'gas': gas }
+                );
+            }
+            case 2: {
+                return this.contract.respond2(
+                    queryId,
+                    responseParams[0],
+                    responseParams[1],
+                    { 'from': from, 'gas': gas }
+                );
+            }
+            case 3: {
+                return this.contract.respond3(
+                    queryId,
+                    responseParams[0],
+                    responseParams[1],
+                    responseParams[2],
+                    { 'from': from, 'gas': gas }
+                );
+            }
+            case 4: {
+                return this.contract.respond4(
+                    queryId,
+                    responseParams[0],
+                    responseParams[1],
+                    responseParams[2],
+                    responseParams[3],
+                    { 'from': from, 'gas': gas }
+                );
+            }
+            default: {
+                throw new Error("Invalid number of response parameters");
+            }
         }
     }
 }
