@@ -8,6 +8,7 @@ const migrate = require('../node_modules/truffle-core/lib/commands/migrate');
 const path = require('path');
 // method that helps as get promise with out callback function
 const { serverOptions } = require('../config/server.js');
+// const {} = require('web3-provider-engine/');
 
 const { networks } = require('../truffle.js');
 const { promisify } = require('util');
@@ -77,4 +78,5 @@ require('./tests/zapTokenTest');
 require('./tests/zapRegistryTest');
 require('./tests/zapBondageTest');
 require('./tests/zapArbiterTest');
-require('./tests/closeServer'); 
+require('./tests/zapDispatchTest');
+require('./tests/closeServer');
