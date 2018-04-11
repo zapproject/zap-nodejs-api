@@ -2,7 +2,6 @@ const instanceClass = require('../../src/api/contracts/ZapRegistry');
 const ZapWrapper = require('../../src/api/ZapWrapper');
 const assert = require("chai").assert;
 const {
-    ganacheProvider,
     webProvider,
     eth
 } = require('../bootstrap');
@@ -78,7 +77,7 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
                 gas: 600000
             });
             const title = await zapRegistryWrapper.contract.getProviderTitle(accounts[0]);
-            if (~title['0'].indexOf(providerTitle)) {
+            if (~title['0'].indexOf(fromAscii(providerTitle))) {
                 assert.ok(true);
             } else {
                 assert.ok(false);

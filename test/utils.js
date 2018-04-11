@@ -73,6 +73,18 @@ async function getNewCurrentCostContract({ abiFile, pointerAddress, registryAddr
     return eth.contract(abiFile.abi).at(contractAddress);
 }
 
+async function getNewTestSubscriberContract({ abiFile, dispatchAddress, bondageAddress, tokenAddress }) {
+    const contract = getEthContract(abiFile);
+    const txHash = await contract.new(
+        dispatchAddress,
+        bondageAddress,
+        tokenAddress,
+        objectToCreate
+    );
+    const { contractAddress } = await eth.getTransactionReceipt(txHash);
+    return eth.contract(abiFile.abi).at(contractAddress);
+}
+
 const curveType = {
     "ZapCurveNone": 0,
     "ZapCurveLinear": 1,
@@ -94,6 +106,7 @@ const gasTransaction = toBN(3000000);
 const tokensForOwner = new BigNumber("1e30");
 const tokensForOracle = new BigNumber('1e24');
 const allocateAccount = 300000;
+const query = 'Why?';
 
 
 module.exports = {
@@ -118,5 +131,7 @@ module.exports = {
     allocateAccount,
     getNewCurrentCostContract,
     param1,
-    param2
+    param2,
+    query,
+    getNewTestSubscriberContract
 };
