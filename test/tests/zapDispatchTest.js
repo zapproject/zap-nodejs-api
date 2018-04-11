@@ -366,6 +366,7 @@ describe('Dispatch, path to "/src/api/contract/ZapDispatch"', () => {
             assert.equal(logs.returnValues.response1, queryStringParams[0]);
             assert.equal(logs.returnValues.response2, queryStringParams[1]);
             assert.equal(logs.returnValues.response3, queryStringParams[2]);
+            assert.equal(logs.returnValues.response4, queryStringParams[3]);
             assert.equal(logs.event, 'Result4');
         });
     });
