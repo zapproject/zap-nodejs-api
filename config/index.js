@@ -21,5 +21,6 @@ module.exports = {
     addressSpace: '../../ZapContracts/build/contracts/AddressSpace.json',
     zapDispatchAbi: '../../ZapContracts/build/contracts/Dispatch.json',
     zapDispatchStorageAbi: '../../ZapContracts/build/contracts/DispatchStorage.json',
-    queryCallerAbi: '../../ZapContracts/build/contracts/QueryCaller.json'
+    queryCallerAbi: '../../ZapContracts/build/contracts/QueryCaller.json',
+    testSubscriberAbi: '../../ZapContracts/build/contracts/TestSubscriber.json'
 };
