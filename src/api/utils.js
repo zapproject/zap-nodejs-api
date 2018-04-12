@@ -6,6 +6,11 @@ const getABI = (contractName) => {
     return abiFile;
 }
 
+const getAddress = (contractName, network, contractAddress) => {
+    let address = contractAddress || JSON.parse("../contracts/${network}/addresses.json")[contractName];
+    return address;
+}
+
 const toHex = (str) => {
     let hex = '';
     for(let i=0;i<str.length;i++) {
