@@ -1,3 +1,11 @@
+const { readFileSync } = require('fs');
+
+const getABI = (contractName) => {
+    let abiPath = `../../contracts/abis/${contractName}.json`
+    let abiFile = JSON.parse(readFileSync(abiPath));
+    return abiFile;
+}
+
 const toHex = (str) => {
     let hex = '';
     for(let i=0;i<str.length;i++) {
@@ -16,6 +24,7 @@ const getHexString = (str) => {
 };
 
 module.exports = {
+    getABI,
     toHex,
     getHexBuffer,
     getHexString
