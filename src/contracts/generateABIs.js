@@ -37,7 +37,7 @@ function compileContracts(source_files) {
     return result;
 }
 
-path = "../../../ZapContracts/contracts";
+path = "../../ZapContracts/contracts";
 
 const contracts = [];
 
