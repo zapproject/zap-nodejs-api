@@ -1,8 +1,10 @@
-class ZapDispatch {
-    constructor({ eth, contract_address, abiFile }) {
+const { getABI } = require('../utils.js');
+
+class Dispatch {
+    constructor(eth, network, contractAddress) {
         this.eth = eth;
-        this.address = contract_address;
-        this.abiFile = abiFile;
+        this.address = getAddress("Dispatch", network, contractAddress);
+        this.abiFile = getABI("Dispatch");
         this.contract = eth.contract(this.abiFile).at(this.address);
     }
 
@@ -32,7 +34,7 @@ class ZapDispatch {
             });
             // Sanity check
             if (result.length != 5) {
-                throw new Error("Received invalid ZapDataPurchase event");
+                throw new Error("Received invalid DataPurchase event");
             }
             const [id, provider, recipient, query, endpoint, endpoint_params] = result;
             // Make sure it is us
@@ -105,4 +107,4 @@ class ZapDispatch {
     }
 }
 
-module.exports = ZapDispatch;
+module.exports = Dispatch;

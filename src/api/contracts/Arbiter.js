@@ -1,7 +1,9 @@
 const Eth = require('ethjs');
+const { getABI } = require('../utils.js');
+
 // const EthFilter = require('ethjs-filter');
 // Parse JavaScript parameters into something ethjs can use
-function parseZapParameters(params) {
+function parseParameters(params) {
     const output = [];
 
     for (let i = 0; i < params.length; i++) {
@@ -39,19 +41,19 @@ function parseZapParameters(params) {
     return output;
 }
 
-class ZapArbiter {
-    constructor({ eth, contract_address, abiFile }) {
+class Arbiter {
+    constructor(eth, network, contractAddress) {
         this.eth = eth;
-        this.address = contract_address;
-        this.abiFile = abiFile;
-        this.contract = eth.contract(abiFile).at(this.address);
+        this.address = getAddress("Arbiter", network, contractAddress);
+        this.abiFile = getABI("Arbiter");
+        this.contract = eth.contract(this.abiFile).at(this.address);
         // this.filters = new EthFilter(eth);
     }
 
     // Initiate a subscription
     async initiateSubscription({ oracleAddress, endpoint, js_params, dots, publicKey, from, gas }) {
         try {
-            const params = parseZapParameters(js_params);
+            const params = parseParameters(js_params);
             // Make sure we could parse it correctly
             if (params instanceof Error) {
                 throw params;
@@ -138,4 +140,4 @@ class ZapArbiter {
     }
 }
 
-module.exports = ZapArbiter;
+module.exports = Arbiter;

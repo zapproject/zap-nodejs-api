@@ -1,22 +1,23 @@
 // @flow
 require('babel-register');
 require('babel-polyfill');
-const ZapOracle = require('../ZapOracle');
+const Oracle = require('../Oracle');
 const { fromAscii } = require('ethjs');
+const { getABI } = require('../utils.js');
 
 const curveType = {
-    "ZapCurveNone": 0,
-    "ZapCurveLinear": 1,
-    "ZapCurveExponential": 2,
-    "ZapCurveLogarithmic": 3
+    "None": 0,
+    "Linear": 1,
+    "Exponential": 2,
+    "Logarithmic": 3
 };
 
 
-class ZapRegistry {
-    constructor({eth, contract_address, abiFile}) {
+class Registry {
+    constructor(eth, network, contractAddress) {
         this.eth = eth;
-        this.address = contract_address;
-        this.abiFile = abiFile;
+        this.address = getAddress("Registry", network, contractAddress);
+        this.abiFile = getABI("Registry");
         this.contract = eth.contract(abiFile).at(this.address);
         this.getOracle = this.getOracle.bind(this);
     }
@@ -38,9 +39,9 @@ class ZapRegistry {
         }
     }
 
-    async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from, gas }) {
+    async initiateProviderCurve({ specifier, CurveType, curveStart, curveMultiplier, from, gas }) {
         try {
-            const curve = curveType[ZapCurveType];
+            const curve = curveType[CurveType];
             return await this.contract.initiateProviderCurve(
                 fromAscii(specifier),
                 curve,
@@ -78,7 +79,7 @@ class ZapRegistry {
     // get oracle by address
     async getOracle({ address, specifier }) {
         try {
-            const oracle = new ZapOracle(this);
+            const oracle = new Oracle(this);
             oracle.address = address;
 
             // Get the provider's public getRouteKeys
@@ -114,4 +115,4 @@ class ZapRegistry {
     }
 }
 
-module.exports = ZapRegistry;
+module.exports = Registry;

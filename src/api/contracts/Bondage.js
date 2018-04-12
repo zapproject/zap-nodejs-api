@@ -1,14 +1,15 @@
 const { fromAscii, toBN } = require('ethjs');
+const { getABI, getAddress } = require('../utils.js');
 
-class ZapBondage {
-    constructor({ eth, contract_address, abiFile }) {
+class Bondage {
+    constructor(eth, network, contractAddress) {
         this.eth = eth;
-        this.address = contract_address;
-        this.abiFile = abiFile;
+        this.address = getAddress("Bondage", network, contractAddress);
+        this.abiFile = getABI("Bondage");
         this.contract = eth.contract(this.abiFile).at(this.address);
     }
 
-    // Do a bond to a ZapOracle's endpoint
+    // Do a bond to a Oracle's endpoint
     bond({ oracleAddress, endpoint, amount, from, gas }) {
         endpoint = fromAscii(endpoint);
         amount = toBN(amount);
@@ -38,7 +39,7 @@ class ZapBondage {
         );
     }
 
-    // Do an unbond to a ZapOracle's endpoint
+    // Do an unbond to a Oracle's endpoint
     unbond({ oracleAddress, endpoint, amount, from, gas }) {
         endpoint = fromAscii(endpoint);
         amount = toBN(amount);
@@ -106,4 +107,4 @@ class ZapBondage {
     }
 }
 
-module.exports = ZapBondage;
+module.exports = Bondage;

@@ -1,4 +1,4 @@
-class ZapHandler {
+class Handler {
     constructor() {
 
     }
@@ -9,4 +9,4 @@ class ZapHandler {
     }
 }
 
-module.exports = ZapHandler;
+module.exports = Handler;

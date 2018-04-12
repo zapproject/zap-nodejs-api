@@ -1,10 +1,11 @@
 const Eth = require('ethjs');
+const { getABI } = require('../utils.js');
 
 class ZapToken {
-    constructor({eth, contract_address, abiFile}) {
+    constructor(eth, network, contractAddress) {
         this.eth = eth;
-        this.token_address = contract_address;
-        this.abiFile = abiFile;
+        this.address = getAddress("ZapToken", network, contractAddress);
+        this.abiFile = getABI("ZapToken");
         this.token_contract = eth.contract(abiFile).at(this.token_address);
     }
 
