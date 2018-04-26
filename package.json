@@ -45,9 +45,9 @@
     "local": "JUNIT_REPORT_PATH=report.xml TEST=1 nyc --reporter=clover ./node_modules/.bin/mocha",
     "coverage": "./node_modules/.bin/nyc report clover",
     "bundle": "browserify src/account.js src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -t brfs -o build/bundle.js",
-    "bundle-contracts": "browserify src/api/contracts/bundle.js -o dist/api/contracts/bundle.js -t [ babelify --presets [latest] ] -t brfs",
+    "bundle-contracts": "browserify src/api/contracts-bundle.js -o dist/api/contracts/bundle.js -t [ babelify --presets [latest] ] -t brfs",
     "generateABI": "cd src/contracts && node generateABIs.js && cd ../../",
-    "dev:server": "http-server ./ -a 127.0.0.1"
+    "dev:server": "http-server ./ -a 127.0.0.1 -c-1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

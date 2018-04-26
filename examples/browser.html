@@ -10,8 +10,9 @@
 <script src="../node_modules/ethjs/dist/ethjs.min.js"></script>
 <script src="../dist/api/contracts/bundle.js"></script>
 <script>
-  var tokenInstance = new ZapToken(new Eth(web3.currentProvider), "0x345ca3e014aaf5dca488057592ee47305d9b3e10", ZapTokenAbi);
-  console.log(ethInstance);
+  var ethInstance = new Eth(web3.currentProvider);
+  var tokenInstance = new ZapToken({ eth: ethInstance, address: "0x345ca3e014aaf5dca488057592ee47305d9b3e10", abiFile: ZapTokenAbi });
+
   console.log(tokenInstance);
 </script>
 

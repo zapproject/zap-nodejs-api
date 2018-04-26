@@ -1,7 +1,7 @@
 const Eth = require('ethjs');
 
 class ZapToken {
-    constructor({eth, contract_address, abiFile}) {
+    constructor({ eth, contract_address, abiFile }) {
         this.eth = eth;
         this.token_address = contract_address;
         this.abiFile = abiFile;
@@ -10,22 +10,22 @@ class ZapToken {
 
     // Get our address
     async getAddress() {
-        try{
+        try {
             const accounts = await this.eth.accounts();
-            if(!accounts.length) {
+            if (!accounts.length) {
                 throw new Error('No accounts loaded');
             }
             return accounts[0];
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
-    
+
     async getBalance() {
         try {
             const address = await this.getAddress();
-            return  await this.token_contract.balanceOf(address);
-        } catch(err) {
+            return await this.token_contract.balanceOf(address);
+        } catch (err) {
             throw err;
         }
     }
@@ -35,7 +35,7 @@ class ZapToken {
         try {
             amount = Eth.toBN(amount);
             return await this.token_contract.transfer(destination, amount, { from });
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
@@ -46,11 +46,11 @@ class ZapToken {
         try {
             amount = Eth.toBN(amount);
             const success = await this.token_contract.approve(address, amount, { from });
-            if ( !success ) {
+            if (!success) {
                 throw new Error("Failed to approve Bondage transfer");
             }
             return success;
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
