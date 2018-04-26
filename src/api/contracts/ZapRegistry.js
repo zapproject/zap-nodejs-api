@@ -1,6 +1,3 @@
-// @flow
-require('babel-register');
-require('babel-polyfill');
 const ZapOracle = require('../ZapOracle');
 const { fromAscii } = require('ethjs');
 
@@ -13,7 +10,7 @@ const curveType = {
 
 
 class ZapRegistry {
-    constructor({eth, contract_address, abiFile}) {
+    constructor({ eth, contract_address, abiFile }) {
         this.eth = eth;
         this.address = contract_address;
         this.abiFile = abiFile;
@@ -21,11 +18,11 @@ class ZapRegistry {
         this.getOracle = this.getOracle.bind(this);
     }
 
-    async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from, gas}) {
+    async initiateProvider({ public_key, title, endpoint_specifier, endpoint_params, from, gas }) {
         try {
             return await this.contract.initiateProvider(
-                public_key, 
-                fromAscii(title), 
+                public_key,
+                fromAscii(title),
                 fromAscii(endpoint_specifier),
                 endpoint_params,
                 {
@@ -33,7 +30,7 @@ class ZapRegistry {
                     'gas': gas
                 }
             );
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
@@ -51,7 +48,7 @@ class ZapRegistry {
                     'gas': gas
                 }
             );
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
@@ -70,7 +67,7 @@ class ZapRegistry {
                     'gas': gas
                 }
             );
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
@@ -82,14 +79,14 @@ class ZapRegistry {
             oracle.address = address;
 
             // Get the provider's public getRouteKeys
-            const public_key = await this.contract.getProviderPublicKey( address );
+            const public_key = await this.contract.getProviderPublicKey(address);
             oracle.public_key = public_key;
-    
+
             // // Get the route keys next
             // getNextEndpointParam address provider, bytes32 specifier, uint256 index
             let i = 0;
             let endpoint_params = [];
-            while(true) {
+            while (true) {
                 try {
                     if (i >= 50) break;
                     const { nextIndex, endpoint_param } = await this.contract.getNextEndpointParam(
@@ -98,9 +95,9 @@ class ZapRegistry {
                         i
                     )
                     endpoint_params.push(endpoint_param)
-                    if(!nextIndex.toNumber()) break;
+                    if (!nextIndex.toNumber()) break;
                     i++
-                } catch(err) {
+                } catch (err) {
                     console.log(err)
                     break;
                 }

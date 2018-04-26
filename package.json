@@ -7,11 +7,6 @@
   "private": true,
   "dependencies": {
     "async": "^2.5.0",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.2.2",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
     "bignumber.js": "^4.0.2",
     "bson": "^1.0.4",
     "chai": "^4.1.2",
@@ -50,10 +45,20 @@
     "local": "JUNIT_REPORT_PATH=report.xml TEST=1 nyc --reporter=clover ./node_modules/.bin/mocha",
     "coverage": "./node_modules/.bin/nyc report clover",
     "bundle": "browserify src/account.js src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -t brfs -o build/bundle.js",
-    "generateABI": "cd src/contracts && node generateABIs.js && cd ../../"
+    "bundle-contracts": "browserify src/api/contracts/bundle.js -o dist/api/contracts/bundle.js -t [ babelify --presets [latest] ] -t brfs",
+    "generateABI": "cd src/contracts && node generateABIs.js && cd ../../",
+    "dev:server": "http-server ./ -a 127.0.0.1"
   },
   "devDependencies": {
-    "brfs": "^1.4.3",
-    "browserify": "*"
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.2.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-latest": "^6.24.1",
+    "babelify": "^8.0.0",
+    "brfs": "^1.6.1",
+    "browserify": "^16.2.0",
+    "http-server": "^0.11.1",
+    "uglify-js": "^3.3.22"
   }
 }

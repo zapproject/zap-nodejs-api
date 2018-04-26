@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Zap SDK client usage example. Based on local contracts deployment on truffle so address could be changed.</title>
+</head>
+<script src="../node_modules/ethjs/dist/ethjs.min.js"></script>
+<script src="../dist/api/contracts/bundle.js"></script>
+<script>
+  var tokenInstance = new ZapToken(new Eth(web3.currentProvider), "0x345ca3e014aaf5dca488057592ee47305d9b3e10", ZapTokenAbi);
+  console.log(ethInstance);
+  console.log(tokenInstance);
+</script>
+
+<body>
+
+</body>
+
+</html>
