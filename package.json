@@ -22,6 +22,7 @@
     "elliptic": "^6.4.0",
     "ethereumjs-wallet": "^0.6.0",
     "ethjs": "^0.3.1",
+    "event": "^1.0.0",
     "ganache-core": "^2.0.2",
     "ipfs": "^0.27.6",
     "ipfs-pubsub-room": "^1.1.5",
