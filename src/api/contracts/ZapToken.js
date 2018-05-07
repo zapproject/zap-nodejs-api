@@ -30,11 +30,29 @@ class ZapToken {
         }
     }
 
+    async balanceOf(addr) {
+        try {
+            return await this.token_contract.balanceOf(addr);
+        } catch (err) {
+            throw err;
+        }
+    }
+
     // Send Zap around
-    async send({ destination, amount, from }) {
+    async send({destination, amount, from}) {
         try {
             amount = Eth.toBN(amount);
             return await this.token_contract.transfer(destination, amount, { from });
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    // allocate tokens, must be called only from owner account
+    async allocate(to, amount, from) {
+        try {
+            amount = Eth.toBN(amount);
+            return await this.token_contract.allocate(to, amount, {from: from});
         } catch (err) {
             throw err;
         }
