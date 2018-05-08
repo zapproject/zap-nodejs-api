@@ -1,9 +1,12 @@
 class ZapDispatch {
-    constructor({ eth, contract_address, abiFile }) {
-        this.eth = eth;
+
+    constructor({web3, contract_address, abi}) {
+        this.web3 = web3;
         this.address = contract_address;
-        this.abiFile = abiFile;
-        this.contract = eth.contract(this.abiFile).at(this.address);
+        this.abi = abi;
+        this.contract = new this.web3.eth.Contract(this.abi, this.address);
+
+        this.isZapDispatch = true;
     }
 
     // Listen for oracle queries 
@@ -62,41 +65,33 @@ class ZapDispatch {
         }
     }
 
-    async respond({ queryId, responseParams, from, gas }) {
+    async respond(queryId, responseParams, from) {
         switch (responseParams.length) {
             case 1: {
-                return this.contract.respond1(
+                return this.contract.methods.respond1(
                     queryId,
-                    responseParams[0],
-                    { 'from': from, 'gas': gas }
-                );
+                    responseParams[0]).send({ 'from': from });
             }
             case 2: {
-                return this.contract.respond2(
+                return this.contract.methods.respond2(
                     queryId,
                     responseParams[0],
-                    responseParams[1],
-                    { 'from': from, 'gas': gas }
-                );
+                    responseParams[1]).send({ 'from': from });
             }
             case 3: {
-                return this.contract.respond3(
+                return this.contract.methods.respond3(
                     queryId,
                     responseParams[0],
                     responseParams[1],
-                    responseParams[2],
-                    { 'from': from, 'gas': gas }
-                );
+                    responseParams[2]).send({ 'from': from });
             }
             case 4: {
-                return this.contract.respond4(
+                return this.contract.methods.respond4(
                     queryId,
                     responseParams[0],
                     responseParams[1],
                     responseParams[2],
-                    responseParams[3],
-                    { 'from': from, 'gas': gas }
-                );
+                    responseParams[3]).send({ 'from': from });
             }
             default: {
                 throw new Error("Invalid number of response parameters");

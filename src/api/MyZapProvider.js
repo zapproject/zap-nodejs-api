@@ -1,29 +1,44 @@
-const Web3 = require('web3');
-
 
 class MyZapProvider {
 
-    constructor(provider) {
-        if (provider === 'truffle_develop') {
-            this.web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545'));
-        } else {
-            this.web3 = new Web3(provider);
-        }
-
-        this.DISPATCH_QUERIES_EVENT = 'FulfillQuery';
+    constructor(dispatch) {
+        this.dispatch = dispatch;
     }
 
-    subscribeDispatchQueries(dispatchAddress, callback) {
-        this.queriesSubscription = this.web3.subscribe(this.DISPATCH_QUERIES_EVENT, {address: dispatchAddress}, callback);
+    static parseIncomingEvent(event) {
+        if (!event.returnValues) throw new Error('Must be event object!');
+        if (event.event !== 'Incoming') throw new Error('Wrong event for parsing. Event name = ' + event.event + ', must be Incoming');
+
+        let incomingEvent = Object();
+        incomingEvent.id = event.returnValues.id;
+        incomingEvent.provider = event.returnValues.provider;
+        incomingEvent.subscriber = event.returnValues.subscriber;
+        incomingEvent.query = event.returnValues.query;
+        incomingEvent.endpoint = event.returnValues.endpoint;
+        incomingEvent.endpointParams = event.returnValues.endpointParams;
+        return incomingEvent;
     }
 
-    unsubscribeDispatchQueries() {
-        this.queriesSubscription.unsubscribe(function (error, success) {
-            if (error) console.log('Error while unsubscribed from dispatch queries!');
-            if (success) console.log('Successfully unsubscribed from dispatch queries.');
+    listenSubscriptions(callback) {
+
+    }
+
+    initQueryRespond({id, provider, subscriber}, handler, from) {
+        if (!this.dispatch || !this.dispatch.isZapDispatch) throw new Error('ZapDispatch class must be specified!');
+
+        return this.dispatch.contract.events.Incoming({filter: {id, provider, subscriber}, fromBlock: 0}, (error, result) => {
+            if (error) {
+                console.log(error);
+            } else {
+                try {
+                    const respondParams = handler(MyZapProvider.parseIncomingEvent(result));
+                    this.dispatch.respond(result.returnValues.id, respondParams, from);
+                } catch (e) {
+                   console.log(e);
+                }
+            }
         });
     }
-
 }
 
 module.exports = MyZapProvider;

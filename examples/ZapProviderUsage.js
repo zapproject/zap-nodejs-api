@@ -1,13 +1,14 @@
-const Eth = require('ethjs'); // ethereum utils lib
 const fs = require('fs');
 const path = require('path');
 const { fromAscii } = require('ethjs');
 const Web3 = require('web3');
 const MyProvider = require('../src/api/MyZapProvider');
+const ZapDispatch = require('../src/api/contracts/ZapDispatch');
 
-const testEtherium = `http://127.0.0.1:9545`; // truffle develop rpc
-const eth = new Eth(new Eth.HttpProvider(testEtherium)); // using develop rpc
-const web3 = new Web3(new Web3.providers.HttpProvider(testEtherium));
+const testEtherium = `ws://127.0.0.1:9545`; // truffle develop rpc
+const dockerNetwork = 'ws://172.18.0.2:8546'; // parity docker container
+const web3 = new Web3(new Web3.providers.WebsocketProvider(testEtherium)); // using develop rpc
+
 
 const zapTokenJson = JSON.parse(fs.readFileSync('../zap/build/contracts/ZapToken.json').toString());
 const zapDispatchJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Dispatch.json').toString());
@@ -54,9 +55,18 @@ function getContractAddress(json, networkId) {
     return json.networks[networkId].address;
 }
 
+function getBigNumber(numberOfZeros) {
+    let str = '1';
+    for (let i = 0; i < numberOfZeros; i++) {
+        str += '0';
+    }
+    return new web3.utils.BN(str);
+}
+
+let myProvider;
 
 async function main() {
-    const accounts = await eth.accounts();
+    const accounts = await web3.eth.getAccounts();
 
     const owner = accounts[0];
     const oracle = accounts[1];
@@ -66,25 +76,27 @@ async function main() {
     console.log('oracle: ' + oracle);
     console.log('sub: ' + sub);
 
-    const testEndpoint = 'test.com';
+    const testEndpoint = web3.utils.utf8ToHex('test.com');
+    console.log('Test endpoint hex = ' + testEndpoint);
 
-    const zapToken = eth.contract(getContractAbi(zapTokenJson)).at(getContractAddress(zapTokenJson, 4447));
-    const zapRegistry =  eth.contract(getContractAbi(zapRegistryJson)).at(getContractAddress(zapRegistryJson, 4447));
-    const zapDispatch = eth.contract(getContractAbi(zapDispatchJson)).at(getContractAddress(zapDispatchJson, 4447));
-    const zapBondage = eth.contract(getContractAbi(zapBondageJson)).at(getContractAddress(zapBondageJson, 4447));
+    const zapToken = new web3.eth.Contract(getContractAbi(zapTokenJson), getContractAddress(zapTokenJson, 4447));
+    const zapRegistry =  new web3.eth.Contract(getContractAbi(zapRegistryJson), getContractAddress(zapRegistryJson, 4447));
+    const zapDispatch = new web3.eth.Contract(getContractAbi(zapDispatchJson), getContractAddress(zapDispatchJson, 4447));
+    const zapBondage = new web3.eth.Contract(getContractAbi(zapBondageJson), getContractAddress(zapBondageJson, 4447));
 
-    const registryStorage = eth.contract(getContractAbi(registryStorageJson)).at(getContractAddress(registryStorageJson, 4447));
+    const registryStorage = new web3.eth.Contract(getContractAbi(registryStorageJson), getContractAddress(registryStorageJson, 4447));
 
 
     async function allocateTokens(to, amount) {
-        await zapToken.allocate(to, amount, {from: owner});
+        if (await getBalance(to) >= 1000000000000000000000000) return;
+        await zapToken.methods.allocate(to, amount).send({from: owner});
         getBalance(to);
     }
 
     async function getBalance(address) {
-        const balance  = await zapToken.balanceOf(address, {from: owner});
-        console.log('Address ' + address + ' have tokens: ' + balance[0].toString());
-        return balance[0].toString();
+        const balance  = await zapToken.methods.balanceOf(address).call();
+        console.log('Address ' + address + ' have tokens: ' + balance.valueOf());
+        return balance.valueOf();
     }
 
     async function registerNewDataProvider(publicKey,
@@ -92,59 +104,91 @@ async function main() {
                                            endpoint,
                                            endpointParams) {
 
-        let pk = await zapRegistry.getProviderPublicKey(oracle);
+        let pk = await zapRegistry.methods.getProviderPublicKey(oracle).call({from: oracle});
 
-        if (pk[0].valueOf() !== '0') return;
+        if (pk.valueOf() != '0') return;
 
 
-        await zapRegistry.initiateProvider(publicKey, fromAscii(title), fromAscii(endpoint), endpointParams, {from: oracle});
+        console.log('endpoint = ' + endpoint);
+        await zapRegistry.methods.initiateProvider(
+            new web3.utils.BN('123'),
+            web3.utils.utf8ToHex(title),
+            endpoint,
+            endpointParams)
+            .send({from: oracle});
 
-        await zapRegistry.initiateProviderCurve(fromAscii(endpoint), CurveTypes['Linear'], 1, 2, {from: oracle});
+        await zapRegistry.methods.initiateProviderCurve(endpoint, CurveTypes['Linear'], new web3.utils.BN(1), new web3.utils.BN(2)).send({from: oracle});
 
         //check results
-        pk = await zapRegistry.getProviderPublicKey(oracle);
-        console.log('Received pk of oracle: ' + pk[0].valueOf());
-        if (pk[0].valueOf() === '0') {
+        pk = await zapRegistry.methods.getProviderPublicKey(oracle).call();
+        console.log('Received pk of oracle: ' + pk.valueOf());
+        if (pk.valueOf() === '0') {
             throw new Error('Public key of provider was not specified!');
         }
+
+        const curve = await zapRegistry.methods.getProviderCurve(oracle, endpoint).call();
+        console.log('Inited curve: ' + curve.toString());
     }
 
     async function bondToDataProvider(oracleAddress,
                                       endpoint,
                                       numZap) {
-        await zapToken.approve(zapBondage.address, await getBalance(sub), {from: sub});
+        console.log('endpoint = ' + endpoint);
 
-        await zapBondage.bond(oracle, fromAscii(endpoint), numZap, {from: sub});
+         await zapToken.methods.approve(zapBondage._address, getBigNumber(21)).send({from: sub});
+
+         const dots = await zapBondage.methods.getBoundDots(sub, oracle, endpoint).call();
+         console.log('dots = ' + dots);
+
+         const res = await zapBondage.methods.calcBondRate(oracle, endpoint, getBigNumber(2)).call();
+         console.log(res);
+
+         if (dots != '0') return;
+
+         await zapBondage.methods.bond(oracle, endpoint, new web3.utils.BN(numZap)).send({from: sub, gas: 1000000});
+
     }
 
     async function queryData(provider,
                              userQuery,
                              endpoint,
                              endpointParams) {
-        await zapDispatch.query(provider, userQuery, fromAscii(endpoint), endpointParams, {from: sub});
+        const dots = await zapBondage.methods.getBoundDots(sub, provider, endpoint).call({from: sub});
+        const dstore = await zapDispatch.methods.storageAddress().call();
+
+        await zapDispatch.methods.query(provider, userQuery, endpoint, endpointParams).send({from: sub, gas: 1000000});
+        console.log('Query performed!');
     }
 
-    async function initProvider() {
-        const myProvider = new MyProvider('truffle_develop');
-        myProvider.subscribeDispatchQueries(zapDispatch.address, function (error, result) {
-            if (error) {
-                console.log('Error while receiving FulfillQuery event!');
-            } else {
-                console.log(result);
-                myProvider.unsubscribeDispatchQueries();
-            }
-        })
+    myProvider = new MyProvider(new ZapDispatch({
+        web3: web3,
+        contract_address: zapDispatch._address,
+        abi: getContractAbi(zapDispatchJson)
+    }));
+    const filters = {
+        id: '',
+        provider: oracle,
+        subscriber: ''
+    };
+    const eventHandler = (incomingEvent) => {
+        console.log('Incoming event received!');
+        return ['1', '2'];
+    };
+    const emmiter = myProvider.initQueryRespond(filters, eventHandler, oracle);
+
+    try {
+        await allocateTokens(sub, getBigNumber(21));
+        await allocateTokens(oracle, getBigNumber(21));
+
+        await registerNewDataProvider(111, 'test', testEndpoint, []);
+        await bondToDataProvider(oracle, testEndpoint, getBigNumber(2));
+
+        await queryData(oracle, 'privet', testEndpoint, []);
+    } catch (e) {
+        emmiter.unsubscribe();
+        console.log(e);
+        return 1;
     }
-
-    await allocateTokens(sub, Eth.toBN('1e24'));
-    await allocateTokens(oracle,  Eth.toBN('1e24'));
-
-    await registerNewDataProvider(111, 'test', testEndpoint, []);
-    await bondToDataProvider(oracle, testEndpoint, 10);
-
-    await initProvider();
-
-    await queryData(sub, oracle, 'privet ' + i, testEndpoint, []);
 
     return 0;
 }
@@ -159,3 +203,4 @@ main().then((res) => {
         console.log('\n\nExecution error!');
     }
 });
+
