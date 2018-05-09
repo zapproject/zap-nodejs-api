@@ -4,6 +4,7 @@ const { fromAscii } = require('ethjs');
 const Web3 = require('web3');
 const MyProvider = require('../src/api/MyZapProvider');
 const ZapDispatch = require('../src/api/contracts/ZapDispatch');
+const ZapArbiter = require('../src/api/contracts/ZapArbiter');
 
 const testEtherium = `ws://127.0.0.1:9545`; // truffle develop rpc
 const dockerNetwork = 'ws://172.18.0.2:8546'; // parity docker container
@@ -14,6 +15,7 @@ const zapTokenJson = JSON.parse(fs.readFileSync('../zap/build/contracts/ZapToken
 const zapDispatchJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Dispatch.json').toString());
 const zapBondageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Bondage.json').toString());
 const zapRegistryJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Registry.json').toString());
+const zapArbiterJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Arbiter.json').toString());
 const registryStorageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/RegistryStorage.json').toString());
 
 const CurveTypes = {
@@ -79,10 +81,12 @@ async function main() {
     const testEndpoint = web3.utils.utf8ToHex('test.com');
     console.log('Test endpoint hex = ' + testEndpoint);
 
+    // To use with docker: change network id to 211211
     const zapToken = new web3.eth.Contract(getContractAbi(zapTokenJson), getContractAddress(zapTokenJson, 4447));
     const zapRegistry =  new web3.eth.Contract(getContractAbi(zapRegistryJson), getContractAddress(zapRegistryJson, 4447));
     const zapDispatch = new web3.eth.Contract(getContractAbi(zapDispatchJson), getContractAddress(zapDispatchJson, 4447));
     const zapBondage = new web3.eth.Contract(getContractAbi(zapBondageJson), getContractAddress(zapBondageJson, 4447));
+    const zapArbiter = new web3.eth.Contract(getContractAbi(zapArbiterJson), getContractAddress(zapArbiterJson, 4447));
 
     const registryStorage = new web3.eth.Contract(getContractAbi(registryStorageJson), getContractAddress(registryStorageJson, 4447));
 
@@ -159,11 +163,18 @@ async function main() {
         await zapDispatch.methods.query(provider, userQuery, endpoint, endpointParams).send({from: sub, gas: 1000000});
         console.log('Query performed!');
     }
-
+    
+    //
+    // PROVIDER USAGE
+    //
     myProvider = new MyProvider(new ZapDispatch({
         web3: web3,
         contract_address: zapDispatch._address,
         abi: getContractAbi(zapDispatchJson)
+    }), new ZapArbiter({
+        web3: web3,
+        contract_address: zapArbiter._address,
+        abi: getContractAbi(zapArbiterJson)
     }));
     const filters = {
         id: '',
@@ -189,7 +200,8 @@ async function main() {
         console.log(e);
         return 1;
     }
-
+    
+    emmiter.unsubscribe();
     return 0;
 }
 

@@ -12,7 +12,7 @@ class ZapDispatch {
     // Listen for oracle queries 
     async listen() {
         try {
-            const accounts = await this.eth.accounts();
+            const accounts = await this.web3.eth.accounts();
             if (accounts.length == 0) {
                 throw new Error("No accounts loaded");
             }
@@ -20,7 +20,7 @@ class ZapDispatch {
             const account = accounts[0];
 
             // Create the Event filter
-            this.filter = this.contract.Incoming();
+            this.filter = this.contract.events.Incoming();
             // this.filter = new this.contract.filters.Filter({ delay: 500 });
             this.filter.new({ fromBlock: 0, toBlock: 'latest' }, (err, res) => {
                 if (err) throw err;

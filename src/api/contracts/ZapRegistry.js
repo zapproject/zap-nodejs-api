@@ -1,5 +1,4 @@
 const ZapOracle = require('../ZapOracle');
-const { fromAscii } = require('ethjs');
 
 const curveType = {
     "ZapCurveNone": 0,
@@ -10,22 +9,22 @@ const curveType = {
 
 
 class ZapRegistry {
-    constructor({ eth, contract_address, abiFile }) {
-        this.eth = eth;
+    constructor({ web3, contract_address, abi }) {
+        this.web3 = web3;
         this.address = contract_address;
-        this.abiFile = abiFile;
-        this.contract = eth.contract(abiFile).at(this.address);
+        this.abi = abi;
+        this.contract = new this.web3.eth.Contract(this.abi, this.address);
         this.getOracle = this.getOracle.bind(this);
     }
 
     async initiateProvider({ public_key, title, endpoint_specifier, endpoint_params, from, gas }) {
         try {
-            return await this.contract.initiateProvider(
+            return await this.contract.methods.initiateProvider(
                 public_key,
-                fromAscii(title),
-                fromAscii(endpoint_specifier),
+                web3.utils.utf8ToHex(title),
+                web3.utils.utf8ToHex(endpoint_specifier),
                 endpoint_params,
-                {
+                ).send({
                     'from': from,
                     'gas': gas
                 }
@@ -39,7 +38,7 @@ class ZapRegistry {
         try {
             const curve = curveType[ZapCurveType];
             return await this.contract.initiateProviderCurve(
-                fromAscii(specifier),
+                web3.utils.utf8ToHex(specifier),
                 curve,
                 curveStart,
                 curveMultiplier,
@@ -60,7 +59,7 @@ class ZapRegistry {
             let endpoint_params = [];
             params.forEach(el => endpoint_params.push(fromAscii(el)));
             return await this.contract.setEndpointParams(
-                fromAscii(specifier),
+                web3.utils.utf8ToHex(specifier),
                 endpoint_params,
                 {
                     'from': from,
@@ -79,7 +78,7 @@ class ZapRegistry {
             oracle.address = address;
 
             // Get the provider's public getRouteKeys
-            const public_key = await this.contract.getProviderPublicKey(address);
+            const public_key = await this.contract.methods.getProviderPublicKey(address);
             oracle.public_key = public_key;
 
             // // Get the route keys next
@@ -91,14 +90,14 @@ class ZapRegistry {
                     if (i >= 50) break;
                     const { nextIndex, endpoint_param } = await this.contract.getNextEndpointParam(
                         address,
-                        fromAscii(specifier),
+                        web3.utils.utf8ToHex(specifier),
                         i
-                    )
-                    endpoint_params.push(endpoint_param)
+                    );
+                    endpoint_params.push(endpoint_param);
                     if (!nextIndex.toNumber()) break;
                     i++
                 } catch (err) {
-                    console.log(err)
+                    console.log(err);
                     break;
                 }
             }
