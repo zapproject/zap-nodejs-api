@@ -6,9 +6,15 @@ const MyProvider = require('../src/api/MyZapProvider');
 const ZapDispatch = require('../src/api/contracts/ZapDispatch');
 const ZapArbiter = require('../src/api/contracts/ZapArbiter');
 
-const testEtherium = `ws://127.0.0.1:9545`; // truffle develop rpc
-const dockerNetwork = 'ws://172.18.0.2:8546'; // parity docker container
-const web3 = new Web3(new Web3.providers.WebsocketProvider(testEtherium)); // using develop rpc
+const testNetwork = {
+    address: `ws://127.0.0.1:9545`, // truffle develop rpc
+    id: 4447
+};
+const dockerNetwork = {
+    address: 'ws://172.18.0.2:8546', // parity docker container
+    id: 211211
+};
+const web3 = new Web3(new Web3.providers.WebsocketProvider(testNetwork.address)); // using develop rpc
 
 
 const zapTokenJson = JSON.parse(fs.readFileSync('../zap/build/contracts/ZapToken.json').toString());
@@ -57,7 +63,7 @@ function getContractAddress(json, networkId) {
     return json.networks[networkId].address;
 }
 
-function getBigNumber(numberOfZeros) {
+function getPowOfTenBN(numberOfZeros) {
     let str = '1';
     for (let i = 0; i < numberOfZeros; i++) {
         str += '0';
@@ -78,17 +84,16 @@ async function main() {
     console.log('oracle: ' + oracle);
     console.log('sub: ' + sub);
 
-    const testEndpoint = web3.utils.utf8ToHex('test.com');
+    const testEndpoint = 'test.com';
     console.log('Test endpoint hex = ' + testEndpoint);
 
-    // To use with docker: change network id to 211211
-    const zapToken = new web3.eth.Contract(getContractAbi(zapTokenJson), getContractAddress(zapTokenJson, 4447));
-    const zapRegistry =  new web3.eth.Contract(getContractAbi(zapRegistryJson), getContractAddress(zapRegistryJson, 4447));
-    const zapDispatch = new web3.eth.Contract(getContractAbi(zapDispatchJson), getContractAddress(zapDispatchJson, 4447));
-    const zapBondage = new web3.eth.Contract(getContractAbi(zapBondageJson), getContractAddress(zapBondageJson, 4447));
-    const zapArbiter = new web3.eth.Contract(getContractAbi(zapArbiterJson), getContractAddress(zapArbiterJson, 4447));
+    const zapToken = new web3.eth.Contract(getContractAbi(zapTokenJson), getContractAddress(zapTokenJson, testNetwork.id));
+    const zapRegistry = new web3.eth.Contract(getContractAbi(zapRegistryJson), getContractAddress(zapRegistryJson, testNetwork.id));
+    const zapDispatch = new web3.eth.Contract(getContractAbi(zapDispatchJson), getContractAddress(zapDispatchJson, testNetwork.id));
+    const zapBondage = new web3.eth.Contract(getContractAbi(zapBondageJson), getContractAddress(zapBondageJson, testNetwork.id));
+    const zapArbiter = new web3.eth.Contract(getContractAbi(zapArbiterJson), getContractAddress(zapArbiterJson, testNetwork.id));
 
-    const registryStorage = new web3.eth.Contract(getContractAbi(registryStorageJson), getContractAddress(registryStorageJson, 4447));
+    const registryStorage = new web3.eth.Contract(getContractAbi(registryStorageJson), getContractAddress(registryStorageJson, testNetwork.id));
 
 
     async function allocateTokens(to, amount) {
@@ -103,8 +108,7 @@ async function main() {
         return balance.valueOf();
     }
 
-    async function registerNewDataProvider(publicKey,
-                                           title,
+    async function registerNewDataProvider(title,
                                            endpoint,
                                            endpointParams) {
 
@@ -117,11 +121,15 @@ async function main() {
         await zapRegistry.methods.initiateProvider(
             new web3.utils.BN('123'),
             web3.utils.utf8ToHex(title),
-            endpoint,
+            web3.utils.utf8ToHex(endpoint),
             endpointParams)
-            .send({from: oracle});
+            .send({from: oracle, gas: 1000000});
 
-        await zapRegistry.methods.initiateProviderCurve(endpoint, CurveTypes['Linear'], new web3.utils.BN(1), new web3.utils.BN(2)).send({from: oracle});
+        await zapRegistry.methods.initiateProviderCurve(web3.utils.utf8ToHex(endpoint),
+            CurveTypes['Linear'],
+            new web3.utils.BN(1),
+            new web3.utils.BN(2))
+            .send({from: oracle, gas: 1000000});
 
         //check results
         pk = await zapRegistry.methods.getProviderPublicKey(oracle).call();
@@ -130,8 +138,8 @@ async function main() {
             throw new Error('Public key of provider was not specified!');
         }
 
-        const curve = await zapRegistry.methods.getProviderCurve(oracle, endpoint).call();
-        console.log('Inited curve: ' + curve.toString());
+        const curve = await zapRegistry.methods.getProviderCurve(oracle, web3.utils.utf8ToHex(endpoint)).call();
+        console.log('Inited curve: ' + JSON.stringify(curve));
     }
 
     async function bondToDataProvider(oracleAddress,
@@ -139,28 +147,20 @@ async function main() {
                                       numZap) {
         console.log('endpoint = ' + endpoint);
 
-         await zapToken.methods.approve(zapBondage._address, getBigNumber(21)).send({from: sub});
+        const dots = await zapBondage.methods.getBoundDots(sub, oracle, web3.utils.utf8ToHex(endpoint)).call();
+        console.log('dots = ' + dots);
 
-         const dots = await zapBondage.methods.getBoundDots(sub, oracle, endpoint).call();
-         console.log('dots = ' + dots);
+        if (dots != '0') return;
 
-         const res = await zapBondage.methods.calcBondRate(oracle, endpoint, getBigNumber(2)).call();
-         console.log(res);
-
-         if (dots != '0') return;
-
-         await zapBondage.methods.bond(oracle, endpoint, new web3.utils.BN(numZap)).send({from: sub, gas: 1000000});
-
+        await zapToken.methods.approve(zapBondage._address, getPowOfTenBN(21)).send({from: sub});
+        await zapBondage.methods.bond(oracle, web3.utils.utf8ToHex(endpoint), new web3.utils.BN(numZap)).send({from: sub, gas: 1000000});
     }
 
     async function queryData(provider,
                              userQuery,
                              endpoint,
                              endpointParams) {
-        const dots = await zapBondage.methods.getBoundDots(sub, provider, endpoint).call({from: sub});
-        const dstore = await zapDispatch.methods.storageAddress().call();
-
-        await zapDispatch.methods.query(provider, userQuery, endpoint, endpointParams).send({from: sub, gas: 1000000});
+        await zapDispatch.methods.query(provider, userQuery, web3.utils.utf8ToHex(endpoint), endpointParams).send({from: sub, gas: 1000000});
         console.log('Query performed!');
     }
     
@@ -179,20 +179,23 @@ async function main() {
     const filters = {
         id: '',
         provider: oracle,
-        subscriber: ''
+        subscriber: '',
+        fromBlock: 0
     };
     const eventHandler = (incomingEvent) => {
         console.log('Incoming event received!');
         return ['1', '2'];
     };
+
+    // You will have 'revert' exception when event will cought, because sub is not contract address that implement Client2
     const emmiter = myProvider.initQueryRespond(filters, eventHandler, oracle);
 
     try {
-        await allocateTokens(sub, getBigNumber(21));
-        await allocateTokens(oracle, getBigNumber(21));
+        await allocateTokens(sub, getPowOfTenBN(21));
+        await allocateTokens(oracle, getPowOfTenBN(21));
 
-        await registerNewDataProvider(111, 'test', testEndpoint, []);
-        await bondToDataProvider(oracle, testEndpoint, getBigNumber(2));
+        await registerNewDataProvider('test', testEndpoint, []);
+        await bondToDataProvider(oracle, testEndpoint, getPowOfTenBN(2));
 
         await queryData(oracle, 'privet', testEndpoint, []);
     } catch (e) {

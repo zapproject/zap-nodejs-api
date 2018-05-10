@@ -47,10 +47,10 @@ class MyZapProvider {
         return dataSubscriptionEnd;
     }
 
-    listenSubscribes({provider, subscriber}, callback) {
+    listenSubscribes({provider, subscriber, fromBlock}, callback) {
         if (!this.arbiter || !this.arbiter.isZapArbiter) throw new Error('ZapArbiter class must be specified!');
 
-        return this.arbiter.contract.events.DataPurchaseEvent({filter: {provider, subscriber}, fromBlock: 0},
+        return this.arbiter.contract.events.DataPurchaseEvent({filter: {provider, subscriber}, fromBlock: fromBlock},
             (error, result) => {
                 if (error) {
                     console.log(error);
@@ -64,10 +64,10 @@ class MyZapProvider {
             });
     }
 
-    listenUnsubscribes({provider, subscriber, terminator}, callback) {
+    listenUnsubscribes({provider, subscriber, terminator, fromBlock}, callback) {
         if (!this.arbiter || !this.arbiter.isZapArbiter) throw new Error('ZapArbiter class must be specified!');
 
-        return this.arbiter.contract.events.DataSubscriptionEnd({filter: {provider, subscriber, terminator}, fromBlock: 0},
+        return this.arbiter.contract.events.DataSubscriptionEnd({filter: {provider, subscriber, terminator}, fromBlock: fromBlock},
             (error, result) => {
                 if (error) {
                     console.log(error);
@@ -81,10 +81,10 @@ class MyZapProvider {
             });
     }
 
-    initQueryRespond({id, provider, subscriber}, handler, from) {
+    initQueryRespond({id, provider, subscriber, fromBlock}, handler, from) {
         if (!this.dispatch || !this.dispatch.isZapDispatch) throw new Error('ZapDispatch class must be specified!');
 
-        return this.dispatch.contract.events.Incoming({filter: {id, provider, subscriber}, fromBlock: 0}, (error, result) => {
+        return this.dispatch.contract.events.Incoming({filter: {id, provider, subscriber}, fromBlock: fromBlock}, (error, result) => {
             if (error) {
                 console.log(error);
             } else {
