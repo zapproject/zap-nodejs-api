@@ -1,0 +1,258 @@
+[
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "implode",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "providerAddress",
+                "type": "address"
+            },
+            {
+                "name": "endpoint",
+                "type": "bytes32"
+            }
+        ],
+        "name": "endSubscriptionSubscriber",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "providerAddress",
+                "type": "address"
+            },
+            {
+                "name": "subscriberAddress",
+                "type": "address"
+            },
+            {
+                "name": "endpoint",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getSubscription",
+        "outputs": [
+            {
+                "name": "dots",
+                "type": "uint64"
+            },
+            {
+                "name": "blockStart",
+                "type": "uint96"
+            },
+            {
+                "name": "preBlockEnd",
+                "type": "uint96"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "storageAddress",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "providerAddress",
+                "type": "address"
+            },
+            {
+                "name": "endpoint",
+                "type": "bytes32"
+            },
+            {
+                "name": "endpointParams",
+                "type": "bytes32[]"
+            },
+            {
+                "name": "publicKey",
+                "type": "uint256"
+            },
+            {
+                "name": "blocks",
+                "type": "uint64"
+            }
+        ],
+        "name": "initiateSubscription",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "updateContract",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "subscriberAddress",
+                "type": "address"
+            },
+            {
+                "name": "endpoint",
+                "type": "bytes32"
+            }
+        ],
+        "name": "endSubscriptionProvider",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "pointerAddress",
+                "type": "address"
+            },
+            {
+                "name": "_storageAddress",
+                "type": "address"
+            },
+            {
+                "name": "bondageAddress",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "provider",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "subscriber",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "publicKey",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "endpointParams",
+                "type": "bytes32[]"
+            },
+            {
+                "indexed": false,
+                "name": "endpoint",
+                "type": "bytes32"
+            }
+        ],
+        "name": "DataPurchase",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "provider",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "subscriber",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "terminator",
+                "type": "uint8"
+            }
+        ],
+        "name": "DataSubscriptionEnd",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    }
+]

@@ -1,10 +1,11 @@
 const { fromAscii, toBN } = require('ethjs');
+const { getABI } = require('../utils.js');
 
-class ZapBondageStorage {
-    constructor({ eth, contract_address, abiFile }) {
+class BondageStorage {
+    constructor(eth, network, contractAddress) {
         this.eth = eth;
-        this.address = contract_address;
-        this.abiFile = abiFile;
+        this.address = getAddress("BondageStorage", network, contractAddress);
+        this.abiFile = getABI("BondageStorage");
         this.contract = eth.contract(this.abiFile).at(this.address);
     }
 
@@ -46,4 +47,4 @@ class ZapBondageStorage {
     }
 }
 
-module.exports = ZapBondageStorage;
+module.exports = BondageStorage;

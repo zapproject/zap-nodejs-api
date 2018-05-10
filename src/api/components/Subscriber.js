@@ -1,18 +1,18 @@
 const EventEmitter = require('events');
-const ZapArbiter = require('./contracts/ZapArbiter');
-const ZapRegistry = require('./contracts/ZapRegistry');
+const Arbiter = require('./contracts/Arbiter');
+const Registry = require('./contracts/Registry');
 
-class ZapSubscriber extends EventEmitter {
-    constructor(wallet, keypair) {
+class Subscriber extends EventEmitter {
+    constructor(eth, wallet, keypair, registryAddress arbiterAddress) {
         super();
 
         this.handlers = {};
-        this.keypair = keypair;
         this.wallet = wallet;
+        this.keypair = keypair;
         this.eth = wallet.eth;
 
-        this.registry = new ZapRegistry(this.eth, wallet.network);
-        this.arbiter = new ZapArbiter(this.eth, wallet.network);
+        this.registry = new Registry(this.eth, wallet.network, registryAddress);
+        this.arbiter = new Arbiter(this.eth, wallet.network, arbiterAddress);
     }
 
     // Add a endpoint handler
@@ -130,4 +130,4 @@ class ZapSubscriber extends EventEmitter {
     }
 }
 
-module.exports = ZapSubscriber;
+module.exports = Subscriber;

@@ -1,6 +1,6 @@
-const ZapCurve = require('./ZapCurve');
+const Curve = require('./Curve');
 
-class ZapOracle {
+class Oracle {
     constructor(registry) {
         this.registry = registry;
 
@@ -36,4 +36,4 @@ class ZapOracle {
     }
 }
 
-module.exports = ZapOracle;
+module.exports = Oracle;

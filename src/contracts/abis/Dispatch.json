@@ -1,0 +1,282 @@
+[
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "name": "response1",
+                "type": "string"
+            },
+            {
+                "name": "response2",
+                "type": "string"
+            },
+            {
+                "name": "response3",
+                "type": "string"
+            },
+            {
+                "name": "response4",
+                "type": "string"
+            }
+        ],
+        "name": "respond4",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "name": "response1",
+                "type": "string"
+            },
+            {
+                "name": "response2",
+                "type": "string"
+            },
+            {
+                "name": "response3",
+                "type": "string"
+            }
+        ],
+        "name": "respond3",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "implode",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "name": "response",
+                "type": "string"
+            }
+        ],
+        "name": "respond1",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "provider",
+                "type": "address"
+            },
+            {
+                "name": "userQuery",
+                "type": "string"
+            },
+            {
+                "name": "endpoint",
+                "type": "bytes32"
+            },
+            {
+                "name": "endpointParams",
+                "type": "bytes32[]"
+            }
+        ],
+        "name": "query",
+        "outputs": [
+            {
+                "name": "id",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "storageAddress",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "updateContract",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "name": "response1",
+                "type": "string"
+            },
+            {
+                "name": "response2",
+                "type": "string"
+            }
+        ],
+        "name": "respond2",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "pointerAddress",
+                "type": "address"
+            },
+            {
+                "name": "_storageAddress",
+                "type": "address"
+            },
+            {
+                "name": "bondageAddress",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "name": "provider",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "recipient",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "query",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "name": "endpoint",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "name": "endpointParams",
+                "type": "bytes32[]"
+            }
+        ],
+        "name": "Incoming",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    }
+]

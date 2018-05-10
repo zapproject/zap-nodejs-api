@@ -1,4 +1,4 @@
-class ZapCurve {
+class Curve {
     constructor(curveType, curveStart, curveMultiplier) {
         this.type = curveType;
         this.start = curveStart;
@@ -27,4 +27,4 @@ class ZapCurve {
     }
 }
 
-module.exports = ZapCurve;
+module.exports = Curve;

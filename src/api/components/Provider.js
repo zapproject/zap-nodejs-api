@@ -1,15 +1,15 @@
-const ZapArbiter = require('./contracts/ZapArbiter');
-const ZapDispatch = require('./contracts/ZapDispatch');
+const Arbiter = require('./contracts/Arbiter');
+const Dispatch = require('./contracts/Dispatch');
 const EventEmitter = require('event');
 
-class ZapProvider extends EventEmitter {
-    constructor(eth, network) {
+class Provider extends EventEmitter {
+    constructor(eth, network, arbiterAddress, dispatchAddress) {
         super();
 
-        this.arbiter = new ZapArbiter(eth, network);
-        this.dispatch = new ZapDispatch(eth, network);
+        this.arbiter = new Arbiter(eth, network, arbiterAddress);
+        this.dispatch = new Dispatch(eth, network, dispatchAddress);
         this.subscriptions = {}; // In-memory stored subscriptions
-        this.requests = {}; // In-memory stored oracle requests 
+        this.requests = {};      // In-memory stored oracle requests 
         this.handler = {};       // Map for handlers for different endpoints
     }
 
@@ -99,4 +99,4 @@ class ZapProvider extends EventEmitter {
 
 }
 
-module.exports = ZapProvider;
+module.exports = Provider;
