@@ -27,6 +27,7 @@ const {
 const Eth = require('ethjs');
 const endpointTest = `${protocol}${endpoint}:${port}`;
 const eth = new Eth(new Eth.HttpProvider(endpointTest));
+const web3 = new Web3(new Web3.providers.WebsocketProvider(endpointTest));
 
 const webProvider = new Web3();
 const ganacheProvider = provider(serverOptions);
@@ -67,7 +68,8 @@ module.exports = {
     migrateContracts,
     ganacheProvider,
     webProvider,
-    eth
+    eth,
+    web3
 };
 
 require('chai')

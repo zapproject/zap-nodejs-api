@@ -1,49 +1,44 @@
-// @flow
-require('babel-register');
-require('babel-polyfill');
-const Oracle = require('../Oracle');
-const { fromAscii } = require('ethjs');
-const { getABI } = require('../utils.js');
+const ZapOracle = require('../ZapOracle');
 
 const curveType = {
-    "None": 0,
-    "Linear": 1,
-    "Exponential": 2,
-    "Logarithmic": 3
+    "ZapCurveNone": 0,
+    "ZapCurveLinear": 1,
+    "ZapCurveExponential": 2,
+    "ZapCurveLogarithmic": 3
 };
 
 
-class Registry {
-    constructor(eth, network, contractAddress) {
-        this.eth = eth;
-        this.address = getAddress("Registry", network, contractAddress);
-        this.abiFile = getABI("Registry");
-        this.contract = eth.contract(abiFile).at(this.address);
+class ZapRegistry {
+    constructor({ web3, contract_address, abi }) {
+        this.web3 = web3;
+        this.address = contract_address;
+        this.abi = abi;
+        this.contract = new this.web3.eth.Contract(this.abi, this.address);
         this.getOracle = this.getOracle.bind(this);
     }
 
-    async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from, gas}) {
+    async initiateProvider({ public_key, title, endpoint_specifier, endpoint_params, from, gas }) {
         try {
-            return await this.contract.initiateProvider(
-                public_key, 
-                fromAscii(title), 
-                fromAscii(endpoint_specifier),
+            return await this.contract.methods.initiateProvider(
+                public_key,
+                web3.utils.utf8ToHex(title),
+                web3.utils.utf8ToHex(endpoint_specifier),
                 endpoint_params,
-                {
+                ).send({
                     'from': from,
                     'gas': gas
                 }
             );
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
 
-    async initiateProviderCurve({ specifier, CurveType, curveStart, curveMultiplier, from, gas }) {
+    async initiateProviderCurve({ specifier, ZapCurveType, curveStart, curveMultiplier, from, gas }) {
         try {
-            const curve = curveType[CurveType];
+            const curve = curveType[ZapCurveType];
             return await this.contract.initiateProviderCurve(
-                fromAscii(specifier),
+                web3.utils.utf8ToHex(specifier),
                 curve,
                 curveStart,
                 curveMultiplier,
@@ -52,7 +47,7 @@ class Registry {
                     'gas': gas
                 }
             );
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
@@ -64,14 +59,14 @@ class Registry {
             let endpoint_params = [];
             params.forEach(el => endpoint_params.push(fromAscii(el)));
             return await this.contract.setEndpointParams(
-                fromAscii(specifier),
+                web3.utils.utf8ToHex(specifier),
                 endpoint_params,
                 {
                     'from': from,
                     'gas': gas
                 }
             );
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }
@@ -79,30 +74,30 @@ class Registry {
     // get oracle by address
     async getOracle({ address, specifier }) {
         try {
-            const oracle = new Oracle(this);
+            const oracle = new ZapOracle(this);
             oracle.address = address;
 
             // Get the provider's public getRouteKeys
-            const public_key = await this.contract.getProviderPublicKey( address );
+            const public_key = await this.contract.methods.getProviderPublicKey(address);
             oracle.public_key = public_key;
-    
+
             // // Get the route keys next
             // getNextEndpointParam address provider, bytes32 specifier, uint256 index
             let i = 0;
             let endpoint_params = [];
-            while(true) {
+            while (true) {
                 try {
                     if (i >= 50) break;
                     const { nextIndex, endpoint_param } = await this.contract.getNextEndpointParam(
                         address,
-                        fromAscii(specifier),
+                        web3.utils.utf8ToHex(specifier),
                         i
-                    )
-                    endpoint_params.push(endpoint_param)
-                    if(!nextIndex.toNumber()) break;
+                    );
+                    endpoint_params.push(endpoint_param);
+                    if (!nextIndex.toNumber()) break;
                     i++
-                } catch(err) {
-                    console.log(err)
+                } catch (err) {
+                    console.log(err);
                     break;
                 }
             }
@@ -115,4 +110,4 @@ class Registry {
     }
 }
 
-module.exports = Registry;
+module.exports = ZapRegistry;

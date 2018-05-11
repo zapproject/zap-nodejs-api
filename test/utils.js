@@ -74,6 +74,18 @@ async function getNewCurrentCostContract({ abiFile, pointerAddress, registryAddr
     return eth.contract(abiFile.abi).at(contractAddress);
 }
 
+async function getNewTestSubscriberContract({ abiFile, dispatchAddress, bondageAddress, tokenAddress }) {
+    const contract = getEthContract(abiFile);
+    const txHash = await contract.new(
+        dispatchAddress,
+        bondageAddress,
+        tokenAddress,
+        objectToCreate
+    );
+    const { contractAddress } = await eth.getTransactionReceipt(txHash);
+    return eth.contract(abiFile.abi).at(contractAddress);
+}
+
 const curveType = {
     "ZapCurveNone": 0,
     "ZapCurveLinear": 1,
@@ -121,5 +133,6 @@ module.exports = {
     getNewCurrentCostContract,
     param1,
     param2,
-    query
+    query,
+    getNewTestSubscriberContract
 };

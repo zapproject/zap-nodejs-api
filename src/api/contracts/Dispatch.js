@@ -1,17 +1,18 @@
-const { getABI } = require('../utils.js');
+class ZapDispatch {
 
-class Dispatch {
-    constructor(eth, network, contractAddress) {
-        this.eth = eth;
-        this.address = getAddress("Dispatch", network, contractAddress);
-        this.abiFile = getABI("Dispatch");
-        this.contract = eth.contract(this.abiFile).at(this.address);
+    constructor({web3, contract_address, abi}) {
+        this.web3 = web3;
+        this.address = contract_address;
+        this.abi = abi;
+        this.contract = new this.web3.eth.Contract(this.abi, this.address);
+
+        this.isZapDispatch = true;
     }
 
     // Listen for oracle queries 
     async listen() {
         try {
-            const accounts = await this.eth.accounts();
+            const accounts = await this.web3.eth.accounts();
             if (accounts.length == 0) {
                 throw new Error("No accounts loaded");
             }
@@ -19,7 +20,7 @@ class Dispatch {
             const account = accounts[0];
 
             // Create the Event filter
-            this.filter = this.contract.Incoming();
+            this.filter = this.contract.events.Incoming();
             // this.filter = new this.contract.filters.Filter({ delay: 500 });
             this.filter.new({ fromBlock: 0, toBlock: 'latest' }, (err, res) => {
                 if (err) throw err;
@@ -34,7 +35,7 @@ class Dispatch {
             });
             // Sanity check
             if (result.length != 5) {
-                throw new Error("Received invalid DataPurchase event");
+                throw new Error("Received invalid ZapDataPurchase event");
             }
             const [id, provider, recipient, query, endpoint, endpoint_params] = result;
             // Make sure it is us
@@ -64,41 +65,33 @@ class Dispatch {
         }
     }
 
-    async respond({ queryId, responseParams, from, gas }) {
+    async respond(queryId, responseParams, from) {
         switch (responseParams.length) {
             case 1: {
-                return this.contract.respond1(
+                return this.contract.methods.respond1(
                     queryId,
-                    responseParams[0],
-                    { 'from': from, 'gas': gas }
-                );
+                    responseParams[0]).send({ 'from': from });
             }
             case 2: {
-                return this.contract.respond2(
+                return this.contract.methods.respond2(
                     queryId,
                     responseParams[0],
-                    responseParams[1],
-                    { 'from': from, 'gas': gas }
-                );
+                    responseParams[1]).send({ 'from': from });
             }
             case 3: {
-                return this.contract.respond3(
+                return this.contract.methods.respond3(
                     queryId,
                     responseParams[0],
                     responseParams[1],
-                    responseParams[2],
-                    { 'from': from, 'gas': gas }
-                );
+                    responseParams[2]).send({ 'from': from });
             }
             case 4: {
-                return this.contract.respond4(
+                return this.contract.methods.respond4(
                     queryId,
                     responseParams[0],
                     responseParams[1],
                     responseParams[2],
-                    responseParams[3],
-                    { 'from': from, 'gas': gas }
-                );
+                    responseParams[3]).send({ 'from': from });
             }
             default: {
                 throw new Error("Invalid number of response parameters");
@@ -107,4 +100,4 @@ class Dispatch {
     }
 }
 
-module.exports = Dispatch;
+module.exports = ZapDispatch;

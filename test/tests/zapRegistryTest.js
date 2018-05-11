@@ -2,7 +2,6 @@ const instanceClass = require('../../src/api/contracts/ZapRegistry');
 const ZapWrapper = require('../../src/api/ZapWrapper');
 const assert = require("chai").assert;
 const {
-    ganacheProvider,
     webProvider,
     eth
 } = require('../bootstrap');
