@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const { fromAscii } = require('ethjs');
 const Web3 = require('web3');
-const MyProvider = require('../src/api/MyZapProvider');
-const ZapDispatch = require('../src/api/contracts/ZapDispatch');
-const ZapArbiter = require('../src/api/contracts/ZapArbiter');
+const TruffleContract = require("truffle-contract");
+const MyProvider = require('../src/api/components/Provider');
+const ZapDispatch = require('../src/api/contracts/Dispatch');
+const ZapArbiter = require('../src/api/contracts/Arbiter');
 
 const testNetwork = {
     address: `ws://127.0.0.1:9545`, // truffle develop rpc
@@ -97,7 +97,7 @@ async function main() {
 
 
     async function allocateTokens(to, amount) {
-        if (await getBalance(to) >= 1000000000000000000000000) return;
+        if (await getBalance(to) >= getPowOfTenBN(21).toNumber()) return;
         await zapToken.methods.allocate(to, amount).send({from: owner});
         getBalance(to);
     }
@@ -188,7 +188,7 @@ async function main() {
     };
 
     // You will have 'revert' exception when event will cought, because sub is not contract address that implement Client2
-    const emmiter = myProvider.initQueryRespond(filters, eventHandler, oracle);
+    const emmiter = myProvider.listenQueries(filters, eventHandler, oracle);
 
     try {
         await allocateTokens(sub, getPowOfTenBN(21));
@@ -212,10 +212,6 @@ async function main() {
  * ENTRY POINT
  */
 main().then((res) => {
-    if (res === 0) {
-        console.log('\n\nExecuted with result code: ' + res);
-    } else {
-        console.log('\n\nExecution error!');
-    }
+   console.log('\n\nExecuted with result code: ' + res);
 });
 

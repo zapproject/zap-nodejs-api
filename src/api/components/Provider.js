@@ -1,102 +1,102 @@
-const Arbiter = require('./contracts/Arbiter');
-const Dispatch = require('./contracts/Dispatch');
-const EventEmitter = require('event');
+class Provider {
 
-class Provider extends EventEmitter {
-    constructor(eth, network, arbiterAddress, dispatchAddress) {
-        super();
-
-        this.arbiter = new Arbiter(eth, network, arbiterAddress);
-        this.dispatch = new Dispatch(eth, network, dispatchAddress);
-        this.subscriptions = {}; // In-memory stored subscriptions
-        this.requests = {};      // In-memory stored oracle requests 
-        this.handler = {};       // Map for handlers for different endpoints
+    constructor(dispatch, arbiter) {
+        this.dispatch = dispatch;
+        this.arbiter = arbiter;
     }
 
-    // Add a given Handler
-    addHandler(type, handler) {
-        this.handler[type] = handler;
+    static parseIncomingEvent(event) {
+        if (!event.returnValues) throw new Error('Must be event object!');
+        if (event.event !== 'Incoming') throw new Error('Wrong event for parsing. Event name = ' + event.event + ', must be Incoming');
+
+        let incomingEvent = Object();
+        incomingEvent.id = event.returnValues.id;
+        incomingEvent.provider = event.returnValues.provider;
+        incomingEvent.subscriber = event.returnValues.subscriber;
+        incomingEvent.query = event.returnValues.query;
+        incomingEvent.endpoint = event.returnValues.endpoint;
+        incomingEvent.endpointParams = event.returnValues.endpointParams;
+        return incomingEvent;
     }
 
-    // Listen for new subscriptions 
-    listenSubscription(callback) {
+    static parseDataPurchaseEvent(event) {
+        if (!event.returnValues) throw new Error('Must be event object!');
+        if (event.event !== 'Incoming') throw new Error('Wrong event for parsing. Event name = ' + event.event + ', must be Incoming');
 
-        this.arbiter.listen((err, data) => {
-            if ( err ) {
-                callback(err);
-                return;
-            }
+        let dataPurchaseEvent;
+        dataPurchaseEvent.provider = event.returnValues.provider;
+        dataPurchaseEvent.subscriber = event.returnValues.subscriber;
+        dataPurchaseEvent.publicKey = event.returnValues.publicKey;
+        dataPurchaseEvent.amount = event.returnValues.amount;
+        dataPurchaseEvent.endpointParams = event.returnValues.endpointParams;
+        dataPurchaseEvent.endpoint = event.returnValues.endpoint;
 
-            const handler = this.handler[data.endpoint];
-
-            if ( !handler ) {
-                callback(new Error("Got unhandled endpoint " + data.endpoint));
-                return;
-            }
-
-            const subscription = handler.parseSubscription(data);
-            this.subscriptions.push(subscription);
-
-            this.emit("new_subscription", data.subscriber);
-        });
-        
+        return dataPurchaseEvent;
     }
 
-    listenOracle(callback){
+    static parseDataSubscriptionEnd(event) {
+        if (!event.returnValues) throw new Error('Must be event object!');
+        if (event.event !== 'Incoming') throw new Error('Wrong event for parsing. Event name = ' + event.event + ', must be Incoming');
 
-        this.dispatch.listen((err, data) => {
-            if ( err ) {
-                callback(err);
-                return;
-            }
+        let dataSubscriptionEnd;
+        dataSubscriptionEnd.provider = event.returnValues.provider;
+        dataSubscriptionEnd.subscriber = event.returnValues.subscriber;
+        dataSubscriptionEnd.terminator = event.returnValues.terminator;
 
-            const handler = this.handler[data.endpoint];
+        return dataSubscriptionEnd;
+    }
 
-            if ( !handler ) {
-                callback(new Error("Got unhandled endpoint " + data.endpoint));
-                return;
-            }
 
-            const request = handler.parseRequest(data);
-            this.requests.push(request);
-            callback(null, this);
-            this.emit("new_oracle_request", data.id);
-        });
-    } 
+    listenSubscribes({provider, subscriber, fromBlock}, callback) {
+        if (!this.arbiter || !this.arbiter.isZapArbiter) throw new Error('ZapArbiter class must be specified!');
 
-    // Publish
-    publish(endpoint, data) {
-        if ( !data ) {
-            data = endpoint;
-            endpoint = null;
-        }
+        return this.arbiter.contract.events.DataPurchaseEvent({filter: {provider, subscriber}, fromBlock: fromBlock},
+            (error, result) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    try {
+                        callback(MyZapProvider.parseDataPurchaseEvent(result));
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            });
+    }
 
-        if ( endpoint ) {
-            // Publish to a specific endpoint
-            for ( const subscription of this.subscriptions[endpoint] ) {
-                subscription.publish(data);
-            }
-        }
-        else {
-            // Publish to all endpoints
-            for ( const endpoint in this.subscriptions ) {
-                for ( const subscription of this.subscriptions[endpoint] ) {
-                    subscription.publish(data);
+    listenUnsubscribes({provider, subscriber, terminator, fromBlock}, callback) {
+        if (!this.arbiter || !this.arbiter.isZapArbiter) throw new Error('ZapArbiter class must be specified!');
+
+        return this.arbiter.contract.events.DataSubscriptionEnd({filter: {provider, subscriber, terminator}, fromBlock: fromBlock},
+            (error, result) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    try {
+                        callback(MyZapProvider.parseDataSubscriptionEnd(result));
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            });
+    }
+
+    listenQueries({id, provider, subscriber, fromBlock}, handler, from) {
+        if (!this.dispatch || !this.dispatch.isZapDispatch) throw new Error('ZapDispatch class must be specified!');
+
+        return this.dispatch.contract.events.Incoming({filter: {id, provider, subscriber}, fromBlock: fromBlock}, (error, result) => {
+            if (error) {
+                console.log(error);
+            } else {
+                try {
+                    let respondParams = handler(MyZapProvider.parseIncomingEvent(result));
+                    this.dispatch.respond(result.returnValues.id, respondParams, from);
+                } catch (e) {
+                    console.log(e);
                 }
             }
-        }
+        });
     }
-    
-    respond(endpoint, data){
-        this.dispatch.respond(data.id, data.params);
-    }
-
-    // Close the current listener
-    close() {
-        this.arbiter.close();
-        this.dispatch.close();
-    }
-
 }
 
 module.exports = Provider;

@@ -1,3 +1,12 @@
+
+function isPromise(object) {
+    if(Promise && Promise.resolve){
+        return Promise.resolve(object) === object;
+    }else{
+        throw "Promise not supported in your environment"
+    }
+}
+
 class ZapDispatch {
 
     constructor({web3, contract_address, abi}) {
@@ -66,6 +75,9 @@ class ZapDispatch {
     }
 
     async respond(queryId, responseParams, from) {
+        if (isPromise(responseParams)) {
+            responseParams = await responseParams;
+        }
         switch (responseParams.length) {
             case 1: {
                 return this.contract.methods.respond1(
