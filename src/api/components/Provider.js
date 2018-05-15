@@ -56,7 +56,7 @@ class Provider {
                     console.log(error);
                 } else {
                     try {
-                        callback(MyZapProvider.parseDataPurchaseEvent(result));
+                        callback(Provider.parseDataPurchaseEvent(result));
                     } catch (e) {
                         console.log(e);
                     }
@@ -73,7 +73,7 @@ class Provider {
                     console.log(error);
                 } else {
                     try {
-                        callback(MyZapProvider.parseDataSubscriptionEnd(result));
+                        callback(Provider.parseDataSubscriptionEnd(result));
                     } catch (e) {
                         console.log(e);
                     }
@@ -89,7 +89,7 @@ class Provider {
                 console.log(error);
             } else {
                 try {
-                    let respondParams = handler(MyZapProvider.parseIncomingEvent(result));
+                    let respondParams = handler(Provider.parseIncomingEvent(result));
                     this.dispatch.respond(result.returnValues.id, respondParams, from);
                 } catch (e) {
                     console.log(e);

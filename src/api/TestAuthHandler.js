@@ -1,4 +1,4 @@
-const AuthHandler = require('handlers/AuthHandler');
+const AuthHandler = require('./handlers/AuthHandler');
 
 class TestAuthHandler extends AuthHandler {
     constructor() {
@@ -14,3 +14,5 @@ class TestAuthHandler extends AuthHandler {
         return options;
     }
 }
+
+module.exports = TestAuthHandler;

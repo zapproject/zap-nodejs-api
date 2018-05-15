@@ -1,8 +1,8 @@
 
 function isPromise(object) {
-    if(Promise && Promise.resolve){
+    if (Promise && Promise.resolve) {
         return Promise.resolve(object) === object;
-    }else{
+    } else {
         throw "Promise not supported in your environment"
     }
 }

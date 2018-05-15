@@ -1,40 +1,58 @@
 const Provider = require('./components/Provider');
-const https = require('https');
+const axios = require('axios');
+
+const AUTH_ERROR_CODE = 401;
+
 
 class HttpsProvider extends Provider {
-    constructor(providerId, {endpoint, port, headers, method, path, keyFilePath, certFilePath}, authHandler) {
-        super();
+    constructor(dispatch, arbiter, providerId, {scheme, hostname, port, headers, method, path, key, cert}, authHandler) {
+        super(dispatch, arbiter);
 
         this.id = providerId;
-        this.setAuthHandler(authHandler);
-        this.httpsOptions = {
-            hostname: endpoint,
+        this.authHandler = authHandler;
+        this.httpOptions = {
+            scheme: scheme,
+            hostname: hostname,
             port: port,
             path: path,
             method: method,
-            key: keyFilePath,
-            cert: certFilePath,
+            key: key,
+            cert: cert,
             headers: headers
         };
+        this.httpClient = axios.create({
+            baseURL: hostname ? scheme + '://' + hostname : '',
+            timeout: 10000,
+            headers: headers
+        });
+    }
+
+    get authHandler() {
+        return this._authHandler;
     }
 
     // Set auth handler that will handle auth flow for this provider
-    setAuthHandler(authHandler) {
-        if (authHandler.isAuthHandler) throw Error('Auth handler must be instance of AuthHandler class.');
-        this.authHandler = authHandler;
+    set authHandler(authHandler) {
+        if (!authHandler.isAuthHandler) throw Error('Auth handler must be instance of AuthHandler class.');
+        this._authHandler = authHandler;
     }
 
     initQueryRespond(responseParser, filters, from) {
         let httpsHandler = async (incomingEvent) => {
             try {
                 if (!this.authHandler.isLoggedIn) {
-                    this.httpsOptions = await this.authHandler.login(this.httpsOptions);
+                    this.httpOptions = await this.authHandler.login(this.httpOptions);
                 }
-                const response = await https.request(options);
+                let response = await this.httpClient({
+                    method: this.httpOptions.method,
+                    url: this.httpOptions.path,
+                    headers: this.httpOptions.headers
+                });
                 return responseParser(response);
             } catch (e) {
-                if (e.status === 401) {
-                    this.httpsOptions = await this.authHandler.onAuthError(this.httpsOptions);
+                console.log(e);
+                if (e.status === AUTH_ERROR_CODE) {
+                    this.httpOptions = await this.authHandler.onAuthError(this.httpOptions);
                 }
             }
         };
@@ -42,3 +60,5 @@ class HttpsProvider extends Provider {
         return super.listenQueries(filters, httpsHandler, from);
     }
 }
+
+module.exports = HttpsProvider;

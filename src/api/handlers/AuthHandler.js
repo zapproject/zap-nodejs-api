@@ -8,7 +8,7 @@ class AuthHandler {
         this.isLoggedIn = true;
     }
 
-    async onAuthError(options);
+    async onAuthError(options) {}
 }
 
 module.exports = AuthHandler;

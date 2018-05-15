@@ -97,7 +97,7 @@ async function main() {
 
 
     async function allocateTokens(to, amount) {
-        if (await getBalance(to) >= getPowOfTenBN(21).toNumber()) return;
+        if (getPowOfTenBN(21).lte(await getBalance(to))) return;
         await zapToken.methods.allocate(to, amount).send({from: owner});
         getBalance(to);
     }
