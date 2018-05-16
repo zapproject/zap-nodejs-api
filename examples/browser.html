@@ -7,13 +7,26 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Zap SDK client usage example. Based on local contracts deployment on truffle so address could be changed.</title>
 </head>
-<script src="../node_modules/ethjs/dist/ethjs.min.js"></script>
 <script src="../dist/api/contracts/bundle.js"></script>
 <script>
-  var ethInstance = new Eth(web3.currentProvider);
-  var tokenInstance = new ZapToken({ eth: ethInstance, address: "0x345ca3e014aaf5dca488057592ee47305d9b3e10", abiFile: ZapTokenAbi });
+    const currentProvider = web3.currentProvider;
+    const zapSubscriberAccount = "0x010e49e47cbb34e67c072702ed6f4d8b273f751f";
 
-  console.log(tokenInstance);
+    const tokenInstance = new ZapToken({ provider: currentProvider, address: "0xe3d739b5233bde192c9fa05a800ef17dda83acb8", artifact: ZapTokenArtifact });
+    tokenInstance.balanceOf(zapSubscriberAccount).then(function (result) {
+        console.log(result);
+    });
+
+    const bondageInstance = new ZapBondage({provider: web3.currentProvider, address: "0x94605c13002663218ff32616a232085c5711e466", artifact: ZapBondageArtifact});
+    bondageInstance.getBoundDots(
+        {
+            holderAddress: zapSubscriberAccount,
+            oracleAddress: zapSubscriberAccount,
+            specifier: "test-specifier"
+        }
+    ).then(function (result) {
+        console.log(result);
+    })
 </script>
 
 <body>

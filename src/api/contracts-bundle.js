@@ -4,16 +4,18 @@ require('babel-polyfill');
 
 const fs = require('fs');
 
-global.ZapArbiterAbi = JSON.parse(fs.readFileSync(__dirname + '/../contracts/abis/ZapAribiter.json'));
-global.ZapBondageAbi = JSON.parse(fs.readFileSync(__dirname + '/../contracts/abis/ZapBondage.json'));
-global.ZapBondageStorageAbi = JSON.parse(fs.readFileSync(__dirname + '/../contracts/abis/ZapBondageStorage.json'));
-global.ZapDispatchAbi = JSON.parse(fs.readFileSync(__dirname + '/../contracts/abis/ZapDispatch.json'));
-global.ZapRegistryAbi = JSON.parse(fs.readFileSync(__dirname + '/../contracts/abis/ZapRegistry.json'));
-global.ZapTokenAbi = JSON.parse(fs.readFileSync(__dirname + '/../contracts/abis/ZapToken.json'));
+// Truffle contracts artifacts
+global.ZapArbiterArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/Arbiter.json'));
+global.ZapBondageArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/Bondage.json'));
+global.ZapBondageStorageArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/BondageStorage.json'));
+global.ZapDispatchArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/Dispatch.json'));
+global.ZapRegistryArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/Registry.json'));
+global.ZapTokenArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/ZapToken.json'));
 
-global.ZapArbiter = require("./contracts/ZapArbiter");
-global.ZapBondage = require("./contracts/ZapBondage");
-global.ZapBondageStorage = require("./contracts/ZapBondageStorage");
-global.ZapDispatch = require("./contracts/ZapDispatch");
-global.ZapRegistry = require("./contracts/ZapRegistry");
+// Contract wrappers
+global.ZapArbiter = require("./contracts/Arbiter");
+global.ZapBondage = require("./contracts/Bondage");
+// global.ZapBondageStorage = require("./contracts/BondageStorage");
+global.ZapDispatch = require("./contracts/Dispatch");
+global.ZapRegistry = require("./contracts/Registry");
 global.ZapToken = require("./contracts/ZapToken");

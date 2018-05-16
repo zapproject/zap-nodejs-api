@@ -1,3 +1,4 @@
+//todo need to be refactored for using truffle-contract
 class ZapDispatch {
 
     constructor({web3, contract_address, abi}) {
