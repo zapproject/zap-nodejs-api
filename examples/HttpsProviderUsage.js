@@ -165,21 +165,18 @@ async function main() {
     }
 
     //
-    // PROVIDER USAGE
+    // HTTPS PROVIDER USAGE
     //
     let httpsOptions = {
-        scheme: 'https',
-        hostname: 'jsonplaceholder.typicode.com',
+        baseUrl: 'https://jsonplaceholder.typicode.com',
         port: 443,
-        path: '/posts/1',
         method: 'GET',
-        key: '',
-        cert: '',
         headers: {},
+        path: 'posts/1',
         agent: new https.Agent({
-            ca: fs.readFileSync(`${path}CA.pem`),
-            cert: fs.readFileSync(`${path}CERT.pem`),
-            key: fs.readFileSync(`${path}KEY.pem`)
+            ca: '', //fs.readFileSync(`CA.pem`),
+            cert: '', //fs.readFileSync(`CERT.pem`),
+            key: ''//fs.readFileSync(`KEY.pem`)
         })
     };
     let myAuthHandler = new TestAuthHandler();
@@ -199,7 +196,7 @@ async function main() {
         fromBlock: 0
     };
     const responseParser = (response) => {
-        if (response.status !== 200) throw Error('Response returned with status ' + response.status + ' ' + response.data);
+        if (response.status !== 200) throw Error('Response received with status ' + response.status + ' ' + response.data);
         const responseData = response.data;
         console.log('Received response: ' + JSON.stringify(responseData));
 

@@ -1,34 +1,28 @@
-const Provider = require('./components/Provider');
+const ZapProvider = require('./components/Provider');
 const axios = require('axios');
 
 const AUTH_ERROR_CODE = 401;
 
 
-class HttpsProvider extends Provider {
-    constructor(dispatch, arbiter, providerId, {scheme, hostname, port, headers, method, path, key, cert, agent}, authHandler) {
+class HttpsProvider extends ZapProvider {
+    constructor(dispatch, arbiter, providerId, {baseUrl, port, headers, method, path, agent}, authHandler) {
         super(dispatch, arbiter);
 
         this.id = providerId;
         this.authHandler = authHandler;
 
         this.httpOptions = {
-            scheme: scheme,
-            hostname: hostname,
+            baseUrl: baseUrl,
             port: port,
             path: path,
             method: method,
-            key: key,
-            cert: cert,
-            headers: headers,
-            agent: agent
+            httpClient: axios.create({
+                baseURL: baseUrl,
+                timeout: 10000,
+                headers: headers,
+                httpsAgent: agent
+            })
         };
-
-        this.httpClient = axios.create({
-            baseURL: hostname ? scheme + '://' + hostname : '',
-            timeout: 10000,
-            headers: headers,
-            httpsAgent: agent
-        });
     }
 
     get authHandler() {
@@ -56,6 +50,7 @@ class HttpsProvider extends Provider {
             } catch (e) {
                 console.log(e);
                 if (e.status === AUTH_ERROR_CODE) {
+                    this.authHandler.isLoggedIn = false;
                     this.httpOptions = await this.authHandler.onAuthError(this.httpOptions);
                 }
             }
