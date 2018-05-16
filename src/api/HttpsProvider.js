@@ -5,11 +5,12 @@ const AUTH_ERROR_CODE = 401;
 
 
 class HttpsProvider extends Provider {
-    constructor(dispatch, arbiter, providerId, {scheme, hostname, port, headers, method, path, key, cert}, authHandler) {
+    constructor(dispatch, arbiter, providerId, {scheme, hostname, port, headers, method, path, key, cert, agent}, authHandler) {
         super(dispatch, arbiter);
 
         this.id = providerId;
         this.authHandler = authHandler;
+
         this.httpOptions = {
             scheme: scheme,
             hostname: hostname,
@@ -18,12 +19,15 @@ class HttpsProvider extends Provider {
             method: method,
             key: key,
             cert: cert,
-            headers: headers
+            headers: headers,
+            agent: agent
         };
+
         this.httpClient = axios.create({
             baseURL: hostname ? scheme + '://' + hostname : '',
             timeout: 10000,
-            headers: headers
+            headers: headers,
+            httpsAgent: agent
         });
     }
 

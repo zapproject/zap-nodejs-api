@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const Web3 = require('web3');
+const https = require('https');
 const TruffleContract = require("truffle-contract");
 const HttpsProvider = require('../src/api/HttpsProvider');
 const TestAuthHandler = require('../src/api/TestAuthHandler');
@@ -174,7 +175,12 @@ async function main() {
         method: 'GET',
         key: '',
         cert: '',
-        headers: {}
+        headers: {},
+        agent: new https.Agent({
+            ca: fs.readFileSync(`${path}CA.pem`),
+            cert: fs.readFileSync(`${path}CERT.pem`),
+            key: fs.readFileSync(`${path}KEY.pem`)
+        })
     };
     let myAuthHandler = new TestAuthHandler();
     let myProvider = new HttpsProvider(new ZapDispatch({
