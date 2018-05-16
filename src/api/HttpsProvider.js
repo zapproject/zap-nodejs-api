@@ -41,11 +41,18 @@ class HttpsProvider extends ZapProvider {
                 if (!this.authHandler.isLoggedIn) {
                     this.httpOptions = await this.authHandler.login(this.httpOptions);
                 }
-                let response = await this.httpClient({
+
+                console.log('Incoming event: ' + JSON.stringify(incomingEvent));
+
+                let response = await this.httpOptions.httpClient({
                     method: this.httpOptions.method,
-                    url: this.httpOptions.path,
-                    headers: this.httpOptions.headers
+                    url: this.httpOptions.path + '?' + incomingEvent.query,
+                    headers: this.httpOptions.headers,
+                    data: {
+                        params: incomingEvent.endpointParams
+                    }
                 });
+
                 return responseParser(response);
             } catch (e) {
                 console.log(e);

@@ -217,12 +217,10 @@ async function main() {
 
         await queryData(oracle, 'privet', testEndpoint, []);
     } catch (e) {
-        emmiter.unsubscribe();
         console.log(e);
         return 1;
     }
 
-    emmiter.unsubscribe();
     return 0;
 }
 
