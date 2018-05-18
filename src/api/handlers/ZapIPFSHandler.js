@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const ZapCrypto = require('../../util/ZapCrypto.js');
-const ZapHandler = require('../ZapHandler.js');
+const ZapHandler = require('../components/Handler.js');
 const ZapIPFSSubscription = require('./ZapIPFSSubscription.js');
 
 class ZapIPFSHandler extends ZapHandler {
@@ -42,7 +42,7 @@ class ZapIPFSHandler extends ZapHandler {
     }
 
     // Override the listen to decrypt IPFS related data
-    parseSubscription(event) {
+    handleSubscription(event) {
         const args = event.params;
 
         // Sanity check on the arguments

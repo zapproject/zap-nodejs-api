@@ -7,6 +7,8 @@
   "private": true,
   "dependencies": {
     "async": "^2.5.0",
+    "aws-lambda-invoke": "^3.0.0",
+    "aws-sdk": "^2.242.1",
     "axios": "^0.18.0",
     "bignumber.js": "^4.0.2",
     "bson": "^1.0.4",
