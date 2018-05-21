@@ -213,9 +213,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.19;\n\n// Technically an abstract contract, not interface (solidity compiler devs are working to fix this right now)\n\ncontract RegistryInterface {\n\tenum CurveType { None, Linear, Exponential, Logarithmic }\n    function initiateProvider(uint256, string, bytes32, bytes32[]) public returns (bool);\n    function initiateProviderCurve(bytes32, CurveType, uint128, uint128) public;\n    function setEndpointParams(bytes32, bytes32[]) public;\n    function getProviderPublicKey(address) public view returns (uint256);\n    function getProviderTitle(address) public view returns (string);\n\tfunction getNextRouteKey(address, bytes32, uint256) public view returns (uint256, bytes32);\n    function getProviderCurve(address, bytes32) public view returns (CurveType, uint128, uint128);\n    function getNextProvider(uint256) public view returns (uint256, address, uint256, string);\n}\n",
-  "sourcePath": "/Users/derain/Projects/ZapContracts/contracts/registry/RegistryInterface.sol",
+  "sourcePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/registry/RegistryInterface.sol",
   "ast": {
-    "absolutePath": "/Users/derain/Projects/ZapContracts/contracts/registry/RegistryInterface.sol",
+    "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/registry/RegistryInterface.sol",
     "exportedSymbols": {
       "RegistryInterface": [
         3307
@@ -332,7 +332,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string"
+                    "typeString": "string memory"
                   },
                   "typeName": {
                     "id": 3223,
@@ -341,7 +341,7 @@
                     "src": "264:6:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -384,7 +384,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
-                    "typeString": "bytes32[]"
+                    "typeString": "bytes32[] memory"
                   },
                   "typeName": {
                     "baseType": {
@@ -403,7 +403,7 @@
                     "src": "281:9:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
-                      "typeString": "bytes32[]"
+                      "typeString": "bytes32[] storage pointer"
                     }
                   },
                   "value": null,
@@ -639,7 +639,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
-                    "typeString": "bytes32[]"
+                    "typeString": "bytes32[] memory"
                   },
                   "typeName": {
                     "baseType": {
@@ -658,7 +658,7 @@
                     "src": "436:9:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
-                      "typeString": "bytes32[]"
+                      "typeString": "bytes32[] storage pointer"
                     }
                   },
                   "value": null,
@@ -822,7 +822,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string"
+                    "typeString": "string memory"
                   },
                   "typeName": {
                     "id": 3264,
@@ -831,7 +831,7 @@
                     "src": "589:6:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1307,7 +1307,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string"
+                    "typeString": "string memory"
                   },
                   "typeName": {
                     "id": 3303,
@@ -1316,7 +1316,7 @@
                     "src": "876:6:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1339,7 +1339,7 @@
     "src": "0:887:17"
   },
   "legacyAST": {
-    "absolutePath": "/Users/derain/Projects/ZapContracts/contracts/registry/RegistryInterface.sol",
+    "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/registry/RegistryInterface.sol",
     "exportedSymbols": {
       "RegistryInterface": [
         3307
@@ -1456,7 +1456,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string"
+                    "typeString": "string memory"
                   },
                   "typeName": {
                     "id": 3223,
@@ -1465,7 +1465,7 @@
                     "src": "264:6:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1508,7 +1508,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
-                    "typeString": "bytes32[]"
+                    "typeString": "bytes32[] memory"
                   },
                   "typeName": {
                     "baseType": {
@@ -1527,7 +1527,7 @@
                     "src": "281:9:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
-                      "typeString": "bytes32[]"
+                      "typeString": "bytes32[] storage pointer"
                     }
                   },
                   "value": null,
@@ -1763,7 +1763,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
-                    "typeString": "bytes32[]"
+                    "typeString": "bytes32[] memory"
                   },
                   "typeName": {
                     "baseType": {
@@ -1782,7 +1782,7 @@
                     "src": "436:9:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
-                      "typeString": "bytes32[]"
+                      "typeString": "bytes32[] storage pointer"
                     }
                   },
                   "value": null,
@@ -1946,7 +1946,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string"
+                    "typeString": "string memory"
                   },
                   "typeName": {
                     "id": 3264,
@@ -1955,7 +1955,7 @@
                     "src": "589:6:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -2431,7 +2431,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string"
+                    "typeString": "string memory"
                   },
                   "typeName": {
                     "id": 3303,
@@ -2440,7 +2440,7 @@
                     "src": "876:6:17",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -2464,9 +2464,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.23+commit.124ca40d.Emscripten.clang"
+    "version": "0.4.21+commit.dfe3193c.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-26T15:36:46.769Z"
+  "updatedAt": "2018-05-09T21:35:55.812Z"
 }

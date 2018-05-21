@@ -116,9 +116,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.19;\n\ninterface ArbiterInterface {\n    function initiateSubscription(address, bytes32[], bytes32, uint256, uint64) external;\n    function getSubscription(address, address, bytes32) external view returns (uint64, uint96, uint96);\n    function endSubscriptionProvider(address, address, bytes32) external;\n    function endSubscriptionSubscriber(address, address, bytes32) external;\n}\n",
-  "sourcePath": "/Users/derain/Projects/ZapContracts/contracts/arbiter/ArbiterInterface.sol",
+  "sourcePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/arbiter/ArbiterInterface.sol",
   "ast": {
-    "absolutePath": "/Users/derain/Projects/ZapContracts/contracts/arbiter/ArbiterInterface.sol",
+    "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/arbiter/ArbiterInterface.sol",
     "exportedSymbols": {
       "ArbiterInterface": [
         417
@@ -202,7 +202,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_array$_t_bytes32_$dyn_calldata_ptr",
-                    "typeString": "bytes32[]"
+                    "typeString": "bytes32[] calldata"
                   },
                   "typeName": {
                     "baseType": {
@@ -221,7 +221,7 @@
                     "src": "98:9:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
-                      "typeString": "bytes32[]"
+                      "typeString": "bytes32[] storage pointer"
                     }
                   },
                   "value": null,
@@ -732,7 +732,7 @@
     "src": "0:401:2"
   },
   "legacyAST": {
-    "absolutePath": "/Users/derain/Projects/ZapContracts/contracts/arbiter/ArbiterInterface.sol",
+    "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/arbiter/ArbiterInterface.sol",
     "exportedSymbols": {
       "ArbiterInterface": [
         417
@@ -816,7 +816,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_array$_t_bytes32_$dyn_calldata_ptr",
-                    "typeString": "bytes32[]"
+                    "typeString": "bytes32[] calldata"
                   },
                   "typeName": {
                     "baseType": {
@@ -835,7 +835,7 @@
                     "src": "98:9:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
-                      "typeString": "bytes32[]"
+                      "typeString": "bytes32[] storage pointer"
                     }
                   },
                   "value": null,
@@ -1347,9 +1347,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.23+commit.124ca40d.Emscripten.clang"
+    "version": "0.4.21+commit.dfe3193c.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-26T15:36:46.739Z"
+  "updatedAt": "2018-05-09T21:35:55.766Z"
 }

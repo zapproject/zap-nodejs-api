@@ -154,9 +154,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.19;\n\ninterface DispatchInterface {\n    function query(address, string, bytes32, bytes32[]) external returns (uint256);\n    function respond1(uint256, string) external returns (bool);\n    function respond2(uint256, string, string) external returns (bool);\n    function respond3(uint256, string, string, string) external returns (bool);\n    function respond4(uint256, string, string, string, string) external returns (bool);\n}\n",
-  "sourcePath": "/Users/derain/Projects/ZapContracts/contracts/dispatch/DispatchInterface.sol",
+  "sourcePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/dispatch/DispatchInterface.sol",
   "ast": {
-    "absolutePath": "/Users/derain/Projects/ZapContracts/contracts/dispatch/DispatchInterface.sol",
+    "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/dispatch/DispatchInterface.sol",
     "exportedSymbols": {
       "DispatchInterface": [
         2536
@@ -240,7 +240,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2476,
@@ -249,7 +249,7 @@
                     "src": "84:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -292,7 +292,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_array$_t_bytes32_$dyn_calldata_ptr",
-                    "typeString": "bytes32[]"
+                    "typeString": "bytes32[] calldata"
                   },
                   "typeName": {
                     "baseType": {
@@ -311,7 +311,7 @@
                     "src": "101:9:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
-                      "typeString": "bytes32[]"
+                      "typeString": "bytes32[] storage pointer"
                     }
                   },
                   "value": null,
@@ -411,7 +411,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2490,
@@ -420,7 +420,7 @@
                     "src": "171:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -520,7 +520,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2499,
@@ -529,7 +529,7 @@
                     "src": "235:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -546,7 +546,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2501,
@@ -555,7 +555,7 @@
                     "src": "243:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -655,7 +655,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2510,
@@ -664,7 +664,7 @@
                     "src": "307:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -681,7 +681,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2512,
@@ -690,7 +690,7 @@
                     "src": "315:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -707,7 +707,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2514,
@@ -716,7 +716,7 @@
                     "src": "323:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -816,7 +816,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2523,
@@ -825,7 +825,7 @@
                     "src": "387:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -842,7 +842,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2525,
@@ -851,7 +851,7 @@
                     "src": "395:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -868,7 +868,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2527,
@@ -877,7 +877,7 @@
                     "src": "403:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -894,7 +894,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2529,
@@ -903,7 +903,7 @@
                     "src": "411:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -960,7 +960,7 @@
     "src": "0:446:10"
   },
   "legacyAST": {
-    "absolutePath": "/Users/derain/Projects/ZapContracts/contracts/dispatch/DispatchInterface.sol",
+    "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/dispatch/DispatchInterface.sol",
     "exportedSymbols": {
       "DispatchInterface": [
         2536
@@ -1044,7 +1044,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2476,
@@ -1053,7 +1053,7 @@
                     "src": "84:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1096,7 +1096,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_array$_t_bytes32_$dyn_calldata_ptr",
-                    "typeString": "bytes32[]"
+                    "typeString": "bytes32[] calldata"
                   },
                   "typeName": {
                     "baseType": {
@@ -1115,7 +1115,7 @@
                     "src": "101:9:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
-                      "typeString": "bytes32[]"
+                      "typeString": "bytes32[] storage pointer"
                     }
                   },
                   "value": null,
@@ -1215,7 +1215,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2490,
@@ -1224,7 +1224,7 @@
                     "src": "171:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1324,7 +1324,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2499,
@@ -1333,7 +1333,7 @@
                     "src": "235:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1350,7 +1350,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2501,
@@ -1359,7 +1359,7 @@
                     "src": "243:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1459,7 +1459,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2510,
@@ -1468,7 +1468,7 @@
                     "src": "307:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1485,7 +1485,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2512,
@@ -1494,7 +1494,7 @@
                     "src": "315:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1511,7 +1511,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2514,
@@ -1520,7 +1520,7 @@
                     "src": "323:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1620,7 +1620,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2523,
@@ -1629,7 +1629,7 @@
                     "src": "387:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1646,7 +1646,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2525,
@@ -1655,7 +1655,7 @@
                     "src": "395:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1672,7 +1672,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2527,
@@ -1681,7 +1681,7 @@
                     "src": "403:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1698,7 +1698,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_calldata_ptr",
-                    "typeString": "string"
+                    "typeString": "string calldata"
                   },
                   "typeName": {
                     "id": 2529,
@@ -1707,7 +1707,7 @@
                     "src": "411:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
+                      "typeString": "string storage pointer"
                     }
                   },
                   "value": null,
@@ -1765,9 +1765,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.23+commit.124ca40d.Emscripten.clang"
+    "version": "0.4.21+commit.dfe3193c.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-26T15:36:46.751Z"
+  "updatedAt": "2018-05-09T21:35:55.786Z"
 }
