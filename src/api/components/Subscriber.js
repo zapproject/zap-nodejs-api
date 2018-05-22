@@ -3,7 +3,7 @@ const Arbiter = require('./contracts/Arbiter');
 const Registry = require('./contracts/Registry');
 
 class Subscriber extends EventEmitter {
-    constructor(eth, wallet, keypair, registryAddress arbiterAddress) {
+    constructor(eth, wallet, keypair, registryAddress, arbiterAddress) {
         super();
 
         this.handlers = {};

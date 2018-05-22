@@ -1,7 +1,10 @@
 const fs = require('fs');
 const Web3 = require('web3');
+const https = require('https');
 const Provider = require('../src/api/components/Provider');
-const Handler = require('../src/api/components/Handler');
+const HttpsHandler = require('../src/api/handlers/HttpsHandler').HttpsHandler;
+const HttpsResponseParser = require('../src/api/handlers/HttpsHandler').Parser;
+const Auth = require('../src/api/handlers/HttpsHandler').Auth;
 const ZapDispatch = require('../src/api/contracts/Dispatch');
 const ZapArbiter = require('../src/api/contracts/Arbiter');
 
@@ -16,12 +19,12 @@ const dockerNetwork = {
 const web3 = new Web3(new Web3.providers.WebsocketProvider(testNetwork.address)); // using develop rpc
 
 
-const zapTokenJson = JSON.parse(fs.readFileSync('../zap/build/contracts/ZapToken.json').toString());
-const zapDispatchJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Dispatch.json').toString());
-const zapBondageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Bondage.json').toString());
-const zapRegistryJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Registry.json').toString());
-const zapArbiterJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Arbiter.json').toString());
-const registryStorageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/RegistryStorage.json').toString());
+const zapTokenJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/ZapToken.json').toString());
+const zapDispatchJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/Dispatch.json').toString());
+const zapBondageJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/Bondage.json').toString());
+const zapRegistryJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/Registry.json').toString());
+const zapArbiterJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/Arbiter.json').toString());
+const registryStorageJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/RegistryStorage.json').toString());
 
 const CurveTypes = {
     "None": 0,
@@ -69,8 +72,6 @@ function getPowOfTenBN(numberOfZeros) {
     }
     return new web3.utils.BN(str);
 }
-
-
 
 async function executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub, oracle, owner, providerEndpoint, providerTitle) {
     let subBalance = (await zapToken.methods.balanceOf(sub).call()).valueOf();
@@ -149,7 +150,6 @@ async function main() {
     const zapBondage = new web3.eth.Contract(getContractAbi(zapBondageJson), getContractAddress(zapBondageJson, testNetwork.id));
     const zapArbiter = new web3.eth.Contract(getContractAbi(zapArbiterJson), getContractAddress(zapArbiterJson, testNetwork.id));
 
-
     async function queryData(provider,
                              userQuery,
                              endpoint,
@@ -157,23 +157,33 @@ async function main() {
         await zapDispatch.methods.query(provider, userQuery, web3.utils.utf8ToHex(endpoint), endpointParams).send({from: sub, gas: 1000000});
         console.log('Query performed!');
     }
-    
+
     //
-    // PROVIDER USAGE
+    // HTTPS PROVIDER USAGE
     //
+    let httpsOptions = {
+        baseUrl: 'https://jsonplaceholder.typicode.com',
+        port: 443,
+        method: 'GET',
+        headers: {},
+        path: 'posts/1',
+        agent: new https.Agent({
+            ca: '', //fs.readFileSync(`CA.pem`),
+            cert: '', //fs.readFileSync(`CERT.pem`),
+            key: ''//fs.readFileSync(`KEY.pem`)
+        })
+    };
 
-    let myHandler = new class MyHandler extends Handler {
-        async handleSubscription(event) {
-            return new Error("Not implemented yet");
-        }
+    let parser = new class MyParser extends HttpsResponseParser {
+        parseIncomingResponse(response) {
+            if (response.status !== 200) throw Error('Response received with status ' + response.status + ' ' + response.data);
 
-        async handleUnsubscription(event) {
-            return new Error("Not implemented yet");
-        }
+            const responseData = response.data;
+            console.log('Received response: ' + JSON.stringify(responseData));
 
-        async handleIncoming(event) {
-            console.log('Incoming event received!');
-            return ['1', '2'];
+            // return values must be strings
+            // up to 4 values
+            return [responseData.userId.toString(), responseData.id.toString()];
         }
     }();
 
@@ -185,7 +195,10 @@ async function main() {
         web3: web3,
         contract_address: zapArbiter._address,
         abi: getContractAbi(zapArbiterJson)
-    }), myHandler);
+    }),
+        new HttpsHandler(123, httpsOptions, parser, new Auth()),
+    );
+
     const filters = {
         id: '',
         provider: oracle,
@@ -193,19 +206,19 @@ async function main() {
         fromBlock: 0
     };
 
-    // You will have 'revert' exception when event will cought, because sub is not contract address that implement Client2
+    // You will have 'revert' exception when event will caught, because sub is not contract address that implement Client2
     const emmiter = myProvider.listenQueries(filters, oracle);
 
     try {
-        await executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub, oracle, owner, testEndpoint);
+        await executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub, oracle, owner, testEndpoint, 'tst');
         await queryData(oracle, 'privet', testEndpoint, []);
     } catch (e) {
-        emmiter.unsubscribe();
+        emmiter.unsubscribe(res => console.log(res));
         console.log(e);
         return 1;
     }
-    
-    emmiter.unsubscribe();
+
+    emmiter.unsubscribe(res => console.log(res));
     return 0;
 }
 
@@ -213,6 +226,6 @@ async function main() {
  * ENTRY POINT
  */
 main().then((res) => {
-   console.log('\n\nExecuted with result code: ' + res);
+    console.log('\n\nExecuted with result code: ' + res);
 });
 

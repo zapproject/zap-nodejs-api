@@ -1,3 +1,12 @@
+
+function isPromise(object) {
+    if (Promise && Promise.resolve) {
+        return Promise.resolve(object) === object;
+    } else {
+        throw "Promise not supported in your environment"
+    }
+}
+
 //todo need to be refactored for using truffle-contract
 class ZapDispatch {
 
@@ -67,6 +76,9 @@ class ZapDispatch {
     }
 
     async respond(queryId, responseParams, from) {
+        if (isPromise(responseParams)) {
+            responseParams = await responseParams;
+        }
         switch (responseParams.length) {
             case 1: {
                 return this.contract.methods.respond1(

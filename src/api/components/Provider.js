@@ -1,102 +1,84 @@
-const Arbiter = require('./contracts/Arbiter');
-const Dispatch = require('./contracts/Dispatch');
-const EventEmitter = require('event');
-
-class Provider extends EventEmitter {
-    constructor(eth, network, arbiterAddress, dispatchAddress) {
-        super();
-
-        this.arbiter = new Arbiter(eth, network, arbiterAddress);
-        this.dispatch = new Dispatch(eth, network, dispatchAddress);
-        this.subscriptions = {}; // In-memory stored subscriptions
-        this.requests = {};      // In-memory stored oracle requests 
-        this.handler = {};       // Map for handlers for different endpoints
+class Provider {
+    constructor(dispatch, arbiter, handler) {
+        this.dispatch = dispatch;
+        this.arbiter = arbiter;
+        this.handler = handler;
     }
 
-    // Add a given Handler
-    addHandler(type, handler) {
-        this.handler[type] = handler;
+    listenSubscribes({provider, subscriber, fromBlock}) {
+        if (!this.arbiter || !this.arbiter.isZapArbiter) throw new Error('ZapArbiter class must be specified!');
+
+        return this.arbiter.contract.events.DataPurchaseEvent({filter: {provider, subscriber}, fromBlock: fromBlock},
+            (error, result) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    try {
+                        this.handler.handleSubscription(result);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            });
     }
 
-    // Listen for new subscriptions 
-    listenSubscription(callback) {
+    listenUnsubscribes({provider, subscriber, terminator, fromBlock}) {
+        if (!this.arbiter || !this.arbiter.isZapArbiter) throw new Error('ZapArbiter class must be specified!');
 
-        this.arbiter.listen((err, data) => {
-            if ( err ) {
-                callback(err);
-                return;
-            }
-
-            const handler = this.handler[data.endpoint];
-
-            if ( !handler ) {
-                callback(new Error("Got unhandled endpoint " + data.endpoint));
-                return;
-            }
-
-            const subscription = handler.parseSubscription(data);
-            this.subscriptions.push(subscription);
-
-            this.emit("new_subscription", data.subscriber);
-        });
-        
+        return this.arbiter.contract.events.DataSubscriptionEnd({filter: {provider, subscriber, terminator}, fromBlock: fromBlock},
+            (error, result) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    try {
+                        this.handler.handleUnsubscription(result);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            });
     }
 
-    listenOracle(callback){
+    listenQueries({id, provider, subscriber, fromBlock}, from) {
+        if (!this.dispatch || !this.dispatch.isZapDispatch) throw new Error('ZapDispatch class must be specified!');
 
-        this.dispatch.listen((err, data) => {
-            if ( err ) {
-                callback(err);
-                return;
-            }
-
-            const handler = this.handler[data.endpoint];
-
-            if ( !handler ) {
-                callback(new Error("Got unhandled endpoint " + data.endpoint));
-                return;
-            }
-
-            const request = handler.parseRequest(data);
-            this.requests.push(request);
-            callback(null, this);
-            this.emit("new_oracle_request", data.id);
-        });
-    } 
-
-    // Publish
-    publish(endpoint, data) {
-        if ( !data ) {
-            data = endpoint;
-            endpoint = null;
-        }
-
-        if ( endpoint ) {
-            // Publish to a specific endpoint
-            for ( const subscription of this.subscriptions[endpoint] ) {
-                subscription.publish(data);
-            }
-        }
-        else {
-            // Publish to all endpoints
-            for ( const endpoint in this.subscriptions ) {
-                for ( const subscription of this.subscriptions[endpoint] ) {
-                    subscription.publish(data);
+        return this.dispatch.contract.events.Incoming({filter: {id, provider, subscriber}, fromBlock: fromBlock}, (error, result) => {
+            if (error) {
+                console.log(error);
+            } else {
+                try {
+                    let respondParams = this.handler.handleIncoming(result);
+                    this.dispatch.respond(result.returnValues.id, respondParams, from);
+                } catch (e) {
+                    console.log(e);
                 }
             }
-        }
-    }
-    
-    respond(endpoint, data){
-        this.dispatch.respond(data.id, data.params);
+        });
     }
 
-    // Close the current listener
-    close() {
-        this.arbiter.close();
-        this.dispatch.close();
+    get handler() {
+        return this._handler;
     }
 
+    set handler(handler) {
+        this._handler = handler;
+    }
+
+    get dispatch() {
+        return this._dispatch;
+    }
+
+    set dispatch(dispatch) {
+        this._dispatch = dispatch;
+    }
+
+    get arbiter() {
+        return this._arbiter;
+    }
+
+    set arbiter(arbiter) {
+        this._arbiter = arbiter;
+    }
 }
 
 module.exports = Provider;

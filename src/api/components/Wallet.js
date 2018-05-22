@@ -2,7 +2,7 @@ const Bondage = require('./contracts/Bondage.js');
 const ZapToken = require('./contracts/ZapToken.js');
 
 class ZapWallet {
-    constructor(eth, network, bondageAddress tokenAddress) {
+    constructor(eth, network, bondageAddress, tokenAddress) {
         this.eth = eth;
 
         this.bondage = new Bondage(eth, network, bondageAddress);
