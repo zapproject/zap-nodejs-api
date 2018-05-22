@@ -1,0 +1,4105 @@
+{
+  "contractName": "CurrentCost",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "selfDestruct",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "registryAddress",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "oracleAddress",
+          "type": "address"
+        },
+        {
+          "name": "endpoint",
+          "type": "bytes32"
+        },
+        {
+          "name": "totalBound",
+          "type": "uint256"
+        }
+      ],
+      "name": "_currentCostOfDot",
+      "outputs": [
+        {
+          "name": "cost",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6060604052341561000f57600080fd5b6040516020806108c783398101604052808051906020019091905050336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555080600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505061080b806100bc6000396000f300606060405260043610610062576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680638da5cb5b146100675780639cb8a26a146100bc578063ecca1fad146100d1578063f2fde38b14610134575b600080fd5b341561007257600080fd5b61007a61016d565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34156100c757600080fd5b6100cf610192565b005b34156100dc57600080fd5b61011e600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190803560001916906020019091908035906020019091905050610227565b6040518082815260200191505060405180910390f35b341561013f57600080fd5b61016b600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190505061045e565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156101ed57600080fd5b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16ff5b600080600080600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16632316a9ff88886040518363ffffffff167c0100000000000000000000000000000000000000000000000000000000028152600401808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001826000191660001916815260200192505050606060405180830381600087803b15156102f957600080fd5b5af1151561030657600080fd5b505050604051805190602001805190602001805190508093508194508295505050506000600381111561033557fe5b83600381111561034157fe5b1415151561034e57600080fd5b6001600381111561035b57fe5b83600381111561036757fe5b141561039d57816fffffffffffffffffffffffffffffffff1685826fffffffffffffffffffffffffffffffff1602019350610451565b600260038111156103aa57fe5b8360038111156103b657fe5b14156103ef57816fffffffffffffffffffffffffffffffff166002860a826fffffffffffffffffffffffffffffffff1602019350610450565b6003808111156103fb57fe5b83600381111561040757fe5b141561044f57600085141561041b57600194505b816fffffffffffffffffffffffffffffffff16610437866105b3565b826fffffffffffffffffffffffffffffffff16020193505b5b5b8393505050509392505050565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156104b957600080fd5b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16141515156104f557600080fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050565b60008160018303925060028304831792506004830483179250601083048317925061010083048317925062010000830483179250640100000000830483179250680100000000000000008304831792507001000000000000000000000000000000008304831792506001830192506040517ff8f9cbfae6cc78fbefe7cdc3a1793dfcf4f0e8bbd8cec470b6a28a7a5a3e1efd81527ff5ecf1b3e9debc68e1d9cfabc5997135bfb7a7a3938b7b606b5b4b3f2f1f0ffe60208201527ff6e4ed9ff2d6b458eadcdf97bd91692de2d4da8fd2d0ac50c6ae9a827252361660408201527fc8c0b887b0a8a4489c948c7f847c6125746c645c544c444038302820181008ff60608201527ff7cae577eec2a03cf3bad76fb589591debb2dd67e0aa9834bea6925f6a4a2e0e60808201527fe39ed557db96902cd38ed14fad815115c786af479b7e8324736353433727170760a08201527fc976c13bb96e881cb166a933a55e490d9d56952b8d4e801485467d236242260660c08201527f753a6d1b65325d0c552a4d1345224105391a310b29122104190a11030902010060e082015261010081016040527e818283848586878898a8b8c8d8e8f929395969799a9b9d9e9faaeb6bedeeff7f01000000000000000000000000000000000000000000000000000000000000008082870204818160ff038501510495507f80000000000000000000000000000000000000000000000000000000000000008511610100028601955050505050509190505600a165627a7a72305820e8d0b6a6441f44b51574fa8928eadfb409ac5e0f6acaf9c9b90e93802675c7a80029",
+  "deployedBytecode": "0x606060405260043610610062576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680638da5cb5b146100675780639cb8a26a146100bc578063ecca1fad146100d1578063f2fde38b14610134575b600080fd5b341561007257600080fd5b61007a61016d565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34156100c757600080fd5b6100cf610192565b005b34156100dc57600080fd5b61011e600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190803560001916906020019091908035906020019091905050610227565b6040518082815260200191505060405180910390f35b341561013f57600080fd5b61016b600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190505061045e565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156101ed57600080fd5b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16ff5b600080600080600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16632316a9ff88886040518363ffffffff167c0100000000000000000000000000000000000000000000000000000000028152600401808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001826000191660001916815260200192505050606060405180830381600087803b15156102f957600080fd5b5af1151561030657600080fd5b505050604051805190602001805190602001805190508093508194508295505050506000600381111561033557fe5b83600381111561034157fe5b1415151561034e57600080fd5b6001600381111561035b57fe5b83600381111561036757fe5b141561039d57816fffffffffffffffffffffffffffffffff1685826fffffffffffffffffffffffffffffffff1602019350610451565b600260038111156103aa57fe5b8360038111156103b657fe5b14156103ef57816fffffffffffffffffffffffffffffffff166002860a826fffffffffffffffffffffffffffffffff1602019350610450565b6003808111156103fb57fe5b83600381111561040757fe5b141561044f57600085141561041b57600194505b816fffffffffffffffffffffffffffffffff16610437866105b3565b826fffffffffffffffffffffffffffffffff16020193505b5b5b8393505050509392505050565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156104b957600080fd5b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16141515156104f557600080fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050565b60008160018303925060028304831792506004830483179250601083048317925061010083048317925062010000830483179250640100000000830483179250680100000000000000008304831792507001000000000000000000000000000000008304831792506001830192506040517ff8f9cbfae6cc78fbefe7cdc3a1793dfcf4f0e8bbd8cec470b6a28a7a5a3e1efd81527ff5ecf1b3e9debc68e1d9cfabc5997135bfb7a7a3938b7b606b5b4b3f2f1f0ffe60208201527ff6e4ed9ff2d6b458eadcdf97bd91692de2d4da8fd2d0ac50c6ae9a827252361660408201527fc8c0b887b0a8a4489c948c7f847c6125746c645c544c444038302820181008ff60608201527ff7cae577eec2a03cf3bad76fb589591debb2dd67e0aa9834bea6925f6a4a2e0e60808201527fe39ed557db96902cd38ed14fad815115c786af479b7e8324736353433727170760a08201527fc976c13bb96e881cb166a933a55e490d9d56952b8d4e801485467d236242260660c08201527f753a6d1b65325d0c552a4d1345224105391a310b29122104190a11030902010060e082015261010081016040527e818283848586878898a8b8c8d8e8f929395969799a9b9d9e9faaeb6bedeeff7f01000000000000000000000000000000000000000000000000000000000000008082870204818160ff038501510495507f80000000000000000000000000000000000000000000000000000000000000008511610100028601955050505050509190505600a165627a7a72305820e8d0b6a6441f44b51574fa8928eadfb409ac5e0f6acaf9c9b90e93802675c7a80029",
+  "sourceMap": "111:3021:7:-;;;188:114;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;302:10:15;294:5;;:18;;;;;;;;;;;;;;;;;;279:15:7;250:8;;:45;;;;;;;;;;;;;;;;;;188:114;111:3021;;;;;;",
+  "deployedSourceMap": "111:3021:7:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;49:20:15;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;87:68:13;;;;;;;;;;;;;;308:977:7;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;637:180:15;;;;;;;;;;;;;;;;;;;;;;;;;;;;49:20;;;;;;;;;;;;;:::o;87:68:13:-;456:5:15;;;;;;;;;;;442:19;;:10;:19;;;434:28;;;;;;;;145:5:13;;;;;;;;;;;132:19;;;308:977:7;471:12;499:37;546:18;574:23;650:8;;;;;;;;;;;:25;;;676:13;691:8;650:50;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;607:93;;;;;;;;;;;;732:32;719:45;;;;;;;;:9;:45;;;;;;;;;;711:54;;;;;;;;793:34;780:47;;;;;;;;:9;:47;;;;;;;;;776:482;;;881:10;850:41;;868:10;850:15;:28;;;:41;843:48;;776:482;;;925:39;912:52;;;;;;;;:9;:52;;;;;;;;;908:350;;;1025:10;987:48;;1020:1;1006:10;:15;987;:35;;;:48;980:55;;908:350;;;1069:39;1056:52;;;;;;;;:9;:52;;;;;;;;;1052:206;;;1142:1;1128:10;:15;1124:51;;;1174:1;1161:14;;1124:51;1237:10;1196:51;;1214:20;1223:10;1214:8;:20::i;:::-;1196:15;:38;;;:51;1189:58;;1052:206;908:350;776:482;1274:4;1267:11;;308:977;;;;;;;;:::o;637:180:15:-;456:5;;;;;;;;;;;442:19;;:10;:19;;;434:28;;;;;;;;736:1;716:22;;:8;:22;;;;708:31;;;;;;;;776:8;748:37;;769:5;;;;;;;;;;;748:37;;;;;;;;;;;;802:8;794:5;;:16;;;;;;;;;;;;;;;;;;637:180;:::o;1335:1795:7:-;1386:9;1441:1;1467;1464;1460:9;1455:14;;1500:4;1497:1;1493:12;1490:1;1487:19;1482:24;;1537:4;1534:1;1530:12;1527:1;1524:19;1519:24;;1574:4;1571:1;1567:12;1564:1;1561:19;1556:24;;1611:5;1608:1;1604:13;1601:1;1598:20;1593:25;;1649:7;1646:1;1642:15;1639:1;1636:22;1631:27;;1689:11;1686:1;1682:19;1679:1;1676:26;1671:31;;1733:19;1730:1;1726:27;1723:1;1720:34;1715:39;;1785:35;1782:1;1778:43;1775:1;1772:50;1767:55;;1847:1;1844;1840:9;1835:14;;1877:4;1871:11;1905:66;1902:1;1895:77;2006:66;1999:4;1996:1;1992:12;1985:88;2107:66;2100:4;2097:1;2093:12;2086:88;2208:66;2201:4;2198:1;2194:12;2187:88;2309:66;2302:4;2299:1;2295:12;2288:88;2410:66;2403:4;2400:1;2396:12;2389:88;2511:66;2504:4;2501:1;2497:12;2490:88;2612:66;2605:4;2602:1;2598:12;2591:88;2712:5;2709:1;2705:13;2699:4;2692:27;2745:64;2835:65;2941:5;2933;2930:1;2926:13;2922:25;2997:5;2991:1;2986:3;2982:11;2979:1;2975:19;2969:26;2965:38;2960:43;;3045:66;3040:3;3037:75;3032:3;3028:85;3025:1;3021:93;3016:98;;1416:1708;;;;;;;;:::o",
+  "source": "pragma solidity ^0.4.19;\n\nimport \"../../lib/Destructible.sol\";\nimport \"../../registry/RegistryInterface.sol\";\n\ncontract CurrentCost is Destructible {\n\n    RegistryInterface registry;\n\n    function CurrentCost(address registryAddress) public {\n       registry = RegistryInterface(registryAddress);\n    }\n\n    function _currentCostOfDot(\n        address oracleAddress,\n        bytes32 endpoint,\n        uint256 totalBound\n    )\n        public\n        view\n        returns (uint256 cost)\n    {\n        RegistryInterface.CurveType curveType;\n        uint128 curveStart;\n        uint128 curveMultiplier;\n        (curveType, curveStart, curveMultiplier) = registry.getProviderCurve(oracleAddress, endpoint);\n\n        require(curveType != RegistryInterface.CurveType.None);\n\n        if (curveType == RegistryInterface.CurveType.Linear) {\n            cost = curveMultiplier * totalBound + curveStart;\n        } else if (curveType == RegistryInterface.CurveType.Exponential) {\n            cost = curveMultiplier * (totalBound ** 2) + curveStart;\n        } else if (curveType == RegistryInterface.CurveType.Logarithmic) {\n            if (totalBound == 0)\n                totalBound = 1;\n            cost = curveMultiplier * fastlog2(totalBound) + curveStart;\n        }\n        return cost;\n    }\n\n    //log based 2 taylor series in assembly\n    function fastlog2(uint256 x) private pure returns (uint256 y) {\n        assembly {\n            let arg := x\n            x := sub(x, 1)\n            x := or(x, div(x, 0x02))\n            x := or(x, div(x, 0x04))\n            x := or(x, div(x, 0x10))\n            x := or(x, div(x, 0x100))\n            x := or(x, div(x, 0x10000))\n            x := or(x, div(x, 0x100000000))\n            x := or(x, div(x, 0x10000000000000000))\n            x := or(x, div(x, 0x100000000000000000000000000000000))\n            x := add(x, 1)\n            let m := mload(0x40)\n            mstore(m, 0xf8f9cbfae6cc78fbefe7cdc3a1793dfcf4f0e8bbd8cec470b6a28a7a5a3e1efd)\n            mstore(add(m, 0x20), 0xf5ecf1b3e9debc68e1d9cfabc5997135bfb7a7a3938b7b606b5b4b3f2f1f0ffe)\n            mstore(add(m, 0x40), 0xf6e4ed9ff2d6b458eadcdf97bd91692de2d4da8fd2d0ac50c6ae9a8272523616)\n            mstore(add(m, 0x60), 0xc8c0b887b0a8a4489c948c7f847c6125746c645c544c444038302820181008ff)\n            mstore(add(m, 0x80), 0xf7cae577eec2a03cf3bad76fb589591debb2dd67e0aa9834bea6925f6a4a2e0e)\n            mstore(add(m, 0xa0), 0xe39ed557db96902cd38ed14fad815115c786af479b7e83247363534337271707)\n            mstore(add(m, 0xc0), 0xc976c13bb96e881cb166a933a55e490d9d56952b8d4e801485467d2362422606)\n            mstore(add(m, 0xe0), 0x753a6d1b65325d0c552a4d1345224105391a310b29122104190a110309020100)\n            mstore(0x40, add(m, 0x100))\n            let magic := 0x818283848586878898a8b8c8d8e8f929395969799a9b9d9e9faaeb6bedeeff\n            let shift := 0x100000000000000000000000000000000000000000000000000000000000000\n            let a := div(mul(x, magic), shift)\n            y := div(mload(add(m, sub(255, a))), shift)\n            y := add(y, mul(256, gt(arg, 0x8000000000000000000000000000000000000000000000000000000000000000)))\n        }\n    }\n}\n",
+  "sourcePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/bondage/currentCost/CurrentCost.sol",
+  "ast": {
+    "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/bondage/currentCost/CurrentCost.sol",
+    "exportedSymbols": {
+      "CurrentCost": [
+        2089
+      ]
+    },
+    "id": 2090,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1959,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".19"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:7"
+      },
+      {
+        "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/lib/Destructible.sol",
+        "file": "../../lib/Destructible.sol",
+        "id": 1960,
+        "nodeType": "ImportDirective",
+        "scope": 2090,
+        "sourceUnit": 2715,
+        "src": "26:36:7",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/registry/RegistryInterface.sol",
+        "file": "../../registry/RegistryInterface.sol",
+        "id": 1961,
+        "nodeType": "ImportDirective",
+        "scope": 2090,
+        "sourceUnit": 3308,
+        "src": "63:46:7",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": [],
+            "baseName": {
+              "contractScope": null,
+              "id": 1962,
+              "name": "Destructible",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 2714,
+              "src": "135:12:7",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Destructible_$2714",
+                "typeString": "contract Destructible"
+              }
+            },
+            "id": 1963,
+            "nodeType": "InheritanceSpecifier",
+            "src": "135:12:7"
+          }
+        ],
+        "contractDependencies": [
+          2714,
+          2845
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2089,
+        "linearizedBaseContracts": [
+          2089,
+          2714,
+          2845
+        ],
+        "name": "CurrentCost",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 1965,
+            "name": "registry",
+            "nodeType": "VariableDeclaration",
+            "scope": 2089,
+            "src": "155:26:7",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+              "typeString": "contract RegistryInterface"
+            },
+            "typeName": {
+              "contractScope": null,
+              "id": 1964,
+              "name": "RegistryInterface",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 3307,
+              "src": "155:17:7",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                "typeString": "contract RegistryInterface"
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 1976,
+              "nodeType": "Block",
+              "src": "241:61:7",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 1974,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 1970,
+                      "name": "registry",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1965,
+                      "src": "250:8:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                        "typeString": "contract RegistryInterface"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 1972,
+                          "name": "registryAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1967,
+                          "src": "279:15:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        ],
+                        "id": 1971,
+                        "name": "RegistryInterface",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3307,
+                        "src": "261:17:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                          "typeString": "type(contract RegistryInterface)"
+                        }
+                      },
+                      "id": 1973,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "261:34:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                        "typeString": "contract RegistryInterface"
+                      }
+                    },
+                    "src": "250:45:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                      "typeString": "contract RegistryInterface"
+                    }
+                  },
+                  "id": 1975,
+                  "nodeType": "ExpressionStatement",
+                  "src": "250:45:7"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1977,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "CurrentCost",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1968,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1967,
+                  "name": "registryAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1977,
+                  "src": "209:23:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1966,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "209:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "208:25:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1969,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "241:0:7"
+            },
+            "scope": 2089,
+            "src": "188:114:7",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2078,
+              "nodeType": "Block",
+              "src": "489:796:7",
+              "statements": [
+                {
+                  "assignments": [],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1991,
+                      "name": "curveType",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 2079,
+                      "src": "499:37:7",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_enum$_CurveType_$3220",
+                        "typeString": "enum RegistryInterface.CurveType"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 1990,
+                        "name": "RegistryInterface.CurveType",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 3220,
+                        "src": "499:27:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1992,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "499:37:7"
+                },
+                {
+                  "assignments": [],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1994,
+                      "name": "curveStart",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 2079,
+                      "src": "546:18:7",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint128",
+                        "typeString": "uint128"
+                      },
+                      "typeName": {
+                        "id": 1993,
+                        "name": "uint128",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "546:7:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint128",
+                          "typeString": "uint128"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1995,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "546:18:7"
+                },
+                {
+                  "assignments": [],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1997,
+                      "name": "curveMultiplier",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 2079,
+                      "src": "574:23:7",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint128",
+                        "typeString": "uint128"
+                      },
+                      "typeName": {
+                        "id": 1996,
+                        "name": "uint128",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "574:7:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint128",
+                          "typeString": "uint128"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1998,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "574:23:7"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 2008,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "components": [
+                        {
+                          "argumentTypes": null,
+                          "id": 1999,
+                          "name": "curveType",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1991,
+                          "src": "608:9:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 2000,
+                          "name": "curveStart",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1994,
+                          "src": "619:10:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint128",
+                            "typeString": "uint128"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 2001,
+                          "name": "curveMultiplier",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1997,
+                          "src": "631:15:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint128",
+                            "typeString": "uint128"
+                          }
+                        }
+                      ],
+                      "id": 2002,
+                      "isConstant": false,
+                      "isInlineArray": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "TupleExpression",
+                      "src": "607:40:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$_t_enum$_CurveType_$3220_$_t_uint128_$_t_uint128_$",
+                        "typeString": "tuple(enum RegistryInterface.CurveType,uint128,uint128)"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 2005,
+                          "name": "oracleAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1979,
+                          "src": "676:13:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 2006,
+                          "name": "endpoint",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1981,
+                          "src": "691:8:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          },
+                          {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2003,
+                          "name": "registry",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1965,
+                          "src": "650:8:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                            "typeString": "contract RegistryInterface"
+                          }
+                        },
+                        "id": 2004,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "getProviderCurve",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 3293,
+                        "src": "650:25:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_external_view$_t_address_$_t_bytes32_$returns$_t_enum$_CurveType_$3220_$_t_uint128_$_t_uint128_$",
+                          "typeString": "function (address,bytes32) view external returns (enum RegistryInterface.CurveType,uint128,uint128)"
+                        }
+                      },
+                      "id": 2007,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "650:50:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$_t_enum$_CurveType_$3220_$_t_uint128_$_t_uint128_$",
+                        "typeString": "tuple(enum RegistryInterface.CurveType,uint128,uint128)"
+                      }
+                    },
+                    "src": "607:93:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2009,
+                  "nodeType": "ExpressionStatement",
+                  "src": "607:93:7"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        },
+                        "id": 2015,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 2011,
+                          "name": "curveType",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1991,
+                          "src": "719:9:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "!=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "expression": {
+                              "argumentTypes": null,
+                              "id": 2012,
+                              "name": "RegistryInterface",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 3307,
+                              "src": "732:17:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                                "typeString": "type(contract RegistryInterface)"
+                              }
+                            },
+                            "id": 2013,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "CurveType",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 3220,
+                            "src": "732:27:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_enum$_CurveType_$3220_$",
+                              "typeString": "type(enum RegistryInterface.CurveType)"
+                            }
+                          },
+                          "id": 2014,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "memberName": "None",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "732:32:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        "src": "719:45:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      ],
+                      "id": 2010,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 4395,
+                      "src": "711:7:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
+                        "typeString": "function (bool) pure"
+                      }
+                    },
+                    "id": 2016,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "711:54:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2017,
+                  "nodeType": "ExpressionStatement",
+                  "src": "711:54:7"
+                },
+                {
+                  "condition": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_enum$_CurveType_$3220",
+                      "typeString": "enum RegistryInterface.CurveType"
+                    },
+                    "id": 2022,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "id": 2018,
+                      "name": "curveType",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1991,
+                      "src": "780:9:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_enum$_CurveType_$3220",
+                        "typeString": "enum RegistryInterface.CurveType"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "==",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2019,
+                          "name": "RegistryInterface",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 3307,
+                          "src": "793:17:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                            "typeString": "type(contract RegistryInterface)"
+                          }
+                        },
+                        "id": 2020,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "CurveType",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 3220,
+                        "src": "793:27:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_enum$_CurveType_$3220_$",
+                          "typeString": "type(enum RegistryInterface.CurveType)"
+                        }
+                      },
+                      "id": 2021,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "lValueRequested": false,
+                      "memberName": "Linear",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "793:34:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_enum$_CurveType_$3220",
+                        "typeString": "enum RegistryInterface.CurveType"
+                      }
+                    },
+                    "src": "780:47:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "falseBody": {
+                    "condition": {
+                      "argumentTypes": null,
+                      "commonType": {
+                        "typeIdentifier": "t_enum$_CurveType_$3220",
+                        "typeString": "enum RegistryInterface.CurveType"
+                      },
+                      "id": 2036,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "argumentTypes": null,
+                        "id": 2032,
+                        "name": "curveType",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1991,
+                        "src": "912:9:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "==",
+                      "rightExpression": {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 2033,
+                            "name": "RegistryInterface",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 3307,
+                            "src": "925:17:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                              "typeString": "type(contract RegistryInterface)"
+                            }
+                          },
+                          "id": 2034,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "CurveType",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 3220,
+                          "src": "925:27:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_enum$_CurveType_$3220_$",
+                            "typeString": "type(enum RegistryInterface.CurveType)"
+                          }
+                        },
+                        "id": 2035,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "memberName": "Exponential",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "925:39:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        }
+                      },
+                      "src": "912:52:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "falseBody": {
+                      "condition": {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        },
+                        "id": 2053,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 2049,
+                          "name": "curveType",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1991,
+                          "src": "1056:9:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "expression": {
+                              "argumentTypes": null,
+                              "id": 2050,
+                              "name": "RegistryInterface",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 3307,
+                              "src": "1069:17:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                                "typeString": "type(contract RegistryInterface)"
+                              }
+                            },
+                            "id": 2051,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "CurveType",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 3220,
+                            "src": "1069:27:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_enum$_CurveType_$3220_$",
+                              "typeString": "type(enum RegistryInterface.CurveType)"
+                            }
+                          },
+                          "id": 2052,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "memberName": "Logarithmic",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "1069:39:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        "src": "1056:52:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      "falseBody": null,
+                      "id": 2073,
+                      "nodeType": "IfStatement",
+                      "src": "1052:206:7",
+                      "trueBody": {
+                        "id": 2072,
+                        "nodeType": "Block",
+                        "src": "1110:148:7",
+                        "statements": [
+                          {
+                            "condition": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              },
+                              "id": 2056,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftExpression": {
+                                "argumentTypes": null,
+                                "id": 2054,
+                                "name": "totalBound",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1983,
+                                "src": "1128:10:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "nodeType": "BinaryOperation",
+                              "operator": "==",
+                              "rightExpression": {
+                                "argumentTypes": null,
+                                "hexValue": "30",
+                                "id": 2055,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "kind": "number",
+                                "lValueRequested": false,
+                                "nodeType": "Literal",
+                                "src": "1142:1:7",
+                                "subdenomination": null,
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_rational_0_by_1",
+                                  "typeString": "int_const 0"
+                                },
+                                "value": "0"
+                              },
+                              "src": "1128:15:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bool",
+                                "typeString": "bool"
+                              }
+                            },
+                            "falseBody": null,
+                            "id": 2061,
+                            "nodeType": "IfStatement",
+                            "src": "1124:51:7",
+                            "trueBody": {
+                              "expression": {
+                                "argumentTypes": null,
+                                "id": 2059,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "leftHandSide": {
+                                  "argumentTypes": null,
+                                  "id": 2057,
+                                  "name": "totalBound",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 1983,
+                                  "src": "1161:10:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                  }
+                                },
+                                "nodeType": "Assignment",
+                                "operator": "=",
+                                "rightHandSide": {
+                                  "argumentTypes": null,
+                                  "hexValue": "31",
+                                  "id": 2058,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "kind": "number",
+                                  "lValueRequested": false,
+                                  "nodeType": "Literal",
+                                  "src": "1174:1:7",
+                                  "subdenomination": null,
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_rational_1_by_1",
+                                    "typeString": "int_const 1"
+                                  },
+                                  "value": "1"
+                                },
+                                "src": "1161:14:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "id": 2060,
+                              "nodeType": "ExpressionStatement",
+                              "src": "1161:14:7"
+                            }
+                          },
+                          {
+                            "expression": {
+                              "argumentTypes": null,
+                              "id": 2070,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftHandSide": {
+                                "argumentTypes": null,
+                                "id": 2062,
+                                "name": "cost",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1986,
+                                "src": "1189:4:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "nodeType": "Assignment",
+                              "operator": "=",
+                              "rightHandSide": {
+                                "argumentTypes": null,
+                                "commonType": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                },
+                                "id": 2069,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "leftExpression": {
+                                  "argumentTypes": null,
+                                  "commonType": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                  },
+                                  "id": 2067,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "leftExpression": {
+                                    "argumentTypes": null,
+                                    "id": 2063,
+                                    "name": "curveMultiplier",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 1997,
+                                    "src": "1196:15:7",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint128",
+                                      "typeString": "uint128"
+                                    }
+                                  },
+                                  "nodeType": "BinaryOperation",
+                                  "operator": "*",
+                                  "rightExpression": {
+                                    "argumentTypes": null,
+                                    "arguments": [
+                                      {
+                                        "argumentTypes": null,
+                                        "id": 2065,
+                                        "name": "totalBound",
+                                        "nodeType": "Identifier",
+                                        "overloadedDeclarations": [],
+                                        "referencedDeclaration": 1983,
+                                        "src": "1223:10:7",
+                                        "typeDescriptions": {
+                                          "typeIdentifier": "t_uint256",
+                                          "typeString": "uint256"
+                                        }
+                                      }
+                                    ],
+                                    "expression": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_uint256",
+                                          "typeString": "uint256"
+                                        }
+                                      ],
+                                      "id": 2064,
+                                      "name": "fastlog2",
+                                      "nodeType": "Identifier",
+                                      "overloadedDeclarations": [],
+                                      "referencedDeclaration": 2088,
+                                      "src": "1214:8:7",
+                                      "typeDescriptions": {
+                                        "typeIdentifier": "t_function_internal_pure$_t_uint256_$returns$_t_uint256_$",
+                                        "typeString": "function (uint256) pure returns (uint256)"
+                                      }
+                                    },
+                                    "id": 2066,
+                                    "isConstant": false,
+                                    "isLValue": false,
+                                    "isPure": false,
+                                    "kind": "functionCall",
+                                    "lValueRequested": false,
+                                    "names": [],
+                                    "nodeType": "FunctionCall",
+                                    "src": "1214:20:7",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "src": "1196:38:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                  }
+                                },
+                                "nodeType": "BinaryOperation",
+                                "operator": "+",
+                                "rightExpression": {
+                                  "argumentTypes": null,
+                                  "id": 2068,
+                                  "name": "curveStart",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 1994,
+                                  "src": "1237:10:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint128",
+                                    "typeString": "uint128"
+                                  }
+                                },
+                                "src": "1196:51:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "src": "1189:58:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "id": 2071,
+                            "nodeType": "ExpressionStatement",
+                            "src": "1189:58:7"
+                          }
+                        ]
+                      }
+                    },
+                    "id": 2074,
+                    "nodeType": "IfStatement",
+                    "src": "908:350:7",
+                    "trueBody": {
+                      "id": 2048,
+                      "nodeType": "Block",
+                      "src": "966:80:7",
+                      "statements": [
+                        {
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 2046,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "leftHandSide": {
+                              "argumentTypes": null,
+                              "id": 2037,
+                              "name": "cost",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1986,
+                              "src": "980:4:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "nodeType": "Assignment",
+                            "operator": "=",
+                            "rightHandSide": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              },
+                              "id": 2045,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftExpression": {
+                                "argumentTypes": null,
+                                "commonType": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                },
+                                "id": 2043,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "leftExpression": {
+                                  "argumentTypes": null,
+                                  "id": 2038,
+                                  "name": "curveMultiplier",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 1997,
+                                  "src": "987:15:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint128",
+                                    "typeString": "uint128"
+                                  }
+                                },
+                                "nodeType": "BinaryOperation",
+                                "operator": "*",
+                                "rightExpression": {
+                                  "argumentTypes": null,
+                                  "components": [
+                                    {
+                                      "argumentTypes": null,
+                                      "commonType": {
+                                        "typeIdentifier": "t_uint256",
+                                        "typeString": "uint256"
+                                      },
+                                      "id": 2041,
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "leftExpression": {
+                                        "argumentTypes": null,
+                                        "id": 2039,
+                                        "name": "totalBound",
+                                        "nodeType": "Identifier",
+                                        "overloadedDeclarations": [],
+                                        "referencedDeclaration": 1983,
+                                        "src": "1006:10:7",
+                                        "typeDescriptions": {
+                                          "typeIdentifier": "t_uint256",
+                                          "typeString": "uint256"
+                                        }
+                                      },
+                                      "nodeType": "BinaryOperation",
+                                      "operator": "**",
+                                      "rightExpression": {
+                                        "argumentTypes": null,
+                                        "hexValue": "32",
+                                        "id": 2040,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": true,
+                                        "kind": "number",
+                                        "lValueRequested": false,
+                                        "nodeType": "Literal",
+                                        "src": "1020:1:7",
+                                        "subdenomination": null,
+                                        "typeDescriptions": {
+                                          "typeIdentifier": "t_rational_2_by_1",
+                                          "typeString": "int_const 2"
+                                        },
+                                        "value": "2"
+                                      },
+                                      "src": "1006:15:7",
+                                      "typeDescriptions": {
+                                        "typeIdentifier": "t_uint256",
+                                        "typeString": "uint256"
+                                      }
+                                    }
+                                  ],
+                                  "id": 2042,
+                                  "isConstant": false,
+                                  "isInlineArray": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "TupleExpression",
+                                  "src": "1005:17:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                  }
+                                },
+                                "src": "987:35:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "nodeType": "BinaryOperation",
+                              "operator": "+",
+                              "rightExpression": {
+                                "argumentTypes": null,
+                                "id": 2044,
+                                "name": "curveStart",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1994,
+                                "src": "1025:10:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint128",
+                                  "typeString": "uint128"
+                                }
+                              },
+                              "src": "987:48:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "src": "980:55:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "id": 2047,
+                          "nodeType": "ExpressionStatement",
+                          "src": "980:55:7"
+                        }
+                      ]
+                    }
+                  },
+                  "id": 2075,
+                  "nodeType": "IfStatement",
+                  "src": "776:482:7",
+                  "trueBody": {
+                    "id": 2031,
+                    "nodeType": "Block",
+                    "src": "829:73:7",
+                    "statements": [
+                      {
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2029,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "argumentTypes": null,
+                            "id": 2023,
+                            "name": "cost",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1986,
+                            "src": "843:4:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "=",
+                          "rightHandSide": {
+                            "argumentTypes": null,
+                            "commonType": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            },
+                            "id": 2028,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "leftExpression": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              },
+                              "id": 2026,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftExpression": {
+                                "argumentTypes": null,
+                                "id": 2024,
+                                "name": "curveMultiplier",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1997,
+                                "src": "850:15:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint128",
+                                  "typeString": "uint128"
+                                }
+                              },
+                              "nodeType": "BinaryOperation",
+                              "operator": "*",
+                              "rightExpression": {
+                                "argumentTypes": null,
+                                "id": 2025,
+                                "name": "totalBound",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1983,
+                                "src": "868:10:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "src": "850:28:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "nodeType": "BinaryOperation",
+                            "operator": "+",
+                            "rightExpression": {
+                              "argumentTypes": null,
+                              "id": 2027,
+                              "name": "curveStart",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1994,
+                              "src": "881:10:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint128",
+                                "typeString": "uint128"
+                              }
+                            },
+                            "src": "850:41:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "src": "843:48:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "id": 2030,
+                        "nodeType": "ExpressionStatement",
+                        "src": "843:48:7"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 2076,
+                    "name": "cost",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 1986,
+                    "src": "1274:4:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 1987,
+                  "id": 2077,
+                  "nodeType": "Return",
+                  "src": "1267:11:7"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2079,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "_currentCostOfDot",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1984,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1979,
+                  "name": "oracleAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2079,
+                  "src": "344:21:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1978,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "344:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1981,
+                  "name": "endpoint",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2079,
+                  "src": "375:16:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 1980,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "375:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1983,
+                  "name": "totalBound",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2079,
+                  "src": "401:18:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1982,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "401:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "334:91:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1987,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1986,
+                  "name": "cost",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2079,
+                  "src": "471:12:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1985,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "471:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "470:14:7"
+            },
+            "scope": 2089,
+            "src": "308:977:7",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2087,
+              "nodeType": "Block",
+              "src": "1397:1733:7",
+              "statements": [
+                {
+                  "externalReferences": [
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1441:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1490:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1455:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1482:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1464:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1519:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1556:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1631:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1679:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1497:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1671:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1715:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1601:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1608:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1593:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1527:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1534:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1564:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1571:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1775:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1782:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1767:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1844:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1639:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1646:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1723:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1686:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1835:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1730:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "y": {
+                        "declaration": 2084,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "2960:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "y": {
+                        "declaration": 2084,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "3025:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "2930:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "y": {
+                        "declaration": 2084,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "3016:1:7",
+                        "valueSize": 1
+                      }
+                    }
+                  ],
+                  "id": 2086,
+                  "nodeType": "InlineAssembly",
+                  "operations": "{\n    let arg := x\n    x := sub(x, 1)\n    x := or(x, div(x, 0x02))\n    x := or(x, div(x, 0x04))\n    x := or(x, div(x, 0x10))\n    x := or(x, div(x, 0x100))\n    x := or(x, div(x, 0x10000))\n    x := or(x, div(x, 0x100000000))\n    x := or(x, div(x, 0x10000000000000000))\n    x := or(x, div(x, 0x100000000000000000000000000000000))\n    x := add(x, 1)\n    let m := mload(0x40)\n    mstore(m, 0xf8f9cbfae6cc78fbefe7cdc3a1793dfcf4f0e8bbd8cec470b6a28a7a5a3e1efd)\n    mstore(add(m, 0x20), 0xf5ecf1b3e9debc68e1d9cfabc5997135bfb7a7a3938b7b606b5b4b3f2f1f0ffe)\n    mstore(add(m, 0x40), 0xf6e4ed9ff2d6b458eadcdf97bd91692de2d4da8fd2d0ac50c6ae9a8272523616)\n    mstore(add(m, 0x60), 0xc8c0b887b0a8a4489c948c7f847c6125746c645c544c444038302820181008ff)\n    mstore(add(m, 0x80), 0xf7cae577eec2a03cf3bad76fb589591debb2dd67e0aa9834bea6925f6a4a2e0e)\n    mstore(add(m, 0xa0), 0xe39ed557db96902cd38ed14fad815115c786af479b7e83247363534337271707)\n    mstore(add(m, 0xc0), 0xc976c13bb96e881cb166a933a55e490d9d56952b8d4e801485467d2362422606)\n    mstore(add(m, 0xe0), 0x753a6d1b65325d0c552a4d1345224105391a310b29122104190a110309020100)\n    mstore(0x40, add(m, 0x100))\n    let magic := 0x818283848586878898a8b8c8d8e8f929395969799a9b9d9e9faaeb6bedeeff\n    let shift := 0x100000000000000000000000000000000000000000000000000000000000000\n    let a := div(mul(x, magic), shift)\n    y := div(mload(add(m, sub(255, a))), shift)\n    y := add(y, mul(256, gt(arg, 0x8000000000000000000000000000000000000000000000000000000000000000)))\n}",
+                  "src": "1407:1723:7"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2088,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "fastlog2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2082,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2081,
+                  "name": "x",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2088,
+                  "src": "1353:9:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2080,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1353:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1352:11:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2085,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2084,
+                  "name": "y",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2088,
+                  "src": "1386:9:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2083,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1386:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1385:11:7"
+            },
+            "scope": 2089,
+            "src": "1335:1795:7",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "private"
+          }
+        ],
+        "scope": 2090,
+        "src": "111:3021:7"
+      }
+    ],
+    "src": "0:3133:7"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/bondage/currentCost/CurrentCost.sol",
+    "exportedSymbols": {
+      "CurrentCost": [
+        2089
+      ]
+    },
+    "id": 2090,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1959,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".19"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:7"
+      },
+      {
+        "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/lib/Destructible.sol",
+        "file": "../../lib/Destructible.sol",
+        "id": 1960,
+        "nodeType": "ImportDirective",
+        "scope": 2090,
+        "sourceUnit": 2715,
+        "src": "26:36:7",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/home/iefnw/office/browser/docker/ZapContracts/contracts/registry/RegistryInterface.sol",
+        "file": "../../registry/RegistryInterface.sol",
+        "id": 1961,
+        "nodeType": "ImportDirective",
+        "scope": 2090,
+        "sourceUnit": 3308,
+        "src": "63:46:7",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": [],
+            "baseName": {
+              "contractScope": null,
+              "id": 1962,
+              "name": "Destructible",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 2714,
+              "src": "135:12:7",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Destructible_$2714",
+                "typeString": "contract Destructible"
+              }
+            },
+            "id": 1963,
+            "nodeType": "InheritanceSpecifier",
+            "src": "135:12:7"
+          }
+        ],
+        "contractDependencies": [
+          2714,
+          2845
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2089,
+        "linearizedBaseContracts": [
+          2089,
+          2714,
+          2845
+        ],
+        "name": "CurrentCost",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 1965,
+            "name": "registry",
+            "nodeType": "VariableDeclaration",
+            "scope": 2089,
+            "src": "155:26:7",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+              "typeString": "contract RegistryInterface"
+            },
+            "typeName": {
+              "contractScope": null,
+              "id": 1964,
+              "name": "RegistryInterface",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 3307,
+              "src": "155:17:7",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                "typeString": "contract RegistryInterface"
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 1976,
+              "nodeType": "Block",
+              "src": "241:61:7",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 1974,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 1970,
+                      "name": "registry",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1965,
+                      "src": "250:8:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                        "typeString": "contract RegistryInterface"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 1972,
+                          "name": "registryAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1967,
+                          "src": "279:15:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        ],
+                        "id": 1971,
+                        "name": "RegistryInterface",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3307,
+                        "src": "261:17:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                          "typeString": "type(contract RegistryInterface)"
+                        }
+                      },
+                      "id": 1973,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "261:34:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                        "typeString": "contract RegistryInterface"
+                      }
+                    },
+                    "src": "250:45:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                      "typeString": "contract RegistryInterface"
+                    }
+                  },
+                  "id": 1975,
+                  "nodeType": "ExpressionStatement",
+                  "src": "250:45:7"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1977,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "CurrentCost",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1968,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1967,
+                  "name": "registryAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1977,
+                  "src": "209:23:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1966,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "209:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "208:25:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1969,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "241:0:7"
+            },
+            "scope": 2089,
+            "src": "188:114:7",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2078,
+              "nodeType": "Block",
+              "src": "489:796:7",
+              "statements": [
+                {
+                  "assignments": [],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1991,
+                      "name": "curveType",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 2079,
+                      "src": "499:37:7",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_enum$_CurveType_$3220",
+                        "typeString": "enum RegistryInterface.CurveType"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 1990,
+                        "name": "RegistryInterface.CurveType",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 3220,
+                        "src": "499:27:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1992,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "499:37:7"
+                },
+                {
+                  "assignments": [],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1994,
+                      "name": "curveStart",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 2079,
+                      "src": "546:18:7",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint128",
+                        "typeString": "uint128"
+                      },
+                      "typeName": {
+                        "id": 1993,
+                        "name": "uint128",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "546:7:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint128",
+                          "typeString": "uint128"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1995,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "546:18:7"
+                },
+                {
+                  "assignments": [],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1997,
+                      "name": "curveMultiplier",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 2079,
+                      "src": "574:23:7",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint128",
+                        "typeString": "uint128"
+                      },
+                      "typeName": {
+                        "id": 1996,
+                        "name": "uint128",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "574:7:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint128",
+                          "typeString": "uint128"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1998,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "574:23:7"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 2008,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "components": [
+                        {
+                          "argumentTypes": null,
+                          "id": 1999,
+                          "name": "curveType",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1991,
+                          "src": "608:9:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 2000,
+                          "name": "curveStart",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1994,
+                          "src": "619:10:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint128",
+                            "typeString": "uint128"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 2001,
+                          "name": "curveMultiplier",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1997,
+                          "src": "631:15:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint128",
+                            "typeString": "uint128"
+                          }
+                        }
+                      ],
+                      "id": 2002,
+                      "isConstant": false,
+                      "isInlineArray": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "TupleExpression",
+                      "src": "607:40:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$_t_enum$_CurveType_$3220_$_t_uint128_$_t_uint128_$",
+                        "typeString": "tuple(enum RegistryInterface.CurveType,uint128,uint128)"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 2005,
+                          "name": "oracleAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1979,
+                          "src": "676:13:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 2006,
+                          "name": "endpoint",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1981,
+                          "src": "691:8:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          },
+                          {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2003,
+                          "name": "registry",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1965,
+                          "src": "650:8:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_RegistryInterface_$3307",
+                            "typeString": "contract RegistryInterface"
+                          }
+                        },
+                        "id": 2004,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "getProviderCurve",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 3293,
+                        "src": "650:25:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_external_view$_t_address_$_t_bytes32_$returns$_t_enum$_CurveType_$3220_$_t_uint128_$_t_uint128_$",
+                          "typeString": "function (address,bytes32) view external returns (enum RegistryInterface.CurveType,uint128,uint128)"
+                        }
+                      },
+                      "id": 2007,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "650:50:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$_t_enum$_CurveType_$3220_$_t_uint128_$_t_uint128_$",
+                        "typeString": "tuple(enum RegistryInterface.CurveType,uint128,uint128)"
+                      }
+                    },
+                    "src": "607:93:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2009,
+                  "nodeType": "ExpressionStatement",
+                  "src": "607:93:7"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        },
+                        "id": 2015,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 2011,
+                          "name": "curveType",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1991,
+                          "src": "719:9:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "!=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "expression": {
+                              "argumentTypes": null,
+                              "id": 2012,
+                              "name": "RegistryInterface",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 3307,
+                              "src": "732:17:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                                "typeString": "type(contract RegistryInterface)"
+                              }
+                            },
+                            "id": 2013,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "CurveType",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 3220,
+                            "src": "732:27:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_enum$_CurveType_$3220_$",
+                              "typeString": "type(enum RegistryInterface.CurveType)"
+                            }
+                          },
+                          "id": 2014,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "memberName": "None",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "732:32:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        "src": "719:45:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      ],
+                      "id": 2010,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 4395,
+                      "src": "711:7:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
+                        "typeString": "function (bool) pure"
+                      }
+                    },
+                    "id": 2016,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "711:54:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2017,
+                  "nodeType": "ExpressionStatement",
+                  "src": "711:54:7"
+                },
+                {
+                  "condition": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_enum$_CurveType_$3220",
+                      "typeString": "enum RegistryInterface.CurveType"
+                    },
+                    "id": 2022,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "id": 2018,
+                      "name": "curveType",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1991,
+                      "src": "780:9:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_enum$_CurveType_$3220",
+                        "typeString": "enum RegistryInterface.CurveType"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "==",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2019,
+                          "name": "RegistryInterface",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 3307,
+                          "src": "793:17:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                            "typeString": "type(contract RegistryInterface)"
+                          }
+                        },
+                        "id": 2020,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "CurveType",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 3220,
+                        "src": "793:27:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_enum$_CurveType_$3220_$",
+                          "typeString": "type(enum RegistryInterface.CurveType)"
+                        }
+                      },
+                      "id": 2021,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "lValueRequested": false,
+                      "memberName": "Linear",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "793:34:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_enum$_CurveType_$3220",
+                        "typeString": "enum RegistryInterface.CurveType"
+                      }
+                    },
+                    "src": "780:47:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "falseBody": {
+                    "condition": {
+                      "argumentTypes": null,
+                      "commonType": {
+                        "typeIdentifier": "t_enum$_CurveType_$3220",
+                        "typeString": "enum RegistryInterface.CurveType"
+                      },
+                      "id": 2036,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "argumentTypes": null,
+                        "id": 2032,
+                        "name": "curveType",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1991,
+                        "src": "912:9:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "==",
+                      "rightExpression": {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 2033,
+                            "name": "RegistryInterface",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 3307,
+                            "src": "925:17:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                              "typeString": "type(contract RegistryInterface)"
+                            }
+                          },
+                          "id": 2034,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "CurveType",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 3220,
+                          "src": "925:27:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_enum$_CurveType_$3220_$",
+                            "typeString": "type(enum RegistryInterface.CurveType)"
+                          }
+                        },
+                        "id": 2035,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "memberName": "Exponential",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "925:39:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        }
+                      },
+                      "src": "912:52:7",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "falseBody": {
+                      "condition": {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_enum$_CurveType_$3220",
+                          "typeString": "enum RegistryInterface.CurveType"
+                        },
+                        "id": 2053,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 2049,
+                          "name": "curveType",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1991,
+                          "src": "1056:9:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "expression": {
+                              "argumentTypes": null,
+                              "id": 2050,
+                              "name": "RegistryInterface",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 3307,
+                              "src": "1069:17:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_contract$_RegistryInterface_$3307_$",
+                                "typeString": "type(contract RegistryInterface)"
+                              }
+                            },
+                            "id": 2051,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "CurveType",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 3220,
+                            "src": "1069:27:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_enum$_CurveType_$3220_$",
+                              "typeString": "type(enum RegistryInterface.CurveType)"
+                            }
+                          },
+                          "id": 2052,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "memberName": "Logarithmic",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "1069:39:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_enum$_CurveType_$3220",
+                            "typeString": "enum RegistryInterface.CurveType"
+                          }
+                        },
+                        "src": "1056:52:7",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      "falseBody": null,
+                      "id": 2073,
+                      "nodeType": "IfStatement",
+                      "src": "1052:206:7",
+                      "trueBody": {
+                        "id": 2072,
+                        "nodeType": "Block",
+                        "src": "1110:148:7",
+                        "statements": [
+                          {
+                            "condition": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              },
+                              "id": 2056,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftExpression": {
+                                "argumentTypes": null,
+                                "id": 2054,
+                                "name": "totalBound",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1983,
+                                "src": "1128:10:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "nodeType": "BinaryOperation",
+                              "operator": "==",
+                              "rightExpression": {
+                                "argumentTypes": null,
+                                "hexValue": "30",
+                                "id": 2055,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "kind": "number",
+                                "lValueRequested": false,
+                                "nodeType": "Literal",
+                                "src": "1142:1:7",
+                                "subdenomination": null,
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_rational_0_by_1",
+                                  "typeString": "int_const 0"
+                                },
+                                "value": "0"
+                              },
+                              "src": "1128:15:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bool",
+                                "typeString": "bool"
+                              }
+                            },
+                            "falseBody": null,
+                            "id": 2061,
+                            "nodeType": "IfStatement",
+                            "src": "1124:51:7",
+                            "trueBody": {
+                              "expression": {
+                                "argumentTypes": null,
+                                "id": 2059,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "leftHandSide": {
+                                  "argumentTypes": null,
+                                  "id": 2057,
+                                  "name": "totalBound",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 1983,
+                                  "src": "1161:10:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                  }
+                                },
+                                "nodeType": "Assignment",
+                                "operator": "=",
+                                "rightHandSide": {
+                                  "argumentTypes": null,
+                                  "hexValue": "31",
+                                  "id": 2058,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "kind": "number",
+                                  "lValueRequested": false,
+                                  "nodeType": "Literal",
+                                  "src": "1174:1:7",
+                                  "subdenomination": null,
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_rational_1_by_1",
+                                    "typeString": "int_const 1"
+                                  },
+                                  "value": "1"
+                                },
+                                "src": "1161:14:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "id": 2060,
+                              "nodeType": "ExpressionStatement",
+                              "src": "1161:14:7"
+                            }
+                          },
+                          {
+                            "expression": {
+                              "argumentTypes": null,
+                              "id": 2070,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftHandSide": {
+                                "argumentTypes": null,
+                                "id": 2062,
+                                "name": "cost",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1986,
+                                "src": "1189:4:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "nodeType": "Assignment",
+                              "operator": "=",
+                              "rightHandSide": {
+                                "argumentTypes": null,
+                                "commonType": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                },
+                                "id": 2069,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "leftExpression": {
+                                  "argumentTypes": null,
+                                  "commonType": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                  },
+                                  "id": 2067,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "leftExpression": {
+                                    "argumentTypes": null,
+                                    "id": 2063,
+                                    "name": "curveMultiplier",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 1997,
+                                    "src": "1196:15:7",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint128",
+                                      "typeString": "uint128"
+                                    }
+                                  },
+                                  "nodeType": "BinaryOperation",
+                                  "operator": "*",
+                                  "rightExpression": {
+                                    "argumentTypes": null,
+                                    "arguments": [
+                                      {
+                                        "argumentTypes": null,
+                                        "id": 2065,
+                                        "name": "totalBound",
+                                        "nodeType": "Identifier",
+                                        "overloadedDeclarations": [],
+                                        "referencedDeclaration": 1983,
+                                        "src": "1223:10:7",
+                                        "typeDescriptions": {
+                                          "typeIdentifier": "t_uint256",
+                                          "typeString": "uint256"
+                                        }
+                                      }
+                                    ],
+                                    "expression": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_uint256",
+                                          "typeString": "uint256"
+                                        }
+                                      ],
+                                      "id": 2064,
+                                      "name": "fastlog2",
+                                      "nodeType": "Identifier",
+                                      "overloadedDeclarations": [],
+                                      "referencedDeclaration": 2088,
+                                      "src": "1214:8:7",
+                                      "typeDescriptions": {
+                                        "typeIdentifier": "t_function_internal_pure$_t_uint256_$returns$_t_uint256_$",
+                                        "typeString": "function (uint256) pure returns (uint256)"
+                                      }
+                                    },
+                                    "id": 2066,
+                                    "isConstant": false,
+                                    "isLValue": false,
+                                    "isPure": false,
+                                    "kind": "functionCall",
+                                    "lValueRequested": false,
+                                    "names": [],
+                                    "nodeType": "FunctionCall",
+                                    "src": "1214:20:7",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "src": "1196:38:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                  }
+                                },
+                                "nodeType": "BinaryOperation",
+                                "operator": "+",
+                                "rightExpression": {
+                                  "argumentTypes": null,
+                                  "id": 2068,
+                                  "name": "curveStart",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 1994,
+                                  "src": "1237:10:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint128",
+                                    "typeString": "uint128"
+                                  }
+                                },
+                                "src": "1196:51:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "src": "1189:58:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "id": 2071,
+                            "nodeType": "ExpressionStatement",
+                            "src": "1189:58:7"
+                          }
+                        ]
+                      }
+                    },
+                    "id": 2074,
+                    "nodeType": "IfStatement",
+                    "src": "908:350:7",
+                    "trueBody": {
+                      "id": 2048,
+                      "nodeType": "Block",
+                      "src": "966:80:7",
+                      "statements": [
+                        {
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 2046,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "leftHandSide": {
+                              "argumentTypes": null,
+                              "id": 2037,
+                              "name": "cost",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1986,
+                              "src": "980:4:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "nodeType": "Assignment",
+                            "operator": "=",
+                            "rightHandSide": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              },
+                              "id": 2045,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftExpression": {
+                                "argumentTypes": null,
+                                "commonType": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                },
+                                "id": 2043,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "leftExpression": {
+                                  "argumentTypes": null,
+                                  "id": 2038,
+                                  "name": "curveMultiplier",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 1997,
+                                  "src": "987:15:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint128",
+                                    "typeString": "uint128"
+                                  }
+                                },
+                                "nodeType": "BinaryOperation",
+                                "operator": "*",
+                                "rightExpression": {
+                                  "argumentTypes": null,
+                                  "components": [
+                                    {
+                                      "argumentTypes": null,
+                                      "commonType": {
+                                        "typeIdentifier": "t_uint256",
+                                        "typeString": "uint256"
+                                      },
+                                      "id": 2041,
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "leftExpression": {
+                                        "argumentTypes": null,
+                                        "id": 2039,
+                                        "name": "totalBound",
+                                        "nodeType": "Identifier",
+                                        "overloadedDeclarations": [],
+                                        "referencedDeclaration": 1983,
+                                        "src": "1006:10:7",
+                                        "typeDescriptions": {
+                                          "typeIdentifier": "t_uint256",
+                                          "typeString": "uint256"
+                                        }
+                                      },
+                                      "nodeType": "BinaryOperation",
+                                      "operator": "**",
+                                      "rightExpression": {
+                                        "argumentTypes": null,
+                                        "hexValue": "32",
+                                        "id": 2040,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": true,
+                                        "kind": "number",
+                                        "lValueRequested": false,
+                                        "nodeType": "Literal",
+                                        "src": "1020:1:7",
+                                        "subdenomination": null,
+                                        "typeDescriptions": {
+                                          "typeIdentifier": "t_rational_2_by_1",
+                                          "typeString": "int_const 2"
+                                        },
+                                        "value": "2"
+                                      },
+                                      "src": "1006:15:7",
+                                      "typeDescriptions": {
+                                        "typeIdentifier": "t_uint256",
+                                        "typeString": "uint256"
+                                      }
+                                    }
+                                  ],
+                                  "id": 2042,
+                                  "isConstant": false,
+                                  "isInlineArray": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "TupleExpression",
+                                  "src": "1005:17:7",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                  }
+                                },
+                                "src": "987:35:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "nodeType": "BinaryOperation",
+                              "operator": "+",
+                              "rightExpression": {
+                                "argumentTypes": null,
+                                "id": 2044,
+                                "name": "curveStart",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1994,
+                                "src": "1025:10:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint128",
+                                  "typeString": "uint128"
+                                }
+                              },
+                              "src": "987:48:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "src": "980:55:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "id": 2047,
+                          "nodeType": "ExpressionStatement",
+                          "src": "980:55:7"
+                        }
+                      ]
+                    }
+                  },
+                  "id": 2075,
+                  "nodeType": "IfStatement",
+                  "src": "776:482:7",
+                  "trueBody": {
+                    "id": 2031,
+                    "nodeType": "Block",
+                    "src": "829:73:7",
+                    "statements": [
+                      {
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2029,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "argumentTypes": null,
+                            "id": 2023,
+                            "name": "cost",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1986,
+                            "src": "843:4:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "=",
+                          "rightHandSide": {
+                            "argumentTypes": null,
+                            "commonType": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            },
+                            "id": 2028,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "leftExpression": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              },
+                              "id": 2026,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftExpression": {
+                                "argumentTypes": null,
+                                "id": 2024,
+                                "name": "curveMultiplier",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1997,
+                                "src": "850:15:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint128",
+                                  "typeString": "uint128"
+                                }
+                              },
+                              "nodeType": "BinaryOperation",
+                              "operator": "*",
+                              "rightExpression": {
+                                "argumentTypes": null,
+                                "id": 2025,
+                                "name": "totalBound",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1983,
+                                "src": "868:10:7",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "src": "850:28:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "nodeType": "BinaryOperation",
+                            "operator": "+",
+                            "rightExpression": {
+                              "argumentTypes": null,
+                              "id": 2027,
+                              "name": "curveStart",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1994,
+                              "src": "881:10:7",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint128",
+                                "typeString": "uint128"
+                              }
+                            },
+                            "src": "850:41:7",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "src": "843:48:7",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "id": 2030,
+                        "nodeType": "ExpressionStatement",
+                        "src": "843:48:7"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 2076,
+                    "name": "cost",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 1986,
+                    "src": "1274:4:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 1987,
+                  "id": 2077,
+                  "nodeType": "Return",
+                  "src": "1267:11:7"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2079,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "_currentCostOfDot",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1984,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1979,
+                  "name": "oracleAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2079,
+                  "src": "344:21:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1978,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "344:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1981,
+                  "name": "endpoint",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2079,
+                  "src": "375:16:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 1980,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "375:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1983,
+                  "name": "totalBound",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2079,
+                  "src": "401:18:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1982,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "401:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "334:91:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1987,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1986,
+                  "name": "cost",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2079,
+                  "src": "471:12:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1985,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "471:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "470:14:7"
+            },
+            "scope": 2089,
+            "src": "308:977:7",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2087,
+              "nodeType": "Block",
+              "src": "1397:1733:7",
+              "statements": [
+                {
+                  "externalReferences": [
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1441:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1490:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1455:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1482:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1464:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1519:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1556:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1631:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1679:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1497:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1671:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1715:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1601:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1608:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1593:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1527:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1534:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1564:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1571:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1775:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1782:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1767:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1844:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1639:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1646:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1723:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1686:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1835:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "1730:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "y": {
+                        "declaration": 2084,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "2960:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "y": {
+                        "declaration": 2084,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "3025:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "x": {
+                        "declaration": 2081,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "2930:1:7",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "y": {
+                        "declaration": 2084,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "3016:1:7",
+                        "valueSize": 1
+                      }
+                    }
+                  ],
+                  "id": 2086,
+                  "nodeType": "InlineAssembly",
+                  "operations": "{\n    let arg := x\n    x := sub(x, 1)\n    x := or(x, div(x, 0x02))\n    x := or(x, div(x, 0x04))\n    x := or(x, div(x, 0x10))\n    x := or(x, div(x, 0x100))\n    x := or(x, div(x, 0x10000))\n    x := or(x, div(x, 0x100000000))\n    x := or(x, div(x, 0x10000000000000000))\n    x := or(x, div(x, 0x100000000000000000000000000000000))\n    x := add(x, 1)\n    let m := mload(0x40)\n    mstore(m, 0xf8f9cbfae6cc78fbefe7cdc3a1793dfcf4f0e8bbd8cec470b6a28a7a5a3e1efd)\n    mstore(add(m, 0x20), 0xf5ecf1b3e9debc68e1d9cfabc5997135bfb7a7a3938b7b606b5b4b3f2f1f0ffe)\n    mstore(add(m, 0x40), 0xf6e4ed9ff2d6b458eadcdf97bd91692de2d4da8fd2d0ac50c6ae9a8272523616)\n    mstore(add(m, 0x60), 0xc8c0b887b0a8a4489c948c7f847c6125746c645c544c444038302820181008ff)\n    mstore(add(m, 0x80), 0xf7cae577eec2a03cf3bad76fb589591debb2dd67e0aa9834bea6925f6a4a2e0e)\n    mstore(add(m, 0xa0), 0xe39ed557db96902cd38ed14fad815115c786af479b7e83247363534337271707)\n    mstore(add(m, 0xc0), 0xc976c13bb96e881cb166a933a55e490d9d56952b8d4e801485467d2362422606)\n    mstore(add(m, 0xe0), 0x753a6d1b65325d0c552a4d1345224105391a310b29122104190a110309020100)\n    mstore(0x40, add(m, 0x100))\n    let magic := 0x818283848586878898a8b8c8d8e8f929395969799a9b9d9e9faaeb6bedeeff\n    let shift := 0x100000000000000000000000000000000000000000000000000000000000000\n    let a := div(mul(x, magic), shift)\n    y := div(mload(add(m, sub(255, a))), shift)\n    y := add(y, mul(256, gt(arg, 0x8000000000000000000000000000000000000000000000000000000000000000)))\n}",
+                  "src": "1407:1723:7"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2088,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "fastlog2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2082,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2081,
+                  "name": "x",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2088,
+                  "src": "1353:9:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2080,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1353:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1352:11:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2085,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2084,
+                  "name": "y",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2088,
+                  "src": "1386:9:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2083,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1386:7:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1385:11:7"
+            },
+            "scope": 2089,
+            "src": "1335:1795:7",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "private"
+          }
+        ],
+        "scope": 2090,
+        "src": "111:3021:7"
+      }
+    ],
+    "src": "0:3133:7"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.21+commit.dfe3193c.Emscripten.clang"
+  },
+  "networks": {
+    "42": {
+      "events": {},
+      "links": {},
+      "address": "0x5981aaa81991edc65eb3562e1571395dff437981",
+      "transactionHash": "0xfa20a812cbe13cf4117e48e9fdf504b537043271864c7747d5c196f12ebc57a8"
+    },
+    "development": {
+      "events": {},
+      "links": {},
+      "address": "0x39cb2c71cf3c2384066a47afb28ff2ae26256e0a",
+      "transactionHash": "0x1048cd2efcc47c79c64e08df8987a7b867cf007281904b78dddb7d33f714ee64"
+    }
+  },
+  "schemaVersion": "2.0.0",
+  "updatedAt": "2018-05-10T02:38:34.968Z"
+}

@@ -38,7 +38,7 @@
     "nyc": "^11.4.1",
     "readline": "^1.3.0",
     "solc": "^0.4.19",
-    "truffle-contract": "3.0.3",
+    "truffle-contract": "^3.0.3",
     "truffle-core": "^4.0.6",
     "vorpal": "^1.12.0",
     "web3": "^1.0.0-beta.34",
@@ -51,7 +51,6 @@
     "coverage": "./node_modules/.bin/nyc report clover",
     "bundle": "browserify src/account.js src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -t brfs -o build/bundle.js",
     "bundle-contracts": "browserify src/api/contracts-bundle.js -o dist/api/contracts/bundle.js -t [ babelify --presets [latest] ] -t brfs",
-    "generateABI": "cd src/contracts && node generateABIs.js && cd ../../",
     "dev:server": "http-server ./ -a 127.0.0.1 -c-1"
   },
   "devDependencies": {
