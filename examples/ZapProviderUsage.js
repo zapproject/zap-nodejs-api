@@ -1,5 +1,4 @@
 const fs = require('fs');
-const Web3 = require('web3');
 const Provider = require('../src/api/components/Provider');
 const Handler = require('../src/api/components/Handler');
 const ZapDispatch = require('../src/api/contracts/Dispatch');
@@ -178,13 +177,13 @@ async function main() {
     }();
 
     let myProvider = new Provider(new ZapDispatch({
-        web3: web3,
-        contract_address: zapDispatch._address,
-        abi: getContractAbi(zapDispatchJson)
+        provider: new Web3.providers.WebsocketProvider(testNetwork.address),
+        address: zapDispatch._address,
+        artifact: zapDispatchJson
     }), new ZapArbiter({
-        web3: web3,
-        contract_address: zapArbiter._address,
-        abi: getContractAbi(zapArbiterJson)
+        provider: new Web3.providers.WebsocketProvider(testNetwork.address),
+        address: zapArbiter._address,
+        artifact: zapArbiterJson
     }), myHandler);
     const filters = {
         id: '',

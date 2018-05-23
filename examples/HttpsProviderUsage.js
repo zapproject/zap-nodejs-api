@@ -187,16 +187,16 @@ async function main() {
         }
     }();
 
-    let myProvider = new Provider(new ZapDispatch({
-        web3: web3,
-        contract_address: zapDispatch._address,
-        abi: getContractAbi(zapDispatchJson)
+    new Provider(new ZapDispatch({
+        provider: new Web3.providers.WebsocketProvider(testNetwork.address),
+        address: zapDispatch._address,
+        artifact: zapDispatchJson
     }), new ZapArbiter({
-        web3: web3,
-        contract_address: zapArbiter._address,
-        abi: getContractAbi(zapArbiterJson)
+        provider: new Web3.providers.WebsocketProvider(testNetwork.address),
+        address: zapArbiter._address,
+        artifact: zapArbiterJson
     }),
-        new HttpsHandler(123, httpsOptions, parser, new Auth()),
+        new HttpsHandler(123, httpsOptions, parser, new Auth())
     );
 
     const filters = {

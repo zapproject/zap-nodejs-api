@@ -5,10 +5,11 @@ class Provider {
         this.handler = handler;
     }
 
-    listenSubscribes({provider, subscriber, fromBlock}) {
-        if (!this.arbiter || !this.arbiter.isZapArbiter) throw new Error('ZapArbiter class must be specified!');
+    async listenSubscribes({provider, subscriber, fromBlock}) {
+        if (!this.arbiter) throw new Error('ZapArbiter class must be specified!');
 
-        return this.arbiter.contract.events.DataPurchaseEvent({filter: {provider, subscriber}, fromBlock: fromBlock},
+        const contract = await this.arbiter.contractInstance();
+        return contract.events.DataPurchaseEvent({ provider, subscriber }, { fromBlock: 0, toBlock: 'latest' },
             (error, result) => {
                 if (error) {
                     console.log(error);
@@ -22,10 +23,11 @@ class Provider {
             });
     }
 
-    listenUnsubscribes({provider, subscriber, terminator, fromBlock}) {
-        if (!this.arbiter || !this.arbiter.isZapArbiter) throw new Error('ZapArbiter class must be specified!');
+    async listenUnsubscribes({provider, subscriber, terminator, fromBlock}) {
+        if (!this.arbiter) throw new Error('ZapArbiter class must be specified!');
 
-        return this.arbiter.contract.events.DataSubscriptionEnd({filter: {provider, subscriber, terminator}, fromBlock: fromBlock},
+        const contract = await this.arbiter.contractInstance();
+        return contract.events.DataSubscriptionEnd({ provider, subscriber, terminator }, { fromBlock: fromBlock, toBlock: 'latest' },
             (error, result) => {
                 if (error) {
                     console.log(error);
@@ -39,10 +41,12 @@ class Provider {
             });
     }
 
-    listenQueries({id, provider, subscriber, fromBlock}, from) {
-        if (!this.dispatch || !this.dispatch.isZapDispatch) throw new Error('ZapDispatch class must be specified!');
+    async listenQueries({id, provider, subscriber, fromBlock}, from) {
+        if (!this.dispatch) throw new Error('ZapDispatch class must be specified!');
 
-        return this.dispatch.contract.events.Incoming({filter: {id, provider, subscriber}, fromBlock: fromBlock}, (error, result) => {
+        const contract = await this.dispatch.contractInstance();
+        return contract.events.Incoming({id, provider, subscriber}, { fromBlock: fromBlock, toBlock: 'latest' },
+            (error, result) => {
             if (error) {
                 console.log(error);
             } else {
