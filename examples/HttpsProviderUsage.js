@@ -13,18 +13,22 @@ const testNetwork = {
     id: 4447
 };
 const dockerNetwork = {
-    address: 'ws://172.18.0.2:8546', // parity docker container
+    address: 'ws://127.0.0.1:8546', // parity docker container
     id: 211211
 };
-const web3 = new Web3(new Web3.providers.WebsocketProvider(testNetwork.address)); // using develop rpc
 
+const currentNetwork = dockerNetwork;
 
-const zapTokenJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/ZapToken.json').toString());
-const zapDispatchJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/Dispatch.json').toString());
-const zapBondageJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/Bondage.json').toString());
-const zapRegistryJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/Registry.json').toString());
-const zapArbiterJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/Arbiter.json').toString());
-const registryStorageJson = JSON.parse(fs.readFileSync('../../zap/build/contracts/RegistryStorage.json').toString());
+// Init websocket provider for listening events (HttpProvider is deprecated);
+const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address)); // using develop rpc
+
+// Truffle artifacts
+const zapTokenJson = JSON.parse(fs.readFileSync('../zap/build/contracts/ZapToken.json'));
+const zapDispatchJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Dispatch.json'));
+const zapBondageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Bondage.json'));
+const zapRegistryJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Registry.json'));
+const zapArbiterJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Arbiter.json'));
+const registryStorageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/RegistryStorage.json'));
 
 const CurveTypes = {
     "None": 0,
@@ -65,6 +69,12 @@ function getContractAddress(json, networkId) {
     return json.networks[networkId].address;
 }
 
+/**
+ * Get 10^n as Big Number
+ *
+ * @param numberOfZeros power of ten
+ * @returns {web3.utils.BN} big number that is 10^numberOfZeros
+ */
 function getPowOfTenBN(numberOfZeros) {
     let str = '1';
     for (let i = 0; i < numberOfZeros; i++) {
@@ -73,7 +83,25 @@ function getPowOfTenBN(numberOfZeros) {
     return new web3.utils.BN(str);
 }
 
-async function executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub, oracle, owner, providerEndpoint, providerTitle) {
+
+/**
+ * Using Web3 for initialize start state of contracts to be prepared to use query() function of Dispatch contract
+ * Should be called only if using test network without configured contracts
+ *
+ * @param web3 instance of web3 with specified provider
+ * @param zapRegistry Web3 instance of Registry contract
+ * @param zapToken Web3 instance of ZapToken contract
+ * @param zapBondage Web3 instance of Bondage contract
+ * @param sub address of subscriber that will request data from provider
+ * @param oracle provider address
+ * @param owner contracts owner address
+ * @param providerEndpoint endpoint for data subscriber data requests
+ * @param providerTitle provider title
+ * @param providerPublicKey public key of provider in Registry contract
+ *
+ * @returns {Promise<void>} async function
+ */
+async function executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub, oracle, owner, providerEndpoint, providerTitle, providerPublicKey) {
     let subBalance = (await zapToken.methods.balanceOf(sub).call()).valueOf();
     if (!getPowOfTenBN(21).lte(subBalance)) {
         await zapToken.methods.allocate(sub, getPowOfTenBN(21)).send({from: owner});
@@ -93,7 +121,7 @@ async function executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub,
     if (pk.valueOf() == '0') {
         console.log('endpoint = ' + providerEndpoint);
         await zapRegistry.methods.initiateProvider(
-            new web3.utils.BN('123'),
+            new web3.utils.BN(providerPublicKey),
             web3.utils.utf8ToHex(providerTitle),
             web3.utils.utf8ToHex(providerEndpoint),
             [])
@@ -130,7 +158,13 @@ async function executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub,
     }
 }
 
+/**
+ * Main function that perform configuration flow and calling query to receive Incoming event
+ *
+ * @returns {Promise<number>} result code
+ */
 async function main() {
+    // get accounts from test network
     const accounts = await web3.eth.getAccounts();
 
     const owner = accounts[0];
@@ -142,14 +176,17 @@ async function main() {
     console.log('sub: ' + sub);
 
     const testEndpoint = 'test.com';
-    console.log('Test endpoint hex = ' + testEndpoint);
+    const providerPublicKey = 123;
 
-    const zapToken = new web3.eth.Contract(getContractAbi(zapTokenJson), getContractAddress(zapTokenJson, testNetwork.id));
-    const zapRegistry = new web3.eth.Contract(getContractAbi(zapRegistryJson), getContractAddress(zapRegistryJson, testNetwork.id));
-    const zapDispatch = new web3.eth.Contract(getContractAbi(zapDispatchJson), getContractAddress(zapDispatchJson, testNetwork.id));
-    const zapBondage = new web3.eth.Contract(getContractAbi(zapBondageJson), getContractAddress(zapBondageJson, testNetwork.id));
-    const zapArbiter = new web3.eth.Contract(getContractAbi(zapArbiterJson), getContractAddress(zapArbiterJson, testNetwork.id));
+    // creating web3 contract instances
+    const zapToken = new web3.eth.Contract(getContractAbi(zapTokenJson), getContractAddress(zapTokenJson, currentNetwork.id));
+    const zapRegistry = new web3.eth.Contract(getContractAbi(zapRegistryJson), getContractAddress(zapRegistryJson, currentNetwork.id));
+    const zapDispatch = new web3.eth.Contract(getContractAbi(zapDispatchJson), getContractAddress(zapDispatchJson, currentNetwork.id));
+    const zapBondage = new web3.eth.Contract(getContractAbi(zapBondageJson), getContractAddress(zapBondageJson, currentNetwork.id));
+    const zapArbiter = new web3.eth.Contract(getContractAbi(zapArbiterJson), getContractAddress(zapArbiterJson, currentNetwork.id));
 
+
+    // Call query function of Dispatch contract to request data from provider
     async function queryData(provider,
                              userQuery,
                              endpoint,
@@ -161,6 +198,8 @@ async function main() {
     //
     // HTTPS PROVIDER USAGE
     //
+
+    // options for https handler
     let httpsOptions = {
         baseUrl: 'https://jsonplaceholder.typicode.com',
         port: 443,
@@ -174,6 +213,8 @@ async function main() {
         })
     };
 
+    // handler response parser
+    // return value of parseIncomingResponse will be used as params for Dispatch.respond() function
     let parser = new class MyParser extends HttpsResponseParser {
         parseIncomingResponse(response) {
             if (response.status !== 200) throw Error('Response received with status ' + response.status + ' ' + response.data);
@@ -187,45 +228,63 @@ async function main() {
         }
     }();
 
-    new Provider(new ZapDispatch({
-        provider: new Web3.providers.WebsocketProvider(testNetwork.address),
-        address: zapDispatch._address,
-        artifact: zapDispatchJson
-    }), new ZapArbiter({
-        provider: new Web3.providers.WebsocketProvider(testNetwork.address),
-        address: zapArbiter._address,
-        artifact: zapArbiterJson
-    }),
-        new HttpsHandler(123, httpsOptions, parser, new Auth())
+    const awsCredentials = {
+        accessKeyId: 'access_key_id',
+        secretAccessKey: 'secret_access_key',
+        region: 'eu-west-1'
+    };
+
+    // Init provider with https handler
+    let myProvider = new Provider(new ZapDispatch({
+            provider: web3.currentProvider,
+            address: zapDispatch._address,
+            artifact: zapDispatchJson
+        }), new ZapArbiter({
+            provider: web3.currentProvider,
+            address: zapArbiter._address,
+            artifact: zapArbiterJson
+        }),
+        // Using default Auth class, because authorization not needed
+        // You should implement your own Auth and Parser
+        // also you should specify aws credentials for tls notary in Auth constructor
+        new HttpsHandler(providerPublicKey, httpsOptions, parser, new Auth(awsCredentials))
     );
 
+    // Specifying filters for Incoming event
+    // Catch only events with our provider == oracle
+    // events with different provider will be ignored
     const filters = {
-        id: '',
         provider: oracle,
-        subscriber: '',
         fromBlock: 0
     };
 
     // You will have 'revert' exception when event will caught, because sub is not contract address that implement Client2
-    const emmiter = myProvider.listenQueries(filters, oracle);
+    const event = await myProvider.listenQueries(filters, oracle);
 
+    // execute query to receive Incoming event
     try {
-        await executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub, oracle, owner, testEndpoint, 'tst');
-        await queryData(oracle, 'privet', testEndpoint, []);
+        await executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub, oracle, owner, testEndpoint, 'title', providerPublicKey);
+        await queryData(oracle, 'hello', testEndpoint, []);
     } catch (e) {
-        emmiter.unsubscribe(res => console.log(res));
         console.log(e);
-        return 1;
+        return {
+            resultCode: 1,
+            event: event
+        };
     }
 
-    emmiter.unsubscribe(res => console.log(res));
-    return 0;
+    return {
+        resultCode: 0,
+        event: event
+    };
 }
 
 /**
  * ENTRY POINT
  */
 main().then((res) => {
-    console.log('\n\nExecuted with result code: ' + res);
+    console.log('\n\nExecuted with result code: ' + res.resultCode);
 });
+
+
 

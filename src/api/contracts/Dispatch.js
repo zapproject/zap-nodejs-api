@@ -10,41 +10,19 @@ function isPromise(object) {
 
 class ZapDispatch extends Base {
 
-    // Listen for oracle queries 
-    async listen(providerAddress) {
+    /**
+     * Listen for oracle queries
+     *
+     * @param filters event filters
+     * @param callback callback function that will be called after event received
+     */
+    async listen(filters, callback) {
         try {
             const contract = await super.contractInstance();
 
-            // Create the Event filter
-            this.filter = contract.events.Incoming();
-
-            this.filter.new({ provider: providerAddress }, { fromBlock: 0, toBlock: 'latest' }, (err, res) => {
-                if (err) throw err;
-            });
-
-            // Watch the event filter
-            const result = await new Promise((resolve, reject) => {
-                this.filter.watch((err, res) => {
-                    if (err) return reject(err);
-                    if (res) return resolve(res);
-                });
-            });
-
-            // Sanity check
-            if (result.length !== 5) {
-                throw new Error("Received invalid ZapDataPurchase event");
-            }
-            const [id, provider, recipient, query, endpoint, endpoint_params] = result;
-
-            // Emit event
-            return {
-                id,
-                provider,
-                recipient,
-                query,
-                endpoint,
-                endpoint_params
-            };
+            // Specify filters and watch Incoming event
+            this.filter = contract.Incoming(filters, { fromBlock: filters.fromBlock ? filters.fromBlock : 0, toBlock: 'latest' });
+            this.filter.watch(callback);
         } catch (err) {
             throw err;
         }
@@ -67,20 +45,20 @@ class ZapDispatch extends Base {
             case 1: {
                 return contract.respond1(
                     queryId,
-                    responseParams[0], { 'from': from });
+                    responseParams[0], { from: from });
             }
             case 2: {
                 return contract.respond2(
                     queryId,
                     responseParams[0],
-                    responseParams[1], { 'from': from });
+                    responseParams[1], { from: from });
             }
             case 3: {
                 return contract.respond3(
                     queryId,
                     responseParams[0],
                     responseParams[1],
-                    responseParams[2], { 'from': from });
+                    responseParams[2], { from: from });
             }
             case 4: {
                 return contract.respond4(
@@ -88,7 +66,7 @@ class ZapDispatch extends Base {
                     responseParams[0],
                     responseParams[1],
                     responseParams[2],
-                    responseParams[3], { 'from': from });
+                    responseParams[3], { from: from });
             }
             default: {
                 throw new Error("Invalid number of response parameters");

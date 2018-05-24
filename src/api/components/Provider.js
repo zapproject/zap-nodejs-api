@@ -9,55 +9,63 @@ class Provider {
         if (!this.arbiter) throw new Error('ZapArbiter class must be specified!');
 
         const contract = await this.arbiter.contractInstance();
-        return contract.events.DataPurchaseEvent({ provider, subscriber }, { fromBlock: 0, toBlock: 'latest' },
-            (error, result) => {
-                if (error) {
-                    console.log(error);
-                } else {
-                    try {
-                        this.handler.handleSubscription(result);
-                    } catch (e) {
-                        console.log(e);
-                    }
+
+        let callback =  (error, result) => {
+            if (error) {
+                console.log(error);
+            } else {
+                try {
+                    this.handler.handleSubscription(result);
+                } catch (e) {
+                    console.log(e);
                 }
-            });
+            }
+        };
+
+        let event = contract.events.DataPurchaseEvent({ provider, subscriber }, { fromBlock: fromBlock, toBlock: 'latest' });
+        event.watch(callback);
+        return event;
     }
 
     async listenUnsubscribes({provider, subscriber, terminator, fromBlock}) {
         if (!this.arbiter) throw new Error('ZapArbiter class must be specified!');
 
         const contract = await this.arbiter.contractInstance();
-        return contract.events.DataSubscriptionEnd({ provider, subscriber, terminator }, { fromBlock: fromBlock, toBlock: 'latest' },
-            (error, result) => {
-                if (error) {
-                    console.log(error);
-                } else {
-                    try {
-                        this.handler.handleUnsubscription(result);
-                    } catch (e) {
-                        console.log(e);
-                    }
+
+        let callback = (error, result) => {
+            if (error) {
+                console.log(error);
+            } else {
+                try {
+                    this.handler.handleUnsubscription(result);
+                } catch (e) {
+                    console.log(e);
                 }
-            });
+            }
+        };
+
+        let event = contract.events.DataSubscriptionEnd({ provider, subscriber, terminator }, { fromBlock: fromBlock, toBlock: 'latest' });
+        event.watch(callback);
+        return event;
     }
 
     async listenQueries({id, provider, subscriber, fromBlock}, from) {
         if (!this.dispatch) throw new Error('ZapDispatch class must be specified!');
 
-        const contract = await this.dispatch.contractInstance();
-        return contract.events.Incoming({id, provider, subscriber}, { fromBlock: fromBlock, toBlock: 'latest' },
-            (error, result) => {
+        let callback = (error, result) => {
             if (error) {
                 console.log(error);
             } else {
                 try {
                     let respondParams = this.handler.handleIncoming(result);
-                    this.dispatch.respond(result.returnValues.id, respondParams, from);
+                    this.dispatch.respond(result.args.id.valueOf(), respondParams, from);
                 } catch (e) {
                     console.log(e);
                 }
             }
-        });
+        };
+
+        await this.dispatch.listen({id, provider, subscriber, fromBlock}, callback);
     }
 
     get handler() {

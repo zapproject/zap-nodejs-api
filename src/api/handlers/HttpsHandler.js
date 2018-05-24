@@ -9,7 +9,7 @@ class HttpsHandler extends Handler {
         super();
 
         this.id = providerId;
-        this.parser = parser;
+        this.responseParser = parser;
         this.auth = auth;
 
         this.httpOptions = {
@@ -25,9 +25,9 @@ class HttpsHandler extends Handler {
             })
         };
 
-        process.env.AWS_ACCESS_KEY_ID = 'AKIAI73YIGOIBAHBMCWA';
-        process.env.AWS_SECRET_ACCESS_KEY = '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';
-        process.env.AWS_REGION = 'eu-west-1';
+        process.env.AWS_ACCESS_KEY_ID = this.auth.awsAccessKeyId;
+        process.env.AWS_SECRET_ACCESS_KEY = this.auth.awsSecretAccessKey;
+        process.env.AWS_REGION = this.auth.awsRegion;
     }
 
     async handleSubscription(event) {
@@ -39,7 +39,7 @@ class HttpsHandler extends Handler {
     }
 
     async handleIncoming(event) {
-        const incomingEvent = Handler.parseIncomingEvent(event);
+        const incomingEvent = this.eventParser.parseIncomingEvent(event);
         try {
             if (!this.auth.isLoggedIn) {
                 this.httpOptions = await this.auth.login(this.httpOptions);
@@ -69,7 +69,7 @@ class HttpsHandler extends Handler {
             headers: this.httpOptions.headers
         });
 
-        return this.parser.parseIncomingResponse(response);
+        return this.responseParser.parseIncomingResponse(response);
     }
 
     async notarize(url) {
@@ -92,12 +92,12 @@ class HttpsHandler extends Handler {
 
     async getSubscriptionsList() { return new Error("Not implemented yet"); }
 
-    get parser() {
-        return this._parser;
+    get responseParser() {
+        return this._responseParser;
     }
 
-    set parser(parser) {
-        this._parser = parser;
+    set responseParser(parser) {
+        this._responseParser = parser;
     }
 
     get auth() {
@@ -109,7 +109,7 @@ class HttpsHandler extends Handler {
     }
 }
 
-class Parser {
+class ResponseParser {
     constructor() {
 
     }
@@ -122,8 +122,36 @@ class Parser {
 }
 
 class Auth {
-    constructor() {
+    constructor(awsCredentials) {
         this.isLoggedIn = false;
+
+        this.awsSecretAccessKey = awsCredentials.secretAccessKey;
+        this.awsAccessKeyId = awsCredentials.accessKeyId;
+        this.awsRegion = awsCredentials.region;
+    }
+
+    get awsRegion() {
+        return this.awsCredentials._region;
+    }
+
+    set awsRegion(region) {
+        return this.awsCredentials._region = region;
+    }
+
+    get awsAccessKeyId() {
+        return this.awsCredentials._access_key_id;
+    }
+
+    set awsAccessKeyId(accessKeyId) {
+        return this.awsCredentials._access_key_id = keyId;
+    }
+
+    get awsSecretAccessKey() {
+        return this.awsCredentials._secret_access_key;
+    }
+
+    set awsSecretAccessKey(secretAccessKeyId) {
+        return this.awsCredentials._secret_access_key = secretAccessKeyId;
     }
 
     // should be implemented to handle authentication inside https handler
