@@ -1,3 +1,4 @@
+const Base = require('./Base');
 
 function isPromise(object) {
     if (Promise && Promise.resolve) {
@@ -7,61 +8,21 @@ function isPromise(object) {
     }
 }
 
-//todo need to be refactored for using truffle-contract
-class ZapDispatch {
+class ZapDispatch extends Base {
 
-    constructor({web3, contract_address, abi}) {
-        this.web3 = web3;
-        this.address = contract_address;
-        this.abi = abi;
-        this.contract = new this.web3.eth.Contract(this.abi, this.address);
-
-        this.isZapDispatch = true;
-    }
-
-    // Listen for oracle queries 
-    async listen() {
+    /**
+     * Listen for oracle queries
+     *
+     * @param filters event filters
+     * @param callback callback function that will be called after event received
+     */
+    async listen(filters, callback) {
         try {
-            const accounts = await this.web3.eth.accounts();
-            if (accounts.length == 0) {
-                throw new Error("No accounts loaded");
-            }
+            const contract = await super.contractInstance();
 
-            const account = accounts[0];
-
-            // Create the Event filter
-            this.filter = this.contract.events.Incoming();
-            // this.filter = new this.contract.filters.Filter({ delay: 500 });
-            this.filter.new({ fromBlock: 0, toBlock: 'latest' }, (err, res) => {
-                if (err) throw err;
-            });
-
-            // Watch the event filter
-            const result = await new Promise((resolve, reject) => {
-                this.filter.watch((err, res) => {
-                    if (err) return reject(err);
-                    if (res) return resolve(res);
-                });
-            });
-            // Sanity check
-            if (result.length != 5) {
-                throw new Error("Received invalid ZapDataPurchase event");
-            }
-            const [id, provider, recipient, query, endpoint, endpoint_params] = result;
-            // Make sure it is us
-            if (provider !== account) {
-                return;
-            }
-
-            // Emit event
-            return {
-                id,
-                provider,
-                recipient,
-                query,
-                endpoint,
-                endpoint_params
-            };
+            // Specify filters and watch Incoming event
+            this.filter = contract.Incoming(filters, { fromBlock: filters.fromBlock ? filters.fromBlock : 0, toBlock: 'latest' });
+            this.filter.watch(callback);
         } catch (err) {
             throw err;
         }
@@ -79,32 +40,33 @@ class ZapDispatch {
         if (isPromise(responseParams)) {
             responseParams = await responseParams;
         }
+        const contract = await super.contractInstance();
         switch (responseParams.length) {
             case 1: {
-                return this.contract.methods.respond1(
+                return contract.respond1(
                     queryId,
-                    responseParams[0]).send({ 'from': from });
+                    responseParams[0], { from: from });
             }
             case 2: {
-                return this.contract.methods.respond2(
+                return contract.respond2(
                     queryId,
                     responseParams[0],
-                    responseParams[1]).send({ 'from': from });
+                    responseParams[1], { from: from });
             }
             case 3: {
-                return this.contract.methods.respond3(
+                return contract.respond3(
                     queryId,
                     responseParams[0],
                     responseParams[1],
-                    responseParams[2]).send({ 'from': from });
+                    responseParams[2], { from: from });
             }
             case 4: {
-                return this.contract.methods.respond4(
+                return contract.respond4(
                     queryId,
                     responseParams[0],
                     responseParams[1],
                     responseParams[2],
-                    responseParams[3]).send({ 'from': from });
+                    responseParams[3], { from: from });
             }
             default: {
                 throw new Error("Invalid number of response parameters");
