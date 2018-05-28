@@ -18,12 +18,12 @@ const currentNetwork = dockerNetwork;
 const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address)); // using develop rpc
 
 
-const zapTokenJson = JSON.parse(fs.readFileSync('../zap/build/contracts/ZapToken.json'));
-const zapDispatchJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Dispatch.json'));
-const zapBondageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Bondage.json'));
-const zapRegistryJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Registry.json'));
-const zapArbiterJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Arbiter.json'));
-const registryStorageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/RegistryStorage.json'));
+const zapTokenJson = JSON.parse(fs.readFileSync('../ZapContracts/build/contracts/ZapToken.json'));
+const zapDispatchJson = JSON.parse(fs.readFileSync('../ZapContracts/build/contracts/Dispatch.json'));
+const zapBondageJson = JSON.parse(fs.readFileSync('../ZapContracts/build/contracts/Bondage.json'));
+const zapRegistryJson = JSON.parse(fs.readFileSync('../ZapContracts/build/contracts/Registry.json'));
+const zapArbiterJson = JSON.parse(fs.readFileSync('../ZapContracts/build/contracts/Arbiter.json'));
+const registryStorageJson = JSON.parse(fs.readFileSync('../ZapContracts/build/contracts/RegistryStorage.json'));
 
 const CurveTypes = {
     "None": 0,
