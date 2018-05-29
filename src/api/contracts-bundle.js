@@ -5,12 +5,12 @@ require('babel-polyfill');
 const fs = require('fs');
 
 // Truffle contracts artifacts
-global.ZapArbiterArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/Arbiter.json'));
-global.ZapBondageArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/Bondage.json'));
-global.ZapBondageStorageArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/BondageStorage.json'));
-global.ZapDispatchArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/Dispatch.json'));
-global.ZapRegistryArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/Registry.json'));
-global.ZapTokenArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../artifacts/contracts/ZapToken.json'));
+global.ZapArbiterArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../ZapContracts/build/contracts/Arbiter.json'));
+global.ZapBondageArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../ZapContracts/build/contracts//Bondage.json'));
+global.ZapBondageStorageArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../ZapContracts/build/contracts/BondageStorage.json'));
+global.ZapDispatchArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../ZapContracts/build/contracts/Dispatch.json'));
+global.ZapRegistryArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../ZapContracts/build/contracts/Registry.json'));
+global.ZapTokenArtifact = JSON.parse(fs.readFileSync(__dirname + '/../../ZapContracts/build/contracts/ZapToken.json'));
 
 // Contract wrappers
 global.ZapArbiter = require("./contracts/Arbiter");

@@ -10,7 +10,7 @@ const path = require('path');
 const { serverOptions } = require('../config/server.js');
 // const {} = require('web3-provider-engine/');
 
-const { networks } = require('../truffle.js');
+const { networks } = require('../networks.js');
 const { promisify } = require('util');
 const asyncMigrate = promisify(migrate.run);
 const {

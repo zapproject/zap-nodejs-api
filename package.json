@@ -1,10 +1,11 @@
 {
   "bin": {
-    "zapcli": "./src/api/index.js"
+    "zapcli": "./src/api/contracts-bundle.js"
   },
-  "name": "synapse-poc",
+  "name": "zapsdk",
   "version": "0.0.0",
   "private": true,
+  "main":"./src/api/contracts-bundle.js",
   "dependencies": {
     "async": "^2.5.0",
     "aws-lambda-invoke": "^3.0.0",
