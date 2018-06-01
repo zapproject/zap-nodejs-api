@@ -4,7 +4,7 @@ const https = require('https');
 const Provider = require('../src/api/components/Provider');
 const HttpsHandler = require('../src/api/handlers/HttpsHandler').HttpsHandler;
 const HttpsResponseParser = require('../src/api/handlers/HttpsHandler').Parser;
-const Auth = require('../src/api/handlers/HttpsHandler').Auth;
+const Auth = require('../src/api/handlers/Auth').AuthRuntime;
 const ZapDispatch = require('../src/api/contracts/Dispatch');
 const ZapArbiter = require('../src/api/contracts/Arbiter');
 

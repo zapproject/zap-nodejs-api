@@ -2,6 +2,7 @@ const axios = require('axios');
 const lambda = require('aws-lambda-invoke');
 const Handler = require('../components/Handler');
 
+
 const AUTH_ERROR_CODE = 401;
 
 class HttpsHandler extends Handler {
@@ -24,10 +25,6 @@ class HttpsHandler extends Handler {
                 httpsAgent: agent
             })
         };
-
-        process.env.AWS_ACCESS_KEY_ID = this.auth.awsAccessKeyId;
-        process.env.AWS_SECRET_ACCESS_KEY = this.auth.awsSecretAccessKey;
-        process.env.AWS_REGION = this.auth.awsRegion;
     }
 
     async handleSubscription(event) {
@@ -73,15 +70,22 @@ class HttpsHandler extends Handler {
     }
 
     async notarize(url) {
-        // run notarize
-        let fileUrl = await lambda.invoke('notarize', {
-            url: url,
-            headers: this.httpOptions.headers
-        });
+        await this.auth.updateNotarizeCredentials();
 
-        return await lambda.invoke('auditor', {
-            audit_file_url: fileUrl
-        });
+        try {
+            // run notarize
+            let fileUrl = await lambda.invoke('notarize', {
+                url: url,
+                headers: this.httpOptions.headers
+            });
+
+            return await lambda.invoke('auditor', {
+                audit_file_url: fileUrl
+            });
+        } catch (e) {
+            console.log(e);
+            this.auth.setAwsCredentialsOutdated();
+        }
     }
 
     async insertSubscription() { return new Error("Not implemented yet"); }
@@ -121,52 +125,6 @@ class ResponseParser {
     }
 }
 
-class Auth {
-    constructor(awsCredentials) {
-        this.isLoggedIn = false;
-
-        this.awsSecretAccessKey = awsCredentials.secretAccessKey;
-        this.awsAccessKeyId = awsCredentials.accessKeyId;
-        this.awsRegion = awsCredentials.region;
-    }
-
-    get awsRegion() {
-        return this.awsCredentials._region;
-    }
-
-    set awsRegion(region) {
-        return this.awsCredentials._region = region;
-    }
-
-    get awsAccessKeyId() {
-        return this.awsCredentials._access_key_id;
-    }
-
-    set awsAccessKeyId(accessKeyId) {
-        return this.awsCredentials._access_key_id = keyId;
-    }
-
-    get awsSecretAccessKey() {
-        return this.awsCredentials._secret_access_key;
-    }
-
-    set awsSecretAccessKey(secretAccessKeyId) {
-        return this.awsCredentials._secret_access_key = secretAccessKeyId;
-    }
-
-    // should be implemented to handle authentication inside https handler
-    async login(httpOptions) {
-        this.isLoggedIn = true;
-        return httpOptions;
-    }
-
-    // should be implemented to handle authentication errors inside https handler
-    async onAuthError(httpOptions) {
-        this.isLoggedIn = false;
-        return httpOptions;
-    }
-}
 
 module.exports.HttpsHandler = HttpsHandler;
-module.exports.Parser = Parser;
-module.exports.Auth = Auth;
+module.exports.Parser = ResponseParser;
