@@ -7,6 +7,7 @@ const HttpsResponseParser = require('../src/api/handlers/HttpsHandler').Parser;
 const Auth = require('../src/api/handlers/HttpsHandler').Auth;
 const ZapDispatch = require('../src/api/contracts/Dispatch');
 const ZapArbiter = require('../src/api/contracts/Arbiter');
+const Curve = require('../src/api/components/Curve');
 
 const testNetwork = {
     address: `ws://127.0.0.1:9545`, // truffle develop rpc
@@ -23,19 +24,13 @@ const currentNetwork = dockerNetwork;
 const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address)); // using develop rpc
 
 // Truffle artifacts
-const zapTokenJson = JSON.parse(fs.readFileSync('../zap/build/contracts/ZapToken.json'));
-const zapDispatchJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Dispatch.json'));
-const zapBondageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Bondage.json'));
-const zapRegistryJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Registry.json'));
-const zapArbiterJson = JSON.parse(fs.readFileSync('../zap/build/contracts/Arbiter.json'));
-const registryStorageJson = JSON.parse(fs.readFileSync('../zap/build/contracts/RegistryStorage.json'));
+const zapTokenJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/ZapToken.json'));
+const zapDispatchJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Dispatch.json'));
+const zapBondageJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Bondage.json'));
+const zapRegistryJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Registry.json'));
+const zapArbiterJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Arbiter.json'));
+const registryStorageJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/RegistryStorage.json'));
 
-const CurveTypes = {
-    "None": 0,
-    "Linear": 1,
-    "Exponential": 2,
-    "Logarithmic": 3
-};
 
 /**
  * truffle json files contains all contract info
@@ -127,10 +122,8 @@ async function executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub,
             [])
             .send({from: oracle, gas: 1000000});
 
-        await zapRegistry.methods.initiateProviderCurve(web3.utils.utf8ToHex(providerEndpoint),
-            CurveTypes['Linear'],
-            new web3.utils.BN(1),
-            new web3.utils.BN(2))
+        let c = new Curve([2, 2, 0, 1, 1, 1, 10, 0, 0], [0, 5, 5, 10], [1, 3]);
+        await zapRegistry.methods.initiateProviderCurve(web3.utils.utf8ToHex(providerEndpoint), c.constants, c.parts, c.dividers)
             .send({from: oracle, gas: 1000000});
 
         //check results
@@ -190,8 +183,9 @@ async function main() {
     async function queryData(provider,
                              userQuery,
                              endpoint,
-                             endpointParams) {
-        await zapDispatch.methods.query(provider, userQuery, web3.utils.utf8ToHex(endpoint), endpointParams).send({from: sub, gas: 1000000});
+                             endpointParams,
+                             onChain) {
+        await zapDispatch.methods.query(provider, userQuery, web3.utils.utf8ToHex(endpoint), endpointParams, onChain).send({from: sub, gas: 1000000});
         console.log('Query performed!');
     }
 
@@ -264,7 +258,7 @@ async function main() {
     // execute query to receive Incoming event
     try {
         await executePreQueryFlow(web3, zapRegistry, zapToken, zapBondage, sub, oracle, owner, testEndpoint, 'title', providerPublicKey);
-        await queryData(oracle, 'hello', testEndpoint, []);
+        await queryData(oracle, 'hello', testEndpoint, [], false);
     } catch (e) {
         console.log(e);
         return {

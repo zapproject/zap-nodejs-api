@@ -14,13 +14,13 @@ class ZapRegistry extends Base {
         this.getOracle = this.getOracle.bind(this);
     }
 
-    async initiateProvider({public_key, title, endpoint_specifier, endpoint_params, from, gas}) {
+    async initiateProvider({public_key, title, endpoint, endpoint_params, from, gas}) {
         try {
             const contractInstance = await this.contractInstance();
             return await contractInstance.initiateProvider(
                 public_key,
                 title,
-                endpoint_specifier,
+                endpoint,
                 endpoint_params,
                 {
                     from: from,
@@ -32,15 +32,14 @@ class ZapRegistry extends Base {
         }
     }
 
-    async initiateProviderCurve({specifier, ZapCurveType, curveStart, curveMultiplier, from, gas}) {
+    async initiateProviderCurve({endpoint, curve, from, gas}) {
         try {
-            const curve = curveType[ZapCurveType];
             const contractInstance = await this.contractInstance();
             return await contractInstance.initiateProviderCurve(
-                specifier,
-                curve,
-                curveStart,
-                curveMultiplier,
+                endpoint,
+                curve.constants,
+                curve.parts,
+                curve.dividers,
                 {
                     'from': from,
                     'gas': gas
@@ -52,13 +51,13 @@ class ZapRegistry extends Base {
     }
 
     // bytes32 specifier, bytes32[] endpoint_params
-    async setEndpointParams({specifier, params, from, gas}) {
+    async setEndpointParams({endpoint, params, from, gas}) {
         try {
             const contractInstance = await this.contractInstance();
             let endpoint_params = [];
             params.forEach(el => endpoint_params.push(fromAscii(el)));
             return await contractInstance.setEndpointParams(
-                specifier,
+                endpoint,
                 endpoint_params,
                 {
                     'from': from,
@@ -71,7 +70,7 @@ class ZapRegistry extends Base {
     }
 
     // get oracle by address
-    async getOracle({address, specifier}) {
+    async getOracle({address, endpoint}) {
         try {
             const contractInstance = await this.contractInstance();
             const oracle = new Oracle(this);
@@ -89,7 +88,7 @@ class ZapRegistry extends Base {
                     if (i >= 50) break;
                     const {nextIndex, endpoint_param} = await contractInstance.getNextEndpointParam(
                         address,
-                        specifier,
+                        endpoint,
                         i
                     );
                     endpoint_params.push(endpoint_param);

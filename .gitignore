@@ -7,3 +7,4 @@ src/.synapsesubscriber
 .nyc_output
 coverage/
 .idea/
+ZapContracts/node_modules
