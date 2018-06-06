@@ -1,6 +1,7 @@
 const instanceClass = require('../../src/api/contracts/ZapRegistry');
 const ZapWrapper = require('../../src/api/ZapWrapper');
 const assert = require("chai").assert;
+const Curve = require('../src/api/components/Curve');
 const {
     webProvider,
     eth
@@ -85,18 +86,17 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
         });
 
         it('Should initiate Provider curve in zap registry contract', async () => {
+            let c = new Curve([2, 2, 0, 1, 1, 1, 10, 0, 0], [0, 5, 5, 10], [1, 3]);
             await zapRegistryWrapper.initiateProviderCurve({
-                specifier: specifier.valueOf(),
-                ZapCurveType,
-                curveStart,
-                curveMultiplier,
+                specifier,
+                c,
                 from: accounts[0],
                 gas: 300000
             });
-            const provider = await zapRegistryWrapper.contract.getProviderCurve(accounts[0], fromAscii(specifier.valueOf()));
-            assert.equal(provider.curveType.toString(), curveType[ZapCurveType]);
-            assert.equal(provider.curveStart.toString(), curveStart);
-            assert.equal(provider.curveMultiplier.toString(), curveMultiplier);
+            const curve = await zapRegistryWrapper.contract.getProviderCurve(accounts[0], fromAscii(specifier.valueOf()));
+            await expect(Utils.fetchPureArray(curve[0],parseInt)).to.deep.equal(c.constants);
+            await expect(Utils.fetchPureArray(curve[1],parseInt)).to.deep.equal(c.parts);
+            await expect(Utils.fetchPureArray(curve[2],parseInt)).to.deep.equal(c.dividers);
         });
 
         it('Should set endpoint params in zap registry contract', async () => {
