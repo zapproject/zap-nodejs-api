@@ -1,13 +1,9 @@
 const Registry = require('../../src/api/contracts/Registry');
+const Web3 = require('web3');
 const assert = require("chai").assert;
 const fs = require('fs');
-const {
-    webProvider,
-    migrateContracts,
-} = require('../bootstrap');
-const {
-    ganacheNetwork
-} = require('../../config');
+const { migrateContracts, ganacheProvider, ganacheServer } = require('../bootstrap');
+const { ganacheNetwork } = require('../../config');
 const path = require('path');
 const {
     curve,
@@ -19,8 +15,8 @@ const {
 
 const currentNetwork = ganacheNetwork;
 
-// Init websocket provider for listening events (HttpProvider is deprecated);
-const web3 = webProvider; // using develop rpc
+const web3 = new Web3();
+web3.setProvider(ganacheProvider);
 
 
 describe('Registry, path to "/src/api/contracts/Registry"', () => {
@@ -38,6 +34,7 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
         abiJSONStorage = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/RegistryStorage.json'));
         addressZapRegistry = abiJSON.networks[currentNetwork.id].address;
         addressZapRegistryStorage = abiJSONStorage.networks[currentNetwork.id].address;
+        deployedStorage = new web3.eth.Contract(abiJSONStorage.abi, addressZapRegistryStorage);
         accounts = await web3.eth.getAccounts();
         zapRegistryWrapper = new Registry({
             provider: web3.currentProvider,
@@ -49,12 +46,8 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
 
     describe('ZapRegistryWrapper', function () {
 
-        beforeEach((done) => {
-            setTimeout(() => done(), 500);
-        });
-
         it('should check bind registry storage', async () => {
-            const data = await deployedStorage.owner({ from: accounts[0], gas: 6000000 });
+            const data = await deployedStorage.methods.owner();
             assert.equal(data['0'], addressZapRegistry);
         });
 
