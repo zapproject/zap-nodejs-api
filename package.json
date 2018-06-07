@@ -5,11 +5,11 @@
   "name": "zapsdk",
   "version": "0.0.0",
   "private": true,
-  "main":"./src/api/contracts-bundle.js",
+  "main": "./src/api/contracts-bundle.js",
   "dependencies": {
     "async": "^2.5.0",
     "aws-lambda-invoke": "^3.0.0",
-    "aws-sdk": "^2.242.1",
+    "aws-sdk": "^2.250.1",
     "axios": "^0.18.0",
     "bignumber.js": "^4.0.2",
     "bson": "^1.0.4",

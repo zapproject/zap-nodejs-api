@@ -62,7 +62,7 @@ class HttpsHandler extends Handler {
     async doRequest(urlWithQuery) {
         let response = await this.httpOptions.httpClient({
             method: this.httpOptions.method,
-            url: url,
+            url: urlWithQuery,
             headers: this.httpOptions.headers
         });
 
@@ -125,6 +125,53 @@ class ResponseParser {
     }
 }
 
+class Auth {
+    constructor(awsCredentials) {
+        this.isLoggedIn = false;
+
+        this.awsSecretAccessKey = awsCredentials.secretAccessKey;
+        this.awsAccessKeyId = awsCredentials.accessKeyId;
+        this.awsRegion = awsCredentials.region;
+    }
+
+    get awsRegion() {
+        return this._region;
+    }
+
+    set awsRegion(region) {
+        return this._region = region;
+    }
+
+    get awsAccessKeyId() {
+        return this._access_key_id;
+    }
+
+    set awsAccessKeyId(accessKeyId) {
+        return this._access_key_id = accessKeyId;
+    }
+
+    get awsSecretAccessKey() {
+        return this._secret_access_key;
+    }
+
+    set awsSecretAccessKey(secretAccessKeyId) {
+        return this._secret_access_key = secretAccessKeyId;
+    }
+
+    // should be implemented to handle authentication inside https handler
+    async login(httpOptions) {
+        this.isLoggedIn = true;
+        return httpOptions;
+    }
+
+    // should be implemented to handle authentication errors inside https handler
+    async onAuthError(httpOptions) {
+        this.isLoggedIn = false;
+        return httpOptions;
+    }
+}
+
 
 module.exports.HttpsHandler = HttpsHandler;
 module.exports.Parser = ResponseParser;
+module.exports.Auth = Auth;
