@@ -6,53 +6,49 @@ const { provider } = require('ganache-core');
 const migrate = require('../node_modules/truffle-core/lib/commands/migrate');
 // method that helps to resolve paths 
 const path = require('path');
-// method that helps as get promise with out callback function
-const { serverOptions } = require('../config/server.js');
-// const {} = require('web3-provider-engine/');
 
-const { networks } = require('../networks.js');
+// method that helps as get promise with out callback function
+const { serverOptions, server } = require('./server');
+
 const { promisify } = require('util');
 const asyncMigrate = promisify(migrate.run);
 const {
-    endpoint,
-    port,
-    network,
+    ganacheNetwork,
     contractsBuildDirectory,
     contractsDirectory,
-    network_id,
     migrationsDirectory,
+    workingDirectory,
     protocol
 } = require('../config');
-// initiate and run ganache server;
-const Eth = require('ethjs');
-const endpointTest = `${protocol}${endpoint}:${port}`;
-const eth = new Eth(new Eth.HttpProvider(endpointTest));
-const web3 = new Web3(new Web3.providers.WebsocketProvider(endpointTest));
 
+// initiate and run ganache server;
 const webProvider = new Web3();
 const ganacheProvider = provider(serverOptions);
+const ganacheServer = server;
+
 //connect our provider with ganache-core
 webProvider.setProvider(ganacheProvider);
 
-process.on('unhandledRejection', (reason, p) => {
-    // console.log( //eslint-disable-line
-    //     `Unhandled Rejection at: Promise', ${p}, 
-    //     'reason:', ${reason}`
-    // );
-});
+function getNetworkPort(network) {
+    return network.address.split(':')[2];
+}
+
+function getNetworkHostname(network) {
+    return network.address.split(':')[1].slice(2);
+}
 
 async function migrateContracts() {
     const options = {
-        // logger: console,
-        "contracts_build_directory": path.join(__dirname, contractsBuildDirectory),
-        "contracts_directory": path.join(__dirname, contractsDirectory),
-        network: network,
-        networks,
+        logger: console,
+        contracts_build_directory: path.join(__dirname, contractsBuildDirectory),
+        contracts_directory: path.join(__dirname, contractsDirectory),
+        working_directory: path.join(__dirname, workingDirectory),
+        migrations_directory: path.join(__dirname, migrationsDirectory),
+        network: 'ganache-gui',
         provider: ganacheProvider,
-        "migrations_directory": path.join(__dirname, migrationsDirectory),
-        "network_id":network_id,
-        "hostname":endpoint,
-        "port":port,
+        network_id: ganacheNetwork.id,
+        hostname: getNetworkPort(ganacheNetwork),
+        port: getNetworkHostname(ganacheNetwork).toString(),
         gas: "6721975",
         gasPrice: "10000000"
     };
@@ -67,18 +63,17 @@ async function migrateContracts() {
 module.exports = {
     migrateContracts,
     ganacheProvider,
-    webProvider,
-    eth,
-    web3
+    ganacheServer,
+    webProvider
 };
 
 require('chai')
     .use(require('chai-as-promised'))
     .use(require('chai-bignumber'))
     .should();
-require('./tests/zapTokenTest');
+/*require('./tests/zapTokenTest');*/
 require('./tests/zapRegistryTest');
-require('./tests/zapBondageTest');
+/*require('./tests/zapBondageTest');
 require('./tests/zapArbiterTest');
-require('./tests/zapDispatchTest');
-require('./tests/closeServer');
+require('./tests/zapDispatchTest');*/
+/*require('./tests/closeServer');*/

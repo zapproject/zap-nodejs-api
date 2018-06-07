@@ -18,3 +18,6 @@ function closeServer() {
 }
 
 global.closeServer = closeServer;
+
+module.exports.serverOptions = serverOptions;
+module.exports.server = ganacheServer;

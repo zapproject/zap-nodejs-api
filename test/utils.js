@@ -3,6 +3,7 @@ const { network_id } = require('../config');
 const objectToCreate = { from: '0x627306090abab3a6e1400e9345bc60c78a8bef57', gas: 6000000 };
 const { fromAscii, toBN } = require('ethjs');
 const BigNumber = require('bignumber.js');
+const Curve = require('../src/api/components/Curve');
 
 function getInstanceOfSmartContract(abiFile) {
     return eth.contract(abiFile.abi).at(abiFile.networks[network_id].address);
@@ -86,18 +87,8 @@ async function getNewTestSubscriberContract({ abiFile, dispatchAddress, bondageA
     return eth.contract(abiFile.abi).at(contractAddress);
 }
 
-const curveType = {
-    "ZapCurveNone": 0,
-    "ZapCurveLinear": 1,
-    "ZapCurveExponential": 2,
-    "ZapCurveLogarithmic": 3
-};
-
 const providerTitle = fromAscii("test");
 const providerPublicKey = 111;
-const ZapCurveType = 'ZapCurveLinear';
-const curveStart = 1;
-const curveMultiplier = 1;
 const param1 = new String("p1");
 const param2 = new String("p2");
 const params = [fromAscii(param1.valueOf()), fromAscii(param2.valueOf())];
@@ -108,21 +99,19 @@ const tokensForOwner = new BigNumber("1e30");
 const tokensForOracle = new BigNumber('1e24');
 const allocateAccount = 300000;
 const query = "Why?";
+const curve = new Curve([2, 2, 0, 1, 1, 1, 10, 0, 0], [0, 5, 5, 10], [1, 3]);
 
 
 module.exports = {
+    curve,
     getInstanceOfSmartContract,
     getNewSmartContract,
     getNewBondageContract,
     getNewArbiterContract,
     getNewDispatchContract,
     getNewRegistryContract,
-    curveType,
     providerTitle,
     providerPublicKey,
-    ZapCurveType,
-    curveStart,
-    curveMultiplier,
     params,
     specifier,
     oracleEndpoint,

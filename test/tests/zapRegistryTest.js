@@ -1,36 +1,31 @@
-const instanceClass = require('../../src/api/contracts/ZapRegistry');
-const ZapWrapper = require('../../src/api/ZapWrapper');
+const Registry = require('../../src/api/contracts/Registry');
 const assert = require("chai").assert;
-const Curve = require('../src/api/components/Curve');
+const fs = require('fs');
 const {
     webProvider,
-    eth
+    migrateContracts,
 } = require('../bootstrap');
 const {
-    zapRegistryAbi,
-    network_id,
-    zapRegistryStorageAbi
+    ganacheNetwork
 } = require('../../config');
 const path = require('path');
-// const zapRegistryAbiFile = require(path.join(__dirname, '../../src/contracts/abis/ZapRegistry.json'));
-const { fromAscii } = require('ethjs');
 const {
-    curveType,
+    curve,
     providerTitle,
     providerPublicKey,
-    ZapCurveType,
     specifier,
-    curveStart,
-    curveMultiplier,
     params
 } = require('../utils');
 
+const currentNetwork = ganacheNetwork;
 
-describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
+// Init websocket provider for listening events (HttpProvider is deprecated);
+const web3 = webProvider; // using develop rpc
+
+
+describe('Registry, path to "/src/api/contracts/Registry"', () => {
     let addressZapRegistry;
     let accounts = [];
-    let deployedZapRegistry;
-    let zapRegistry;
     let abiJSON;
     let zapRegistryWrapper;
     let addressZapRegistryStorage;
@@ -38,13 +33,17 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
     let abiJSONStorage;
 
     before(async () => {
-        abiJSON = require(path.join(__dirname, zapRegistryAbi));
-        abiJSONStorage = require(path.join(__dirname, zapRegistryStorageAbi));
-        addressZapRegistry = abiJSON.networks[network_id].address;
-        addressZapRegistryStorage = abiJSONStorage.networks[network_id].address;
-        deployedZapRegistry = eth.contract(abiJSON.abi).at(addressZapRegistry);
-        deployedStorage = eth.contract(abiJSONStorage.abi).at(addressZapRegistryStorage);
-        accounts = await webProvider.eth.getAccounts();
+        await migrateContracts();
+        abiJSON = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Registry.json'));
+        abiJSONStorage = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/RegistryStorage.json'));
+        addressZapRegistry = abiJSON.networks[currentNetwork.id].address;
+        addressZapRegistryStorage = abiJSONStorage.networks[currentNetwork.id].address;
+        accounts = await web3.eth.getAccounts();
+        zapRegistryWrapper = new Registry({
+            provider: web3.currentProvider,
+            address: addressZapRegistry,
+            artifact: abiJSON
+        });
         assert.ok(true);
     });
 
@@ -52,15 +51,6 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
 
         beforeEach((done) => {
             setTimeout(() => done(), 500);
-        });
-
-        it('Should initiate zapRegistry wrapper', async () => {
-            const wrapper = new ZapWrapper(eth);
-            zapRegistryWrapper = wrapper.initClass({
-                instanceClass,
-                address: addressZapRegistry,
-                abiPath: abiJSON.abi
-            });
         });
 
         it('should check bind registry storage', async () => {
@@ -86,17 +76,16 @@ describe('ZapRegistry, path to "/src/api/contracts/ZapRegistry"', () => {
         });
 
         it('Should initiate Provider curve in zap registry contract', async () => {
-            let c = new Curve([2, 2, 0, 1, 1, 1, 10, 0, 0], [0, 5, 5, 10], [1, 3]);
             await zapRegistryWrapper.initiateProviderCurve({
                 specifier,
-                c,
+                curve,
                 from: accounts[0],
                 gas: 300000
             });
             const curve = await zapRegistryWrapper.contract.getProviderCurve(accounts[0], fromAscii(specifier.valueOf()));
-            await expect(Utils.fetchPureArray(curve[0],parseInt)).to.deep.equal(c.constants);
-            await expect(Utils.fetchPureArray(curve[1],parseInt)).to.deep.equal(c.parts);
-            await expect(Utils.fetchPureArray(curve[2],parseInt)).to.deep.equal(c.dividers);
+            await expect(Utils.fetchPureArray(curve[0],parseInt)).to.deep.equal(curve.constants);
+            await expect(Utils.fetchPureArray(curve[1],parseInt)).to.deep.equal(curve.parts);
+            await expect(Utils.fetchPureArray(curve[2],parseInt)).to.deep.equal(curve.dividers);
         });
 
         it('Should set endpoint params in zap registry contract', async () => {
