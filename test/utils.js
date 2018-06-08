@@ -87,13 +87,11 @@ async function getNewTestSubscriberContract({ abiFile, dispatchAddress, bondageA
     return eth.contract(abiFile.abi).at(contractAddress);
 }
 
-const providerTitle = fromAscii("test");
+const providerTitle = "test";
 const providerPublicKey = 111;
-const param1 = new String("p1");
-const param2 = new String("p2");
-const params = [fromAscii(param1.valueOf()), fromAscii(param2.valueOf())];
+const params = ["p1", "p2"];
 const specifier = "test-linear-specifier";
-const oracleEndpoint = fromAscii(specifier.valueOf());
+const oracleEndpoint = specifier.valueOf();
 const gasTransaction = toBN(3000000);
 const tokensForOwner = new BigNumber("1e30");
 const tokensForOracle = new BigNumber('1e24');
@@ -103,7 +101,6 @@ const curve = new Curve([2, 2, 0, 1, 1, 1, 10, 0, 0], [0, 5, 5, 10], [1, 3]);
 
 
 module.exports = {
-    curve,
     getInstanceOfSmartContract,
     getNewSmartContract,
     getNewBondageContract,
@@ -120,8 +117,7 @@ module.exports = {
     tokensForOracle,
     allocateAccount,
     getNewCurrentCostContract,
-    param1,
-    param2,
     query,
+    curve,
     getNewTestSubscriberContract
 };
