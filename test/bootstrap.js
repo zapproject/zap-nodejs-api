@@ -6,10 +6,8 @@ const migrate = require('../node_modules/truffle-core/lib/commands/migrate');
 const path = require('path');
 const fs = require('fs');
 
-const { provider } = require('ganache-core');
-
-// method that helps as get promise with out callback function
-const { server, serverOptions } = require('./server');
+const { provider, server } = require('ganache-core');
+const { ganacheServerOptions } = require('../config/server.js');
 
 const { promisify } = require('util');
 const asyncMigrate = promisify(migrate.run);
@@ -22,8 +20,19 @@ const {
 } = require('../config');
 
 // initiate and run ganache server;
-const ganacheServer = server;
-const ganacheProvider = provider(serverOptions);
+const ganacheServer = server(ganacheServerOptions);
+
+ganacheServer.listen(7545, (err, blockchain) => {
+    if (err) {
+        throw err;
+    }
+    if (blockchain) {
+        //  console.log(blockchain);
+    }
+});
+console.log('server started on port: 7545');
+
+const ganacheProvider = provider(ganacheServerOptions);
 
 
 function getNetworkPort(network) {
@@ -35,7 +44,7 @@ function getNetworkHostname(network) {
 }
 
 function clearDeploymentInfo(onlyRemoveNetworks = true) {
-    const buildDir = path.join(__dirname, '../ZapContracts/build/contracts');
+    const buildDir = path.join(__dirname, contractsBuildDirectory);
     let files = fs.readdirSync(buildDir);
 
     for (let i = 0; i < files.length; i++) {
@@ -57,27 +66,21 @@ function clearDeploymentInfo(onlyRemoveNetworks = true) {
 }
 
 async function migrateContracts() {
-    ganacheServer.listen(7545, (err, blockchain) => {
-        if (err) {
-            throw err;
-        }
-        if (blockchain) {
-          //  console.log(blockchain);
-        }
-    });
-    console.log('server started on port: 7545');
-
     const options = {
-        logger: console,
-        contracts_build_directory: path.join(__dirname, contractsBuildDirectory),
-        contracts_directory: path.join(__dirname, contractsDirectory),
-        working_directory: path.join(__dirname, workingDirectory),
-        migrations_directory: path.join(__dirname, migrationsDirectory),
-        network: 'ganache-gui',
-        provider: ganacheProvider,
-        gas: "6721975",
-        gasPrice: "10000000"
+        "logger": console,
+        "contracts_build_directory": path.join(__dirname, contractsBuildDirectory),
+        "contracts_directory": path.join(__dirname, contractsDirectory),
+        "working_directory": path.join(__dirname, workingDirectory),
+        "migrations_directory": path.join(__dirname, migrationsDirectory),
+        "network": 'ganache-gui',
+        "network_id": ganacheNetwork.address,
+        "provider": ganacheProvider,
+        "hostname": 'localhost',
+        "port": 7545,
+        "gas": "6721975",
+        "gasPrice": "10000000"
     };
+
     try {
         clearDeploymentInfo(false);
         await asyncMigrate(options);
@@ -101,7 +104,7 @@ try {
     //     .use(require('chai-bignumber'))
     //     .should();
     /*require('./tests/zapTokenTest');*/
-    //require('./tests/zapRegistryTest');
+    require('./tests/zapRegistryTest');
     /*require('./tests/zapBondageTest');
     require('./tests/zapArbiterTest');
     require('./tests/zapDispatchTest');*/

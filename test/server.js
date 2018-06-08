@@ -1,5 +1,5 @@
 const { server } = require('ganache-core');
-const { serverOptions } = require('../config/server.js');
+
 
 const ganacheServer = server(serverOptions);
 
