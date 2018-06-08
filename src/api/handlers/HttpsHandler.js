@@ -2,6 +2,7 @@ const axios = require('axios');
 const lambda = require('aws-lambda-invoke');
 const Handler = require('../components/Handler');
 
+
 const AUTH_ERROR_CODE = 401;
 
 class HttpsHandler extends Handler {
@@ -24,10 +25,6 @@ class HttpsHandler extends Handler {
                 httpsAgent: agent
             })
         };
-
-        process.env.AWS_ACCESS_KEY_ID = this.auth.awsAccessKeyId;
-        process.env.AWS_SECRET_ACCESS_KEY = this.auth.awsSecretAccessKey;
-        process.env.AWS_REGION = this.auth.awsRegion;
     }
 
     async handleSubscription(event) {
@@ -73,15 +70,22 @@ class HttpsHandler extends Handler {
     }
 
     async notarize(url) {
-        // run notarize
-        let fileUrl = await lambda.invoke('notarize', {
-            url: url,
-            headers: this.httpOptions.headers
-        });
+        await this.auth.updateNotarizeCredentials();
 
-        return await lambda.invoke('auditor', {
-            audit_file_url: fileUrl
-        });
+        try {
+            // run notarize
+            let fileUrl = await lambda.invoke('notarize', {
+                url: url,
+                headers: this.httpOptions.headers
+            });
+
+            return await lambda.invoke('auditor', {
+                audit_file_url: fileUrl
+            });
+        } catch (e) {
+            console.log(e);
+            this.auth.setAwsCredentialsOutdated();
+        }
     }
 
     async insertSubscription() { return new Error("Not implemented yet"); }
@@ -166,6 +170,7 @@ class Auth {
         return httpOptions;
     }
 }
+
 
 module.exports.HttpsHandler = HttpsHandler;
 module.exports.Parser = ResponseParser;
