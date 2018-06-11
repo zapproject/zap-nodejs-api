@@ -1,5 +1,3 @@
-// web3 interface
-const Web3 = require('web3');
 // import method that will deploy our contracts
 const migrate = require('../node_modules/truffle-core/lib/commands/migrate');
 // method that helps to resolve paths 
@@ -21,8 +19,7 @@ const {
 
 // initiate and run ganache server;
 const ganacheServer = server(ganacheServerOptions);
-
-ganacheServer.listen(7545, (err, blockchain) => {
+ganacheServer.listen(ganacheServerOptions.port, (err, blockchain) => {
     if (err) {
         throw err;
     }
@@ -30,20 +27,12 @@ ganacheServer.listen(7545, (err, blockchain) => {
         //  console.log(blockchain);
     }
 });
-console.log('server started on port: 7545');
+console.log('server started on port: ' + ganacheServerOptions.port);
 
 const ganacheProvider = provider(ganacheServerOptions);
 
 
-function getNetworkPort(network) {
-    return network.address.split(':')[2];
-}
-
-function getNetworkHostname(network) {
-    return network.address.split(':')[1].slice(2);
-}
-
-function clearDeploymentInfo(onlyRemoveNetworks = true) {
+function clearBuild(onlyRemoveNetworks = true) {
     const buildDir = path.join(__dirname, contractsBuildDirectory);
     let files = fs.readdirSync(buildDir);
 
@@ -73,16 +62,16 @@ async function migrateContracts() {
         "working_directory": path.join(__dirname, workingDirectory),
         "migrations_directory": path.join(__dirname, migrationsDirectory),
         "network": 'ganache-gui',
-        "network_id": ganacheNetwork.address,
+        "network_id": ganacheNetwork.id,
         "provider": ganacheProvider,
         "hostname": 'localhost',
-        "port": 7545,
+        "port": ganacheServerOptions.port,
         "gas": "6721975",
         "gasPrice": "10000000"
     };
 
     try {
-        clearDeploymentInfo(false);
+        clearBuild(false);
         await asyncMigrate(options);
         return Promise.resolve('done');
     } catch(err) {
@@ -93,21 +82,18 @@ async function migrateContracts() {
 
 module.exports = {
     migrateContracts,
-    ganacheServer,
-    ganacheProvider
+    clearBuild,
+    ganacheServer
 };
 
 
 try {
-    // require('chai')
-    //     .use(require('chai-as-promised'))
-    //     .use(require('chai-bignumber'))
-    //     .should();
-    /*require('./tests/zapTokenTest');*/
+    require('./tests/zapDispatchTest');
+    require('./tests/zapTokenTest');
     require('./tests/zapRegistryTest');
     /*require('./tests/zapBondageTest');
     require('./tests/zapArbiterTest');
-    require('./tests/zapDispatchTest');*/
+    */
 } catch (e) {
     console.log(e);
     ganacheServer.close();

@@ -5,7 +5,7 @@ module.exports = {
     workingDirectory: '../ZapContracts',
     runMigrationTimeOut: 5000,
     migrationsDirectory: '../ZapContracts/migrations',
-    zapTokenAbi: '../ZapContracts/build/contracts/TheToken.json',
+    zapTokenAbi: '../ZapContracts/build/contracts/ZapToken.json',
     zapRegistryAbi: '../ZapContracts/build/contracts/Registry.json',
     zapArbiterAbi: '../ZapContracts/build/contracts/Arbiter.json',
     zapRegistryStorageAbi: '../ZapContracts/build/contracts/RegistryStorage.json',
