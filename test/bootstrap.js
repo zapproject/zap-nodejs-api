@@ -88,12 +88,11 @@ module.exports = {
 
 
 try {
+    require('./tests/zapBondageTest');
     require('./tests/zapDispatchTest');
     require('./tests/zapTokenTest');
     require('./tests/zapRegistryTest');
-    /*require('./tests/zapBondageTest');
-    require('./tests/zapArbiterTest');
-    */
+    //require('./tests/zapArbiterTest');
 } catch (e) {
     console.log(e);
     ganacheServer.close();

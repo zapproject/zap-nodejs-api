@@ -60,7 +60,7 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
 
     describe('Registry', function () {
 
-        it('should check bind registry storage', async () => {
+        it('Should check bind registry storage', async () => {
             const data = await deployedStorage.owner.call();
             await expect(data.toLowerCase()).to.be.equal(addressRegistry.toLowerCase());
         });

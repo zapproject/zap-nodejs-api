@@ -176,7 +176,7 @@ describe('Dispatch, path to "/src/api/contract/Dispatch"', () => {
             ]);
         }
 
-        it('should get instances of smart contract and bind their storages', async () => {
+        it('Should get instances of smart contract and bind their storages', async () => {
             const data = await getNewSmartContracts();
 
             await expect(data[0].valueOf()).to.be.equal(deployedZapBondage.address);
