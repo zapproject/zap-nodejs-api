@@ -77,7 +77,7 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
             let registryInstance = await registryWrapper.contractInstance();
             const title = web3.utils.hexToUtf8(await registryInstance.getProviderTitle(accounts[0]));
 
-            expect(title).to.be.equal(providerTitle);
+            await expect(title).to.be.equal(providerTitle);
         });
 
         it('Should initiate Provider curve in zap registry contract', async () => {
@@ -108,7 +108,7 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
             });
             const endpointsSize = await deployedStorage.getEndpointIndexSize.call(accounts[0], specifier, { from: accounts[0] });
 
-            expect(endpointsSize.valueOf()).to.be.equal(params.length.toString());
+            await expect(endpointsSize.valueOf()).to.be.equal(params.length.toString());
         });
 
         it('Should get oracle in zap registry contract', async () => {
@@ -117,8 +117,8 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
                 endpoint: specifier.valueOf()
             });
 
-            expect(oracle.public_key.toNumber()).to.be.equal(providerPublicKey);
-            expect(oracle.endpoint_params.length).to.be.equal(params.length);
+            await expect(oracle.public_key.toNumber()).to.be.equal(providerPublicKey);
+            await expect(oracle.endpoint_params.length).to.be.equal(params.length);
         });
 
         after(function () {

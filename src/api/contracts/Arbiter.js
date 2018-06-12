@@ -1,13 +1,13 @@
 const Base = require('./Base');
 
-class ZapArbiter {
+class Arbiter extends Base {
     // Initiate a subscription
     async initiateSubscription({oracleAddress, endpoint, js_params, dots, publicKey, from, gas}) {
         try {
             const contractInstance = await this.contractInstance();
             // Make sure we could parse it correctly
-            if (params instanceof Error) {
-                throw params;
+            if (js_params instanceof Error) {
+                throw js_params;
             }
 
             return await contractInstance.initiateSubscription(
@@ -24,4 +24,4 @@ class ZapArbiter {
     }
 }
 
-module.exports = ZapArbiter;
+module.exports = Arbiter;
