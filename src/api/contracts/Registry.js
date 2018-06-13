@@ -1,12 +1,7 @@
 const Oracle = require('../components/Oracle');
 const Base = require('./Base');
-
-const curveType = {
-    "ZapCurveNone": 0,
-    "ZapCurveLinear": 1,
-    "ZapCurveExponential": 2,
-    "ZapCurveLogarithmic": 3
-};
+const Web3 = require('web3');
+const web3 = new Web3();
 
 class ZapRegistry extends Base {
     constructor({provider, address, artifact}) {
@@ -55,7 +50,7 @@ class ZapRegistry extends Base {
         try {
             const contractInstance = await this.contractInstance();
             let endpoint_params = [];
-            params.forEach(el => endpoint_params.push(fromAscii(el)));
+            params.forEach(el => endpoint_params.push(web3.utils.utf8ToHex(el)));
             return await contractInstance.setEndpointParams(
                 endpoint,
                 endpoint_params,
@@ -86,13 +81,13 @@ class ZapRegistry extends Base {
             while (true) {
                 try {
                     if (i >= 50) break;
-                    const {nextIndex, endpoint_param} = await contractInstance.getNextEndpointParam(
+                    const result = await contractInstance.getNextEndpointParam(
                         address,
                         endpoint,
                         i
                     );
-                    endpoint_params.push(endpoint_param);
-                    if (!nextIndex.toNumber()) break;
+                    endpoint_params.push(result[1]);
+                    if (!result[0].toNumber()) break;
                     i++
                 } catch (err) {
                     console.log(err);

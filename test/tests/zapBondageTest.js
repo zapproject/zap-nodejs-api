@@ -1,11 +1,13 @@
-const instanceClass = require('../../src/api/contracts/ZapBondage');
-const instanceStorageClass = require('../../src/api/contracts/ZapBondageStorage');
-const ZapWrapper = require('../../src/api/ZapWrapper');
-const assert = require('chai').assert;
-const {
-    webProvider,
-    eth
-} = require('../bootstrap');
+const expect = require('chai')
+    .use(require('chai-as-promised'))
+    .use(require('chai-bignumber'))
+    .expect;
+
+const Bondage = require('../../src/api/contracts/Bondage');
+const Web3 = require('web3');
+
+const { migrateContracts, clearBuild, ganacheServer } = require('../bootstrap');
+
 const {
     zapBondageAbi,
     bondageStorageAbi,
@@ -13,31 +15,33 @@ const {
     zapRegistryAbi,
     zapRegistryStorageAbi,
     currentCostAbi,
-    addressSpacePointerAbi
+    addressSpacePointerAbi,
+    ganacheNetwork
 } = require('../../config');
 const { join } = require('path');
+const fs = require('fs');
 const {
-    getNewSmartContract,
-    getNewRegistryContract,
-    getNewBondageContract,
-    curveType,
+    getDeployedContract,
+    curve,
     providerTitle,
     providerPublicKey,
-    ZapCurveType,
-    curveStart,
-    curveMultiplier,
     params,
     specifier,
     oracleEndpoint,
     tokensForOracle,
     tokensForOwner,
-    gasTransaction,
-    getInstanceOfSmartContract,
-    getNewCurrentCostContract
+    gasTransaction
 } = require('../utils');
 
+const currentNetwork = ganacheNetwork;
+const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address));
 
-describe('Bondage contract, path to "/src/api/contracts/ZapBondage"', () => {
+async function configureEnvironment(func) {
+    await func();
+}
+
+
+describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
 
     let
         accounts,
@@ -50,84 +54,56 @@ describe('Bondage contract, path to "/src/api/contracts/ZapBondage"', () => {
         currentCostStorage,
         addressZapBondage,
         zapBondageWrapper,
-        zapBondageStorageWrapper,
-        wrapper,
         bondageStoreAbi;
 
-    before(async () => {
-        accounts = await webProvider.eth.getAccounts();
-        assert.ok(true);
+    before(function (done) {
+        configureEnvironment(async () => {
+            this.timeout(60000);
+            await migrateContracts();
+            accounts = await web3.eth.getAccounts();
+            done();
+        });
     });
 
-    describe('ZapBondageWrapper', function () {
-
-        beforeEach(function (done) {
-            setTimeout(() => done(), 500);
-        });
+    describe('Bondage', function () {
 
         it('Should get new instances of contracts and bind their storages', async () => {
-            bondageAbi = require(join(__dirname, zapBondageAbi));
-            bondageStoreAbi = require(join(__dirname, bondageStorageAbi));
-            const
-                registryAbi = require(join(__dirname, zapRegistryAbi)),
-                registryStoreAbi = require(join(__dirname, zapRegistryStorageAbi)),
-                tokenAbi = require(join(__dirname, zapTokenAbi)),
-                costStorageAbi = require(join(__dirname, currentCostAbi)),
-                spacePointerAbi = require(join(__dirname, addressSpacePointerAbi));
+            bondageAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + zapBondageAbi)));
+            bondageStoreAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + bondageStorageAbi)));
 
-            const spacePointer = getInstanceOfSmartContract(spacePointerAbi);
+            const registryAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + zapRegistryAbi)));
+            const registryStoreAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + zapRegistryStorageAbi)));
+            const tokenAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + zapTokenAbi)));
+            const costStorageAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + currentCostAbi)));
 
             [
                 bondageStorage,
                 registryStorage,
                 zapToken,
             ] = await Promise.all([
-                getNewSmartContract(bondageStoreAbi),
-                getNewSmartContract(registryStoreAbi),
-                getNewSmartContract(tokenAbi),
+                getDeployedContract(bondageStoreAbi, currentNetwork, web3.currentProvider),
+                getDeployedContract(registryStoreAbi, currentNetwork, web3.currentProvider),
+                getDeployedContract(tokenAbi, currentNetwork, web3.currentProvider),
             ]);
 
-            zapRegistry = await getNewRegistryContract({
-                abiFile: registryAbi,
-                regStoreAddress: registryStorage.address
-            });
-
-            currentCostStorage = await getNewCurrentCostContract({
-                abiFile: costStorageAbi,
-                pointerAddress: spacePointer.address,
-                registryAddress: zapRegistry.address
-            });
-
-            zapBondage = await getNewBondageContract({
-                abiFile: bondageAbi,
-                pointerAddress: spacePointer.address,
-                bondStoreAddress: bondageStorage.address,
-                tokenAddress: zapToken.address,
-                currentCostAddress: currentCostStorage.address
-            });
+            zapRegistry = await getDeployedContract(registryAbi, currentNetwork, web3.currentProvider);
+            currentCostStorage = await getDeployedContract(costStorageAbi, currentNetwork, web3.currentProvider);
+            zapBondage = await getDeployedContract(bondageAbi, currentNetwork, web3.currentProvider);
 
             addressZapBondage = zapBondage.address;
 
-            await Promise.all([
-                bondageStorage.transferOwnership(zapBondage.address, { from: accounts[0], gas: 600000 }),
-                registryStorage.transferOwnership(zapRegistry.address, { from: accounts[0], gas: 600000 })
-            ]);
+            const bondageStorageOwner = await bondageStorage.owner.call();
+            const registryStorageOwner = await registryStorage.owner.call();
 
-            const data = await Promise.all([
-                bondageStorage.owner({ from: accounts[0], gas: 6000000 }),
-                registryStorage.owner({ from: accounts[0], gas: 6000000 })
-            ]);
-
-            assert.equal(data[0]['0'], zapBondage.address);
-            assert.equal(data[1]['0'], zapRegistry.address);
+            await expect(bondageStorageOwner.valueOf().toLowerCase()).to.be.equal(zapBondage.address.toLowerCase());
+            await expect(registryStorageOwner.valueOf().toLowerCase()).to.be.equal(zapRegistry.address.toLowerCase());
         });
 
         it('Should get instance of smart contract throw wrapper', () => {
-            wrapper = new ZapWrapper(eth);
-            zapBondageWrapper = wrapper.initClass({
-                instanceClass,
+            zapBondageWrapper = new Bondage({
+                provider: web3.currentProvider,
                 address: addressZapBondage,
-                abiPath: bondageAbi.abi
+                artifact: bondageAbi
             });
         });
 
@@ -142,9 +118,9 @@ describe('Bondage contract, path to "/src/api/contracts/ZapBondage"', () => {
 
             await zapRegistry.initiateProviderCurve(
                 oracleEndpoint,
-                curveType[ZapCurveType],
-                curveStart,
-                curveMultiplier,
+                curve.constants,
+                curve.parts,
+                curve.dividers,
                 { from: accounts[2], gas: gasTransaction }
             );
 
@@ -168,19 +144,19 @@ describe('Bondage contract, path to "/src/api/contracts/ZapBondage"', () => {
 
             await zapBondageWrapper.bond({
                 oracleAddress: accounts[2],
-                endpoint: specifier.valueOf(),
-                amount: 8,
+                endpoint: specifier,
+                amountOfZap: 100,
                 from: accounts[0],
                 gas: gasTransaction
             });
         });
 
-        it('should get price of dots', async () => {
+        it('Should get price of dots', async () => {
             //const data =  { numDots }
             await zapBondageWrapper.estimateBond({
                 oracleAddress: accounts[2],
                 endpoint: specifier.valueOf(),
-                amount: 10,
+                amountOfZap: 10,
                 from: accounts[0],
                 gas: gasTransaction
             });
@@ -188,83 +164,37 @@ describe('Bondage contract, path to "/src/api/contracts/ZapBondage"', () => {
 
         it('Should call unbond function of zapBondage Wrapper', async () => {
             const amount = 2;
-            const { dots } = await zapBondage.getDots(
+            const dots = await zapBondage.getBoundDots(
                 accounts[0],
                 accounts[2],
-                oracleEndpoint,
-                { from: accounts[0], gas: gasTransaction }
+                oracleEndpoint
             );
 
             await zapBondageWrapper.unbond({
                 oracleAddress: accounts[2],
                 endpoint: specifier.valueOf(),
-                amount,
+                amountOfDots: amount,
                 from: accounts[0],
                 gas: gasTransaction
             });
 
-            const { dots: newDots } = await zapBondage.getDots(
+            const newDots = await zapBondage.getBoundDots(
                 accounts[0],
                 accounts[2],
-                oracleEndpoint,
-                { from: accounts[0], gas: gasTransaction }
+                oracleEndpoint
             );
-            assert.equal(dots.toNumber() - amount, newDots.toNumber());
+
+            await expect(dots.toNumber() - amount).to.be.equal(newDots.toNumber());
         });
 
         it('Should call getDots function of zapBondage Wrapper', async () => {
-            const { dots } = await zapBondageWrapper.getDots({
+            const dots = await zapBondageWrapper.getBoundDots({
                 holderAddress: accounts[0],
                 oracleAddress: accounts[2],
-                endpoint: specifier.valueOf(),
-                from: accounts[0],
-                gas: gasTransaction
+                specifier: specifier
             });
-            if (dots.toNumber()) assert.ok(true);
-        });
-    });
 
-    describe('ZapBondageStorageWrapper', function () {
-        beforeEach(function(done) {
-            setTimeout(() => done(), 500);
-        });
-
-        it('Should get instance of BondageStorage Wrapper', async () => {
-            zapBondageStorageWrapper = wrapper.initClass({
-                instanceClass: instanceStorageClass,
-                address: bondageStorage.address,
-                abiPath: bondageStoreAbi.abi
-            });
-        });
-
-        it('Should get number of indexed size', async () => {
-            const data = await zapBondageStorageWrapper.getIndexSize({
-                holderAddress: accounts[0],
-                from: accounts[0],
-                gas: gasTransaction
-            });
-            assert.equal(data['0'].toNumber(), 1);
-        });
-
-        it('Should get oracle address by index', async () => {
-            const data = await zapBondageStorageWrapper.getOracleAddress({
-                holderAddress: accounts[0],
-                index: 0,
-                from: accounts[0],
-                gas: gasTransaction
-            });
-            assert.equal(data['0'], accounts[2].toLowerCase());
-        });
-
-        it('Should get count of bound dots', async () => {
-            const data = await zapBondageStorageWrapper.getBoundDots({
-                holderAddress: accounts[0],
-                oracleAddress: accounts[2],
-                specifier: specifier.valueOf(),
-                from: accounts[0],
-                gas: gasTransaction
-            });
-            if (data['0'].toNumber(0)) assert.ok(true);
+            await expect(dots.toNumber()).to.be.equal(dots.toNumber());
         });
     });
 });

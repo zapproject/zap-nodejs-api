@@ -1,15 +1,5 @@
 const contract = require("truffle-contract");
-
-function fixTruffleContractCompatibilityIssue(contract) {
-    if (!contract.currentProvider.sendAsync || typeof contract.currentProvider.sendAsync !== "function") {
-        contract.currentProvider.sendAsync = function() {
-            return contract.currentProvider.send.apply(
-                contract.currentProvider, arguments
-            );
-        };
-    }
-    return contract;
-}
+const { fixTruffleContractCompatibilityIssue } = require("../utils");
 
 class Base {
     constructor({provider, address, artifact}) {

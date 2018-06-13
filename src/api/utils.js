@@ -28,9 +28,21 @@ const getHexString = (str) => {
     return `0x${hex}`;
 };
 
+const fixTruffleContractCompatibilityIssue = (contract) => {
+    if (!contract.currentProvider.sendAsync || typeof contract.currentProvider.sendAsync !== "function") {
+        contract.currentProvider.sendAsync = function() {
+            return contract.currentProvider.send.apply(
+                contract.currentProvider, arguments
+            );
+        };
+    }
+    return contract;
+};
+
 module.exports = {
     getABI,
     toHex,
     getHexBuffer,
-    getHexString
+    getHexString,
+    fixTruffleContractCompatibilityIssue
 };
