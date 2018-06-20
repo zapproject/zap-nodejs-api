@@ -1,15 +1,5 @@
 const { readFileSync } = require('fs');
-
-const getABI = (contractName) => {
-    let abiPath = `../../contracts/abis/${contractName}.json`
-    let abiFile = JSON.parse(readFileSync(abiPath));
-    return abiFile;
-}
-
-const getAddress = (contractName, network, contractAddress) => {
-    let address = contractAddress || JSON.parse("../contracts/${network}/addresses.json")[contractName];
-    return address;
-}
+const Config = require('../../config/index');
 
 const toHex = (str) => {
     let hex = '';
@@ -39,10 +29,57 @@ const fixTruffleContractCompatibilityIssue = (contract) => {
     return contract;
 };
 
+class Loader {
+    constructor({ address, id }) {
+        this.currentNetwork = { address, id };
+        this.web3 = new Web3(new Web3.providers.WebsocketProvider(this.currentNetwork.address));
+    }
+
+    getArbiterInstance(network_id = this.currentNetwork.id) {
+        const artifact = JSON.parse(fs.readFileSync(path.join(ProjectPath, Config.arbiterAbi)));
+        const address = artifact.networks[network_id].address;
+        const provider = this.web3.currentProvider;
+
+        return new Arbiter({ provider, address, artifact });
+    }
+
+    getBondageInstance(network_id = this.currentNetwork.id) {
+        const artifact = JSON.parse(fs.readFileSync(path.join(ProjectPath, Config.bondageAbi)));
+        const address = artifact.networks[network_id].address;
+        const provider = this.web3.currentProvider;
+
+        return new Bondage({ provider, address, artifact });
+    }
+
+    getDispatchInstance(network_id = this.currentNetwork.id) {
+        const artifact = JSON.parse(fs.readFileSync(path.join(ProjectPath, Config.dispatchAbi)));
+        const address = artifact.networks[network_id].address;
+        const provider = this.web3.currentProvider;
+
+        return new Dispatch({ provider, address, artifact });
+    }
+
+    getRegistryInstance(network_id = this.currentNetwork.id) {
+        const artifact = JSON.parse(fs.readFileSync(path.join(ProjectPath, Config.registryAbi)));
+        const address = artifact.networks[network_id].address;
+        const provider = this.web3.currentProvider;
+
+        return new Registry({ provider, address, artifact });
+    }
+
+    getZapTokenInstance(network_id = this.currentNetwork.id) {
+        const artifact = JSON.parse(fs.readFileSync(path.join(ProjectPath, Config.zapTokenAbi)));
+        const address = artifact.networks[network_id].address;
+        const provider = this.web3.currentProvider;
+
+        return new ZapToken({ provider, address, artifact });
+    }
+}
+
 module.exports = {
-    getABI,
     toHex,
     getHexBuffer,
     getHexString,
-    fixTruffleContractCompatibilityIssue
+    fixTruffleContractCompatibilityIssue,
+    Loader
 };

@@ -9,16 +9,8 @@ const ZapDispatch = require('../src/api/contracts/Dispatch');
 const ZapArbiter = require('../src/api/contracts/Arbiter');
 const Curve = require('../src/api/components/Curve');
 
-const testNetwork = {
-    address: `ws://127.0.0.1:9545`, // truffle develop rpc
-    id: 4447
-};
-const dockerNetwork = {
-    address: 'ws://127.0.0.1:8546', // parity docker container
-    id: 211211
-};
 
-const currentNetwork = dockerNetwork;
+const currentNetwork = Config.dockerNetwork;
 
 // Init websocket provider for listening events (HttpProvider is deprecated);
 const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address)); // using develop rpc
@@ -29,7 +21,6 @@ const zapDispatchJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contrac
 const zapBondageJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Bondage.json'));
 const zapRegistryJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Registry.json'));
 const zapArbiterJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Arbiter.json'));
-const registryStorageJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/RegistryStorage.json'));
 
 
 /**
