@@ -6,10 +6,8 @@ const expect = require('chai')
 const Registry = require('../../src/api/contracts/Registry');
 const Web3 = require('web3');
 const { getDeployedContract } = require("../utils");
-const fs = require('fs');
 const { migrateContracts, clearBuild, ganacheServer } = require('../bootstrap');
-const { ganacheNetwork, contractsBuildDirectory } = require('../../config');
-const path = require('path');
+const Config = require('../../config/index');
 
 const {
     providerTitle,
@@ -19,8 +17,8 @@ const {
     curve
 } = require('../utils');
 
-const currentNetwork = ganacheNetwork;
-const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address));
+const currentNetwork = Config.ganacheNetwork;
+const web3 = new Web3(currentNetwork.provider);
 
 
 async function configureEnvironment(func) {
@@ -32,7 +30,6 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
     let addressRegistry;
     let abiJSON;
     let registryWrapper;
-    let addressRegistryStorage;
     let deployedStorage;
     let abiJSONStorage;
 
@@ -42,8 +39,8 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
             await migrateContracts();
 
             accounts = await web3.eth.getAccounts();
-            abiJSON = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + contractsBuildDirectory + '/Registry.json')));
-            abiJSONStorage = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + contractsBuildDirectory + '/RegistryStorage.json')));
+            abiJSON = Config.getRegistryArtifact();
+            abiJSONStorage = Config.getRegistryStorageArtifact();
             addressRegistry = abiJSON.networks[currentNetwork.id].address;
 
             deployedStorage = await getDeployedContract(abiJSONStorage, currentNetwork, web3.currentProvider);

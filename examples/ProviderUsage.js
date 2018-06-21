@@ -1,13 +1,12 @@
-const fs = require('fs');
 const Web3 = require('web3');
 const Config = require('../config/index');
+const { Loader } = require('../src/api/utils');
 const Provider = require('../src/api/components/Provider');
 const Handler = require('../src/api/components/Handler');
-const ZapDispatch = require('../src/api/contracts/Dispatch');
-const ZapArbiter = require('../src/api/contracts/Arbiter');
 const Curve = require('../src/api/components/Curve');
 
 const currentNetwork = Config.dockerNetwork;
+const loader = new Loader(currentNetwork);
 const web3 = new Web3(currentNetwork.provider); // using develop rpc
 
 /**
@@ -193,11 +192,11 @@ async function main() {
     let myProvider = new Provider(new ZapDispatch({
         provider: web3.currentProvider,
         address: zapDispatch._address,
-        artifact: zapDispatchJson
+        artifact: Config.dispatchArtifact
     }), new ZapArbiter({
         provider:  web3.currentProvider,
         address: zapArbiter._address,
-        artifact: zapArbiterJson
+        artifact: Config.arbiterArtifact
     }), myHandler);
 
     // Specifying filters for Incoming event

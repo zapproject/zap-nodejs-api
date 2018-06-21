@@ -9,13 +9,7 @@ const { ganacheServerOptions } = require('../config/server.js');
 
 const { promisify } = require('util');
 const asyncMigrate = promisify(migrate.run);
-const {
-    ganacheNetwork,
-    contractsBuildDirectory,
-    contractsDirectory,
-    migrationsDirectory,
-    workingDirectory
-} = require('../config');
+const Config = require('../config');
 
 // initiate and run ganache server;
 const ganacheServer = server(ganacheServerOptions);
@@ -33,7 +27,7 @@ const ganacheProvider = provider(ganacheServerOptions);
 
 
 function clearBuild(onlyRemoveNetworks = true) {
-    const buildDir = path.join(__dirname, contractsBuildDirectory);
+    const buildDir = path.join(Config.projectPath, Config.contractsBuildDirectory);
     let files = fs.readdirSync(buildDir);
 
     for (let i = 0; i < files.length; i++) {
@@ -57,12 +51,12 @@ function clearBuild(onlyRemoveNetworks = true) {
 async function migrateContracts() {
     const options = {
         "logger": console,
-        "contracts_build_directory": path.join(__dirname, contractsBuildDirectory),
-        "contracts_directory": path.join(__dirname, contractsDirectory),
-        "working_directory": path.join(__dirname, workingDirectory),
-        "migrations_directory": path.join(__dirname, migrationsDirectory),
+        "contracts_build_directory": path.join(Config.projectPath, Config.contractsBuildDirectory),
+        "contracts_directory": path.join(Config.projectPath, Config.contractsDirectory),
+        "working_directory": path.join(Config.projectPath, Config.workingDirectory),
+        "migrations_directory": path.join(Config.projectPath, Config.migrationsDirectory),
         "network": 'ganache-gui',
-        "network_id": ganacheNetwork.id,
+        "network_id": Config.ganacheNetwork.id,
         "provider": ganacheProvider,
         "hostname": 'localhost',
         "port": ganacheServerOptions.port,

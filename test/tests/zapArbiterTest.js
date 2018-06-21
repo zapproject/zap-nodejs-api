@@ -3,23 +3,10 @@ const expect = require('chai')
     .use(require('chai-bignumber'))
     .expect;
 
+const Config = require('../../config/index');
 const Arbiter = require('../../src/api/contracts/Arbiter');
 const Web3 = require('web3');
 const { migrateContracts, ganacheServer, clearBuild } = require('../bootstrap');
-const {
-    zapArbiterAbi,
-    zapTokenAbi,
-    zapRegistryAbi,
-    zapBondageAbi,
-    arbiterStorageAbi,
-    zapRegistryStorageAbi,
-    bondageStorageAbi,
-    currentCostAbi,
-    addressSpacePointerAbi,
-    ganacheNetwork
-} = require('../../config');
-const path = require('path');
-const fs = require('fs');
 const {
     getDeployedContract,
     curve,
@@ -32,8 +19,8 @@ const {
     gasTransaction
 } = require('../utils');
 
-const currentNetwork = ganacheNetwork;
-const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address));
+const currentNetwork = Config.ganacheNetwork;
+const web3 = new Web3(currentNetwork.provider);
 
 async function configureEnvironment(func) {
     await func();
@@ -68,15 +55,15 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
 
         it('Should get instances of smart contracts, their storages and bind owners', async function () {
             try {
-                arbiterAbi = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + zapArbiterAbi)));
-                let tokenAbi = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + zapTokenAbi)));
-                let registryAbi = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + zapRegistryAbi)));
-                let bondageAbi = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + zapBondageAbi)));
+                arbiterAbi = Config.getArbiterArtifact();
+                let tokenAbi = Config.getZapTokenArtifact();
+                let registryAbi = Config.getRegistryArtifact();
+                let bondageAbi = Config.getBondageArtifact();
 
-                let bondageStorAbi = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + bondageStorageAbi)));
-                let registryStorAbi = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + zapRegistryStorageAbi)));
-                let arbiterStorAbi = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + arbiterStorageAbi)));
-                let currCostAbi = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + currentCostAbi)));
+                let bondageStorAbi = Config.getBondageStorageArtifact();
+                let registryStorAbi = Config.getRegistryStorageArtifact();
+                let arbiterStorAbi = Config.getArbiterStorageArtifact();
+                let currCostAbi = Config.getCurrentCostArtifact();
 
                 [
                     bondageStorage,
