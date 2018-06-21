@@ -6,15 +6,13 @@ const expect = require('chai')
 const ZapToken = require('../../src/api/contracts/ZapToken');
 const BigNumber = require('bignumber.js');
 const Web3 = require('web3');
-const path = require('path');
-const fs = require('fs');
 
 const { migrateContracts, ganacheServer, clearBuild } = require('../bootstrap');
-const { zapTokenAbi, ganacheNetwork, contractsBuildDirectory } = require('../../config');
+const Config = require('../../config/index');
 const { tokensForOwner, allocateAccount, getDeployedContract } = require('../utils');
 
-const currentNetwork = ganacheNetwork;
-const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address));
+const currentNetwork = Config.ganacheNetwork;
+const web3 = new Web3(currentNetwork.provider);
 
 async function configureEnvironment(func) {
     await func();
@@ -26,7 +24,6 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
     let deployedZapToken;
     let abiJSON;
     let zapTokenWrapper;
-    let startOwnerBalance;
 
     before(function (done) {
         configureEnvironment(async () => {
@@ -34,7 +31,7 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
             await migrateContracts();
 
             accounts = await web3.eth.getAccounts();
-            abiJSON = JSON.parse(fs.readFileSync(path.join(__dirname, '../' + zapTokenAbi)));
+            abiJSON = Config.getZapTokenArtifact();
             addressZapToken = abiJSON.networks[currentNetwork.id].address;
             deployedZapToken = await getDeployedContract(abiJSON, currentNetwork, web3.currentProvider);
 

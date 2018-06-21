@@ -6,7 +6,6 @@ const expect = require('chai')
 const Dispatch = require('../../src/api/contracts/Dispatch');
 const Web3 = require('web3');
 const { migrateContracts, ganacheServer, clearBuild } = require('../bootstrap');
-const { join } = require('path');
 const {
     getDeployedContract,
     providerPublicKey,
@@ -19,22 +18,10 @@ const {
     tokensForOwner,
     query
 } = require('../utils');
-const {
-    zapDispatchAbi,
-    zapArbiterAbi,
-    zapTokenAbi,
-    zapRegistryAbi,
-    zapBondageAbi,
-    zapDispatchStorageAbi,
-    arbiterStorageAbi: zapArbiterStorageAbi,
-    zapRegistryStorageAbi,
-    bondageStorageAbi: zapBondageStorageAbi,
-    currentCostAbi: zapCurrentCostAbi,
-    ganacheNetwork
-} = require('../../config');
+const Config = require('../../config/index');
 
-const currentNetwork = ganacheNetwork;
-const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address));
+const currentNetwork = Config.ganacheNetwork;
+const web3 = new Web3(currentNetwork.provider);
 
 async function configureEnvironment(func) {
     await func();
@@ -137,16 +124,16 @@ describe('Dispatch, path to "/src/api/contract/Dispatch"', () => {
         }
 
         async function getNewSmartContracts() {
-            dispatchAbi = require(join(__dirname, '../' + zapDispatchAbi));
-            tokenAbi = require(join(__dirname, '../' + zapTokenAbi));
-            arbiterAbi = require(join(__dirname, '../' + zapArbiterAbi));
-            registryAbi = require(join(__dirname, '../' + zapRegistryAbi));
-            bondageAbi = require(join(__dirname, '../' + zapBondageAbi));
-            dispatchStorageAbi = require(join(__dirname, '../' + zapDispatchStorageAbi));
-            arbiterStorageAbi = require(join(__dirname, '../' + zapArbiterStorageAbi));
-            registryStorageAbi = require(join(__dirname, '../' + zapRegistryStorageAbi));
-            bondageStorageAbi = require(join(__dirname, '../' + zapBondageStorageAbi));
-            currentCostAbi = require(join(__dirname, '../' + zapCurrentCostAbi));
+            dispatchAbi = Config.getDispatchArtifact();
+            tokenAbi = Config.getZapTokenArtifact();
+            arbiterAbi = Config.getArbiterArtifact();
+            registryAbi = Config.getRegistryArtifact();
+            bondageAbi = Config.getBondageArtifact();
+            dispatchStorageAbi = Config.getDispatchStorageArtifact();
+            arbiterStorageAbi = Config.getArbiterStorageArtifact();
+            registryStorageAbi = Config.getRegistryStorageArtifact();
+            bondageStorageAbi = Config.getBondageStorageArtifact();
+            currentCostAbi = Config.getCurrentCostArtifact();
             [
                 bondageStorage,
                 registryStorage,

@@ -3,23 +3,12 @@ const expect = require('chai')
     .use(require('chai-bignumber'))
     .expect;
 
+const Config = require('../../config/index');
 const Bondage = require('../../src/api/contracts/Bondage');
 const Web3 = require('web3');
 
 const { migrateContracts, clearBuild, ganacheServer } = require('../bootstrap');
 
-const {
-    zapBondageAbi,
-    bondageStorageAbi,
-    zapTokenAbi,
-    zapRegistryAbi,
-    zapRegistryStorageAbi,
-    currentCostAbi,
-    addressSpacePointerAbi,
-    ganacheNetwork
-} = require('../../config');
-const { join } = require('path');
-const fs = require('fs');
 const {
     getDeployedContract,
     curve,
@@ -33,8 +22,8 @@ const {
     gasTransaction
 } = require('../utils');
 
-const currentNetwork = ganacheNetwork;
-const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address));
+const currentNetwork = Config.ganacheNetwork;
+const web3 = new Web3(currentNetwork.provider);
 
 async function configureEnvironment(func) {
     await func();
@@ -68,13 +57,13 @@ describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
     describe('Bondage', function () {
 
         it('Should get new instances of contracts and bind their storages', async () => {
-            bondageAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + zapBondageAbi)));
-            bondageStoreAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + bondageStorageAbi)));
+            bondageAbi = Config.getBondageArtifact();
+            bondageStoreAbi = Config.getBondageStorageArtifact();
 
-            const registryAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + zapRegistryAbi)));
-            const registryStoreAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + zapRegistryStorageAbi)));
-            const tokenAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + zapTokenAbi)));
-            const costStorageAbi = JSON.parse(fs.readFileSync(join(__dirname, '../' + currentCostAbi)));
+            const registryAbi = Config.getRegistryArtifact();
+            const registryStoreAbi = Config.getRegistryStorageArtifact();
+            const tokenAbi = Config.getZapTokenArtifact();
+            const costStorageAbi = Config.getCurrentCostArtifact();
 
             [
                 bondageStorage,

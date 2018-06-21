@@ -1,31 +1,13 @@
-const fs = require('fs');
 const Web3 = require('web3');
+const Config = require('../config/index');
+const { Loader } = require('../src/api/utils');
 const Provider = require('../src/api/components/Provider');
 const Handler = require('../src/api/components/Handler');
-const ZapDispatch = require('../src/api/contracts/Dispatch');
-const ZapArbiter = require('../src/api/contracts/Arbiter');
 const Curve = require('../src/api/components/Curve');
 
-const testNetwork = {
-    address: `ws://127.0.0.1:9545`, // truffle develop rpc
-    id: 4447
-};
-const dockerNetwork = {
-    address: 'ws://127.0.0.1:8546', // parity docker container
-    id: 211211
-};
-
-const currentNetwork = dockerNetwork;
-const web3 = new Web3(new Web3.providers.WebsocketProvider(currentNetwork.address)); // using develop rpc
-
-
-const zapTokenJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/ZapToken.json'));
-const zapDispatchJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Dispatch.json'));
-const zapBondageJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Bondage.json'));
-const zapRegistryJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Registry.json'));
-const zapArbiterJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/Arbiter.json'));
-const registryStorageJson = JSON.parse(fs.readFileSync('./ZapContracts/build/contracts/RegistryStorage.json'));
-
+const currentNetwork = Config.dockerNetwork;
+const loader = new Loader(currentNetwork);
+const web3 = new Web3(currentNetwork.provider); // using develop rpc
 
 /**
  * truffle json files contains all contract info
@@ -167,11 +149,11 @@ async function main() {
     const providerPublicKey = 123;
 
     // creating web3 contract instances
-    const zapToken = new web3.eth.Contract(getContractAbi(zapTokenJson), getContractAddress(zapTokenJson, currentNetwork.id));
-    const zapRegistry = new web3.eth.Contract(getContractAbi(zapRegistryJson), getContractAddress(zapRegistryJson, currentNetwork.id));
-    const zapDispatch = new web3.eth.Contract(getContractAbi(zapDispatchJson), getContractAddress(zapDispatchJson, currentNetwork.id));
-    const zapBondage = new web3.eth.Contract(getContractAbi(zapBondageJson), getContractAddress(zapBondageJson, currentNetwork.id));
-    const zapArbiter = new web3.eth.Contract(getContractAbi(zapArbiterJson), getContractAddress(zapArbiterJson, currentNetwork.id));
+    const zapToken = new web3.eth.Contract(getContractAbi(Config.zapTokenArtifact), getContractAddress(Config.zapTokenArtifact, currentNetwork.id));
+    const zapRegistry = new web3.eth.Contract(getContractAbi(Config.registryArtifact), getContractAddress(Config.registryArtifact, currentNetwork.id));
+    const zapDispatch = new web3.eth.Contract(getContractAbi(Config.dispatchArtifact), getContractAddress(Config.dispatchArtifact, currentNetwork.id));
+    const zapBondage = new web3.eth.Contract(getContractAbi(Config.bondageArtifact), getContractAddress(Config.bondageArtifact, currentNetwork.id));
+    const zapArbiter = new web3.eth.Contract(getContractAbi(Config.arbiterArtifact), getContractAddress(Config.arbiterArtifact, currentNetwork.id));
 
     // Call query function of Dispatch contract to request data from provider
     async function queryData(provider,
@@ -210,11 +192,11 @@ async function main() {
     let myProvider = new Provider(new ZapDispatch({
         provider: web3.currentProvider,
         address: zapDispatch._address,
-        artifact: zapDispatchJson
+        artifact: Config.dispatchArtifact
     }), new ZapArbiter({
         provider:  web3.currentProvider,
         address: zapArbiter._address,
-        artifact: zapArbiterJson
+        artifact: Config.arbiterArtifact
     }), myHandler);
 
     // Specifying filters for Incoming event
