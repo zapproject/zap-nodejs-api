@@ -5,7 +5,6 @@ const Web3 = require('web3');
 const contractsBuildDirectory = '/ZapContracts/build/contracts';
 const contractsDirectory = '/ZapContracts/contracts';
 const workingDirectory = '/ZapContracts';
-const runMigrationTimeOut = 5000;
 const migrationsDirectory = '/ZapContracts/migrations';
 const zapTokenAbiPath = '/ZapContracts/build/contracts/ZapToken.json';
 const registryAbiPath = '/ZapContracts/build/contracts/Registry.json';
@@ -18,6 +17,8 @@ const currentCostAbiPath = '/ZapContracts/build/contracts/CurrentCost.json';
 const dispatchAbiPath = '/ZapContracts/build/contracts/Dispatch.json';
 const dispatchStorageAbiPath = '/ZapContracts/build/contracts/DispatchStorage.json';
 const queryCallerAbiPath = '/ZapContracts/build/contracts/QueryCaller.json';
+const runMigrationTimeOut = 5000;
+
 
 const testNetwork = {
     address: 'ws://127.0.0.1:9545', // truffle develop rpc
@@ -43,45 +44,7 @@ function getArtifact(artifactPath) {
     return JSON.parse(fs.readFileSync(path.join(projectPath, artifactPath)));
 }
 
-function getArbiterArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, arbiterAbiPath)));
-}
 
-function getRegistryArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, registryAbiPath)));
-}
-
-function getBondageArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, bondageAbiPath)));
-}
-
-function getDispatchArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, dispatchAbiPath)));
-}
-
-function getZapTokenArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, zapTokenAbiPath)));
-}
-
-function getCurrentCostArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, currentCostAbiPath)));
-}
-
-function getArbiterStorageArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, arbiterStorageAbiPath)));
-}
-
-function getRegistryStorageArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, registryStorageAbiPath)));
-}
-
-function getBondageStorageArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, bondageStorageAbiPath)));
-}
-
-function getDispatchStorageArtifact() {
-    return JSON.parse(fs.readFileSync(path.join(projectPath, dispatchStorageAbiPath)));
-}
 
 module.exports = {
     contractsBuildDirectory,
@@ -118,15 +81,4 @@ module.exports = {
     registryStorageArtifact: JSON.parse(fs.readFileSync(path.join(projectPath, registryStorageAbiPath))),
     bondageStorageArtifact: JSON.parse(fs.readFileSync(path.join(projectPath, bondageStorageAbiPath))),
     dispatchStorageArtifact: JSON.parse(fs.readFileSync(path.join(projectPath, dispatchStorageAbiPath))),
-
-    getArbiterArtifact,
-    getRegistryArtifact,
-    getBondageArtifact,
-    getDispatchArtifact,
-    getZapTokenArtifact,
-    getCurrentCostArtifact,
-    getArbiterStorageArtifact,
-    getRegistryStorageArtifact,
-    getBondageStorageArtifact,
-    getDispatchStorageArtifact
 };

@@ -1,23 +1,18 @@
 const contract = require("truffle-contract");
 const { fixTruffleContractCompatibilityIssue } = require("../utils");
-
+const config = require('./../../../config/index');
 class Base {
-    constructor({provider, address, artifact}) {
+    constructor({artifact}) {
         try {
-            this.address = address;
             this.contract = contract(
-                artifact
+                artifact.abi,
+                artifact[config.network]._address
             );
-            this.contract.setProvider(provider);
+            this.contract.setProvider(config.provider);
             this.contract = fixTruffleContractCompatibilityIssue(this.contract);
         } catch (err) {
             throw err;
         }
-    }
-
-    // Get deployed contract instance
-    async contractInstance() {
-        return await this.contract.at(this.address);
     }
 }
 

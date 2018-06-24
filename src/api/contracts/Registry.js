@@ -1,18 +1,17 @@
 const Oracle = require('../components/Oracle');
+const config = require("./../../../config/index")
 const Base = require('./Base');
 const Web3 = require('web3');
 const web3 = new Web3();
 
 class ZapRegistry extends Base {
-    constructor({provider, address, artifact}) {
-        super({provider: provider, address: address, artifact: artifact});
-        this.getOracle = this.getOracle.bind(this);
+    constructor(){
+        super(config.registryArtifact)
     }
 
     async initiateProvider({public_key, title, endpoint, endpoint_params, from, gas}) {
         try {
-            const contractInstance = await this.contractInstance();
-            return await contractInstance.initiateProvider(
+            return await this.contract.initiateProvider(
                 public_key,
                 title,
                 endpoint,
