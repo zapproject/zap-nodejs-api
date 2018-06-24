@@ -1,9 +1,10 @@
-const Oracle = require('../components/Oracle');
+const Provider = require('../components/Provider');
 const Base = require('./Base');
 const Web3 = require('web3');
 const web3 = new Web3();
 
 class ZapRegistry extends Base {
+
     constructor(){
         super(Base.getConfig().registryArtifact)
     }
@@ -61,13 +62,13 @@ class ZapRegistry extends Base {
     }
 
     // get oracle by address
-    async getOracle({address, endpoint}) {
+    async getProvider({address, endpoint}) {
         try {
-            const oracle = new Oracle(this);
-            oracle.address = address;
+            const provider = new Provider(this);
+            provider.owner = address;
 
             // Get the provider's public getRouteKeys
-            oracle.public_key = await this.contract.getProviderPublicKey(address);
+            provider.pubkey = await this.contract.getProviderPublicKey.call(address);
 
             // // Get the route keys next
             // getNextEndpointParam address provider, bytes32 specifier, uint256 index
@@ -76,7 +77,7 @@ class ZapRegistry extends Base {
             while (true) {
                 try {
                     if (i >= 50) break;
-                    const result = await this.contract.getNextEndpointParam(
+                    const result = await this.contract.getNextEndpointParam.call(
                         address,
                         endpoint,
                         i
@@ -89,9 +90,9 @@ class ZapRegistry extends Base {
                     break;
                 }
             }
-            oracle.endpoint_params = endpoint_params;
+            provider.endpoint_params = endpoint_params;
             // // Output loaded object
-            return oracle;
+            return provider;
         } catch (err) {
             throw err;
         }

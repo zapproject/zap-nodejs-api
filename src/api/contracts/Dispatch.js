@@ -46,7 +46,7 @@ class ZapDispatch extends Base {
         }
     }
 
-    async respond(queryId, responseParams,dynamicResponse, from) {
+    async respond({queryId, responseParams,dynamic, from}) {
         if (isPromise(responseParams)) {
             responseParams = await responseParams;
         }

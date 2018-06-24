@@ -1,13 +1,16 @@
 const Arbiter = require("./../contracts/Arbiter");
 const Dispatch = require("./../contracts/Dispatch");
 const Registry = require("./../contracts/Registry");
+const Bondage = require("./../contracts/Bondage")
 
 class Provider {
+
     constructor({owner, handler}) {
         assert(owner, "owner address is required");
         assert(handler, "handler needs to be specified")
         this.owner = owner
         this.handler = handler;
+        this.pubkey= this.title = this.curve = null;
     }
 
     /**
@@ -21,16 +24,15 @@ class Provider {
     async create({public_key, title, endpoint, endpoint_params}) {
         try {
             assert(Array.isArray(params), "params need to be an array");
-            // if (params.length > 0) {
-            //     for (let i in params) {
-            //         params[i] = web3.utils.utf8ToHex(params[i])
-            //     }
-            // }
             let provider = await Registry.initiateProvider(
                 {public_key, title, endpoint, endpoint_params, from:this.owner})
+            assert(provider,"fail to create provider")
+            this.pubkey = public_key;
+            this.title = title;
             return provider
         } catch (err) {
             console.error(err)
+            return null;
         }
     }
 
@@ -66,6 +68,7 @@ class Provider {
             let success = await Registry.initiateProviderCurve({endpoint, curve, from:this.owner})
 
             assert(success, "fail to init curve ");
+            this.curve = new Curve(constants,parts,dividers);
             return success
         } catch (err) {
             console.error(err)
@@ -79,6 +82,7 @@ class Provider {
      * @returns {Promise<string>}
      */
     async getProviderTitle() {
+        if(this.title) return this.title;
         let title = await Registry.getProviderTitle(this.owner).call()
         return web3.utils.hexToUtf8(title)
     }
@@ -88,6 +92,7 @@ class Provider {
      * @returns {Promise<string>}
      */
     async getProviderPubkey() {
+        if(this.pubkey) return this.pubkey;
         let title = await Registry.getProviderPubkey(this.owner).call()
         return web3.utils.hexToUtf8(title)
     }
@@ -98,6 +103,7 @@ class Provider {
      * @returns {Promise<*>}
      */
     async getProviderCurve({endpoint}) {
+        if(this.curve) return this.curve;
         try {
             let curve = await Registry.getProviderCurve(
                 this.owner, web3.utils.utf8ToHex(endpoint)).call();
@@ -115,7 +121,7 @@ class Provider {
      */
     async getZapBound({endpoint}) {
         assert(endpoint, "endpoint required");
-        let zapBound = await Bondage.methods.getZapBound(this.owner, web3.utils.utf8ToHex(endpoint)).call();
+        let zapBound = await Bondage.getZapBound(this.owner, web3.utils.utf8ToHex(endpoint)).call();
         return zapBound;
     }
 
@@ -126,7 +132,7 @@ class Provider {
      * @returns {Promise<number>}
      */
     async getZapRequired({endpoint, dots}) {
-        let zapRequired = await Bondage.methods.calcZapForDots(this.owner, web3.utils.utf8ToHex(endpoint), web3.utils.toBN(dots)).call();
+        let zapRequired = await Bondage.calcZapForDots({provider:this.owner, endpoint,dots});
         return parseInt(zapRequired);
     }
 
@@ -137,11 +143,11 @@ class Provider {
      * @returns {Promise<any>}
      */
     async calcDotsForZap({endpoint, zapNum}) {
-        let res = await Bondage.calcBondRate(
-            this.owner,
-            web3.utils.utf8ToHex(endpoint),
-            web3.utils.toBN(zapNum)).call();
-        console.log("dot for zap : ", zapNum, res);
+        let res = await Bondage.calcBondRate({
+            provider:this.owner,
+            endpoint,
+            zapNum});
+        //console.log("dot for zap : ", zapNum, res);
         return res
     }
 
@@ -158,7 +164,7 @@ class Provider {
                 console.log(error);
             } else {
                 try {
-                    this.handler.handleSubscription(result);
+                    return this.handler.handleSubscription(result);
                 } catch (e) {
                     console.log(e);
                 }
@@ -189,7 +195,7 @@ class Provider {
                 console.log(error);
             } else {
                 try {
-                    this.handler.handleUnsubscription(result);
+                    return this.handler.handleUnsubscription(result);
                 } catch (e) {
                     console.log(e);
                 }
@@ -204,7 +210,7 @@ class Provider {
     }
 
     /**
-     *
+     *Listen to Queries
      * @param id
      * @param subscriber
      * @param fromBlock
@@ -212,15 +218,12 @@ class Provider {
      * @returns {Promise<void>}
      */
     async listenQueries({id, subscriber, fromBlock}, from) {
-        if (!this.dispatch) throw new Error('ZapDispatch class must be specified!');
-
         let callback = (error, result) => {
             if (error) {
                 console.error(error);
             } else {
                 try {
-                    let respondParams = this.handler.handleIncoming(result);
-                    this.dispatch.respond(result.args.id.valueOf(), respondParams, from);
+                    return this.handler.handleIncoming(result);
                 } catch (e) {
                     console.error(e);
                 }
@@ -230,6 +233,10 @@ class Provider {
         Dispatch.listen("Incoming",
             {id, provider: this.owner, subscriber, fromBlock},
             callback);
+    }
+
+    async respond({queryId,responseParams,dynamic}){
+        await Dispatch.respond({queryId,responseParams,dynamic,from:this.owner})
     }
 
     get handler() {

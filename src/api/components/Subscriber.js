@@ -1,8 +1,11 @@
 const EventEmitter = require('events');
-const Arbiter = require('./contracts/Arbiter');
-const Registry = require('./contracts/Registry');
+const Arbiter = require('./../contracts/Arbiter');
+const Registry = require('./../contracts/Registry');
+const Bondage = require("./../contracts/Bondage")
+const Dispatch = require("./../contracts/Dispatch")
 
 class Subscriber extends EventEmitter {
+
     constructor(eth, wallet, keypair, registryAddress, arbiterAddress) {
         super();
 

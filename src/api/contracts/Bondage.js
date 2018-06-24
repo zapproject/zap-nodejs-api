@@ -1,6 +1,8 @@
 const Base = require('./Base');
 
 class Bondage extends Base {
+
+
     constructor(){
         super(Base.getConfig().bondageArtifact)
     }
@@ -17,17 +19,6 @@ class Bondage extends Base {
         );
     }
 
-    // Estimate amount of dots received from Bondage
-    async estimateBond({oracleAddress, endpoint, amountOfZap, gas}) {
-        return await this.contract.calcZapForDots(
-            oracleAddress,
-            endpoint,
-            amountOfZap,
-            {
-                gas: gas
-            }
-        );
-    }
 
     // Do an unbond to a ZapOracle's endpoint
     async unbond({oracleAddress, endpoint, amountOfDots, from, gas}) {
@@ -44,11 +35,15 @@ class Bondage extends Base {
 
     //get counts of dots regarding provided oracle
     async getBoundDots({holderAddress, oracleAddress, specifier}) {
-        return await this.contract.getBoundDots(
+        return await this.contract.getBoundDots.call(
             holderAddress,
             oracleAddress,
             specifier,
         );
+    }
+
+    async calcZapForDots({provider,endpoint,dots}){
+        return await this.contract.calcZapForDots.call(provider,endpoint,dots).call();
     }
 }
 
