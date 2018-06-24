@@ -1,9 +1,8 @@
 const Base = require('./Base');
-const config = require('./../../../config/index')
 class Arbiter extends Base {
 
     constructor(){
-        super(config.arbiterArtifact)
+        super(Base.getConfig().arbiterArtifact)
     }
     // Initiate a subscription
     async initiateSubscription({oracleAddress, endpoint, js_params, dots, publicKey, from, gas}) {
@@ -29,7 +28,9 @@ class Arbiter extends Base {
     listenSubscriptionEnd(filters,callback){
         try {
             // Specify filters and watch Incoming event
-            let filter = this.contract.DataSubscriptionEnd(filters, { fromBlock: filters.fromBlock ? filters.fromBlock : 0, toBlock: 'latest' });
+            let filter = this.contract.DataSubscriptionEnd(
+                filters,
+                { fromBlock: filters.fromBlock ? filters.fromBlock : 0, toBlock: 'latest' });
             filter.watch(callback);
         } catch (err) {
             throw err;
@@ -39,7 +40,9 @@ class Arbiter extends Base {
     listenSubscriptionStart(filters,callback){
         try {
             // Specify filters and watch Incoming event
-            let filter = this.contract.DataPurchase(filters, { fromBlock: filters.fromBlock ? filters.fromBlock : 0, toBlock: 'latest' });
+            let filter = this.contract.DataPurchase(
+                filters,
+                { fromBlock: filters.fromBlock ? filters.fromBlock : 0, toBlock: 'latest' });
             filter.watch(callback);
         } catch (err) {
             throw err;

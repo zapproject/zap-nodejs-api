@@ -1,3 +1,7 @@
+const Arbiter = require("./../contracts/Arbiter");
+const Dispatch = require("./../contracts/Dispatch");
+const Registry = require("./../contracts/Registry");
+
 class Provider {
     constructor({owner, handler}) {
         assert(owner, "owner address is required");
@@ -14,21 +18,16 @@ class Provider {
      * @param params
      * @returns {Promise<any>}
      */
-    async create({pubkey, title, endpoint, params}) {
+    async create({public_key, title, endpoint, endpoint_params}) {
         try {
             assert(Array.isArray(params), "params need to be an array");
-            if (params.length > 0) {
-                for (let i in params) {
-                    params[i] = web3.utils.utf8ToHex(params[i])
-                }
-            }
-            let provider = await Registry.methods.initiateProvider(
-                new web3.utils.BN(pubkey),
-                web3.utils.utf8ToHex(title),
-                web3.utils.utf8ToHex(endpoint),
-                params)
-                .send({from: this.owner, gas: 6000000});
-            console.log("provider : ", provider)
+            // if (params.length > 0) {
+            //     for (let i in params) {
+            //         params[i] = web3.utils.utf8ToHex(params[i])
+            //     }
+            // }
+            let provider = await Registry.initiateProvider(
+                {public_key, title, endpoint, endpoint_params, from:this.owner})
             return provider
         } catch (err) {
             console.error(err)
@@ -62,12 +61,10 @@ class Provider {
             let convertedDividers = dividers.map(item => {
                 return web3.utils.toHex(item)
             });
-            console.log("converted : ", convertedConstants);
-            let success = await Registry.methods.initiateProviderCurve(
-                web3.utils.utf8ToHex(endpoint),
-                convertedConstants,
-                convertedParts,
-                convertedDividers).send({from: this.owner, gas: 600000});
+            let curve ={constants,parts,dividers}
+            //console.log("converted : ", convertedConstants);
+            let success = await Registry.initiateProviderCurve({endpoint, curve, from:this.owner})
+
             assert(success, "fail to init curve ");
             return success
         } catch (err) {
@@ -82,7 +79,7 @@ class Provider {
      * @returns {Promise<string>}
      */
     async getProviderTitle() {
-        let title = await Registry.methods.getProviderTitle(this.owner).call()
+        let title = await Registry.getProviderTitle(this.owner).call()
         return web3.utils.hexToUtf8(title)
     }
 
@@ -91,7 +88,7 @@ class Provider {
      * @returns {Promise<string>}
      */
     async getProviderPubkey() {
-        let title = await Registry.methods.getProviderPubkey(this.owner).call()
+        let title = await Registry.getProviderPubkey(this.owner).call()
         return web3.utils.hexToUtf8(title)
     }
 
@@ -102,7 +99,7 @@ class Provider {
      */
     async getProviderCurve({endpoint}) {
         try {
-            let curve = await Registry.methods.getProviderCurve(
+            let curve = await Registry.getProviderCurve(
                 this.owner, web3.utils.utf8ToHex(endpoint)).call();
             return curve
         } catch (err) {
@@ -140,7 +137,7 @@ class Provider {
      * @returns {Promise<any>}
      */
     async calcDotsForZap({endpoint, zapNum}) {
-        let res = await Bondage.methods.calcBondRate(
+        let res = await Bondage.calcBondRate(
             this.owner,
             web3.utils.utf8ToHex(endpoint),
             web3.utils.toBN(zapNum)).call();
@@ -199,7 +196,7 @@ class Provider {
             }
         };
 
-        let event = arbiter.listenSubscriptionEnd(
+        let event = Arbiter.listenSubscriptionEnd(
             {provider: this.owner, subscriber, terminator},
             {fromBlock: fromBlock, toBlock: 'latest'});
         event.watch(callback);
@@ -230,7 +227,7 @@ class Provider {
             }
         };
 
-        await this.dispatch.listen(
+        Dispatch.listen("Incoming",
             {id, provider: this.owner, subscriber, fromBlock},
             callback);
     }
@@ -241,22 +238,6 @@ class Provider {
 
     set handler(handler) {
         this._handler = handler;
-    }
-
-    get dispatch() {
-        return this._dispatch;
-    }
-
-    set dispatch(dispatch) {
-        this._dispatch = dispatch;
-    }
-
-    get arbiter() {
-        return this._arbiter;
-    }
-
-    set arbiter(arbiter) {
-        this._arbiter = arbiter;
     }
 }
 

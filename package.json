@@ -59,6 +59,7 @@
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.2",
     "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "babel-preset-latest": "^6.24.1",
     "babelify": "^8.0.0",
     "brfs": "^1.6.1",

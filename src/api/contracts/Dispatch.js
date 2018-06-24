@@ -1,5 +1,4 @@
 const Base = require('./Base');
-const config = require("./../../../config/index")
 function isPromise(object) {
     if (Promise && Promise.resolve) {
         return Promise.resolve(object) === object;
@@ -11,7 +10,7 @@ function isPromise(object) {
 class ZapDispatch extends Base {
 
     constructor(){
-        super(config.dispatchArtifact)
+        super(Base.getConfig().dispatchArtifact)
     }
 
     async queryData({provider,query,endpoint,params,onchainProvider,onchainSubscriber}){
@@ -94,4 +93,4 @@ class ZapDispatch extends Base {
 
 }
 
-module.exports = ZapDispatch;
+module.exports = new ZapDispatch();

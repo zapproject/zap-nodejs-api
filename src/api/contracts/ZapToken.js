@@ -1,10 +1,12 @@
 const Base = require('./Base');
 
 class ZapToken extends Base {
+    constructor(){
+        super(Base.getConfig().zapTokenArtifact)
+    }
     async balanceOf(address) {
         try {
-            const contractInstance = await this.contractInstance();
-            return await contractInstance.balanceOf(address);
+            return await this.contract.balanceOf(address);
         } catch (err) {
             throw err;
         }
@@ -13,8 +15,7 @@ class ZapToken extends Base {
     // Send Zap around
     async send({destination, amount, from}) {
         try {
-            const contractInstance = await this.contractInstance();
-            return await contractInstance.transfer(destination, amount, {from});
+            return await this.contract.transfer(destination, amount, {from});
         } catch (err) {
             throw err;
         }
@@ -23,8 +24,7 @@ class ZapToken extends Base {
     // allocate tokens, must be called only from owner account
     async allocate(to, amount, from) {
         try {
-            const contractInstance = await this.contractInstance();
-            return await contractInstance.allocate(to, amount, {from: from});
+            return await this.contract.allocate(to, amount, {from: from});
         } catch (err) {
             throw err;
         }
@@ -34,8 +34,7 @@ class ZapToken extends Base {
     async approve({address, amount, from}) {
         // Approve to the token contract the spending
         try {
-            const contractInstance = await this.contractInstance();
-            const success = await contractInstance.approve(address, amount, {from: from});
+            const success = await this.contract.approve(address, amount, {from: from});
             if (!success) {
                 throw new Error("Failed to approve Bondage transfer");
             }

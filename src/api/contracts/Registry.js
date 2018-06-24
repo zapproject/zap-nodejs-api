@@ -1,12 +1,11 @@
 const Oracle = require('../components/Oracle');
-const config = require("./../../../config/index")
 const Base = require('./Base');
 const Web3 = require('web3');
 const web3 = new Web3();
 
 class ZapRegistry extends Base {
     constructor(){
-        super(config.registryArtifact)
+        super(Base.getConfig().registryArtifact)
     }
 
     async initiateProvider({public_key, title, endpoint, endpoint_params, from, gas}) {
@@ -18,7 +17,7 @@ class ZapRegistry extends Base {
                 endpoint_params,
                 {
                     from: from,
-                    gas: gas
+                    gas: gas ? gas : 400000
                 }
             );
         } catch (err) {
@@ -28,15 +27,14 @@ class ZapRegistry extends Base {
 
     async initiateProviderCurve({endpoint, curve, from, gas}) {
         try {
-            const contractInstance = await this.contractInstance();
-            return await contractInstance.initiateProviderCurve(
+            return await this.contract.initiateProviderCurve(
                 endpoint,
                 curve.constants,
                 curve.parts,
                 curve.dividers,
                 {
                     'from': from,
-                    'gas': gas
+                    'gas': gas ? gas : 400000
                 }
             );
         } catch (err) {
@@ -47,15 +45,14 @@ class ZapRegistry extends Base {
     // bytes32 specifier, bytes32[] endpoint_params
     async setEndpointParams({endpoint, params, from, gas}) {
         try {
-            const contractInstance = await this.contractInstance();
             let endpoint_params = [];
             params.forEach(el => endpoint_params.push(web3.utils.utf8ToHex(el)));
-            return await contractInstance.setEndpointParams(
+            return await this.contract.setEndpointParams(
                 endpoint,
                 endpoint_params,
                 {
                     'from': from,
-                    'gas': gas
+                    'gas': gas ? gas : 400000
                 }
             );
         } catch (err) {
@@ -66,12 +63,11 @@ class ZapRegistry extends Base {
     // get oracle by address
     async getOracle({address, endpoint}) {
         try {
-            const contractInstance = await this.contractInstance();
             const oracle = new Oracle(this);
             oracle.address = address;
 
             // Get the provider's public getRouteKeys
-            oracle.public_key = await contractInstance.getProviderPublicKey(address);
+            oracle.public_key = await this.contract.getProviderPublicKey(address);
 
             // // Get the route keys next
             // getNextEndpointParam address provider, bytes32 specifier, uint256 index
@@ -80,7 +76,7 @@ class ZapRegistry extends Base {
             while (true) {
                 try {
                     if (i >= 50) break;
-                    const result = await contractInstance.getNextEndpointParam(
+                    const result = await this.contract.getNextEndpointParam(
                         address,
                         endpoint,
                         i
