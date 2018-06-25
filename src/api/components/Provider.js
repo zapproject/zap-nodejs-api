@@ -8,7 +8,7 @@ class Provider {
     constructor({owner, handler}) {
         assert(owner, "owner address is required");
         assert(handler, "handler needs to be specified")
-        this.owner = owner
+        this.owner = owner;
         this.handler = handler;
         this.pubkey= this.title = this.curve = null;
     }
@@ -63,9 +63,9 @@ class Provider {
             let convertedDividers = dividers.map(item => {
                 return web3.utils.toHex(item)
             });
-            let curve ={constants,parts,dividers}
+            let curve ={constants,parts,dividers};
             //console.log("converted : ", convertedConstants);
-            let success = await Registry.initiateProviderCurve({endpoint, curve, from:this.owner})
+            let success = await Registry.initiateProviderCurve({endpoint, curve, from:this.owner});
 
             assert(success, "fail to init curve ");
             this.curve = new Curve(constants,parts,dividers);
