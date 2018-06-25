@@ -10,8 +10,8 @@ class Base {
         try {
             let currentNetwork = config.ganacheNetwork;
             console.log(process.env.NODE_ENV);
-            if(process.env.NODE_ENV.toLowerCase() ==="prod"){
-                currentNetwork = config.dockerNetwork
+            if(!process.env.NODE_ENV || process.env.NODE_ENV.toLowerCase() ==="prod"){
+                currentNetwork = config.mainNetwork
             }
             assert(artifact.abi,"invalid artifact");
             assert(artifact.networks[currentNetwork.id],"contract for current network is not available");

@@ -38,6 +38,12 @@ const ganacheNetwork = {
     provider: new Web3.providers.WebsocketProvider('ws://127.0.0.1:7545')
 };
 
+const mainNetwork = {
+    address: 'ws://127.0.0.1:8545',
+    id: 1,
+    provider: new Web3.providers.WebsocketProvider('ws://127.0.0.1:8545')
+};
+
 const projectPath = path.join(__dirname, '../');
 
 function getArtifact(artifactPath) {
@@ -69,6 +75,7 @@ module.exports = {
     testNetwork,
     dockerNetwork,
     ganacheNetwork,
+    mainNetwork,
 
     getArtifact,
     arbiterArtifact: JSON.parse(fs.readFileSync(path.join(projectPath, arbiterAbiPath))),
