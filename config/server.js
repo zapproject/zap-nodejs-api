@@ -5,7 +5,6 @@ const ganacheServerOptions = {
     "port": 7545,
     "total_accounts": 10,
     "ws": true,
-    // "logger": console
 };
 
 module.exports = {

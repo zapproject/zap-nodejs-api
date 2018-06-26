@@ -46,7 +46,7 @@
     "wrtc": "0.0.65"
   },
   "scripts": {
-    "test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha && nyc report --reporter=text-lcov | coveralls NODE_ENV=test",
+    "test": "NODE_ENV=ganache ./node_modules/.bin/nyc ./node_modules/.bin/mocha && nyc report --reporter=text-lcov | coveralls",
     "test_local": "rm -rf ZapContracts/build/contracts/* && JUNIT_REPORT_PATH=report.xml TEST=1 nyc --reporter=clover ./node_modules/.bin/mocha",
     "local": "JUNIT_REPORT_PATH=report.xml TEST=1 nyc --reporter=clover ./node_modules/.bin/mocha",
     "coverage": "./node_modules/.bin/nyc report clover",

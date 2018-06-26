@@ -42,8 +42,10 @@ function clearBuild(onlyRemoveNetworks = true) {
             fs.writeFileSync(filePath, JSON.stringify(compiledJson), {flag: 'w'});
             console.log('deployment info for file ' + filePath + ' was cleared.');
         } else  {
-            fs.unlinkSync(filePath);
-            console.log('file ' + filePath + ' was deleted.');
+            try {
+                fs.unlinkSync(filePath);
+                console.log('file ' + filePath + ' was deleted.');
+            }catch(e){console.error(e)}
         }
     }
 }
@@ -56,10 +58,10 @@ async function migrateContracts() {
         "working_directory": path.join(Config.projectPath, Config.workingDirectory),
         "migrations_directory": path.join(Config.projectPath, Config.migrationsDirectory),
         "network": 'ganache-gui',
-        "network_id": Config.ganacheNetwork.id,
+        "network_id": Config.networks['ganache'].id,
         "provider": ganacheProvider,
         "hostname": 'localhost',
-        "port": ganacheServerOptions.port,
+        "port": Config.networks['ganache'].port,
         "gas": "6721975",
         "gasPrice": "10000000"
     };
@@ -83,10 +85,10 @@ module.exports = {
 
 try {
     require('./tests/zapArbiterTest');
-    require('./tests/zapBondageTest');
-    require('./tests/zapDispatchTest');
-    require('./tests/zapTokenTest');
-    require('./tests/zapRegistryTest');
+    // require('./tests/zapBondageTest');
+    // require('./tests/zapDispatchTest');
+    // require('./tests/zapTokenTest');
+    // require('./tests/zapRegistryTest');
 } catch (e) {
     console.log(e);
     ganacheServer.close();

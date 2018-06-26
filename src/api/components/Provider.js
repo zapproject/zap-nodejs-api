@@ -6,11 +6,25 @@ const Bondage = require("./../contracts/Bondage")
 class Provider {
 
     constructor({owner, handler}) {
-        assert(owner, "owner address is required");
-        assert(handler, "handler needs to be specified")
         this.owner = owner;
         this.handler = handler;
         this.pubkey= this.title = this.curve = null;
+    }
+
+    set owner({address}){
+        this.owner = address;
+    }
+
+    get owner(){
+        return this.owner;
+    }
+
+    get handler() {
+        return this.handler;
+    }
+
+    set handler(handler) {
+        this.handler = handler;
     }
 
     /**
@@ -83,7 +97,8 @@ class Provider {
      */
     async getProviderTitle() {
         if(this.title) return this.title;
-        let title = await Registry.getProviderTitle(this.owner).call()
+        let title = await Registry.getProviderTitle(this.owner);
+        this.title = title;
         return web3.utils.hexToUtf8(title)
     }
 
@@ -92,9 +107,15 @@ class Provider {
      * @returns {Promise<string>}
      */
     async getProviderPubkey() {
-        if(this.pubkey) return this.pubkey;
-        let title = await Registry.getProviderPubkey(this.owner).call()
-        return web3.utils.hexToUtf8(title)
+        try {
+            if (this.pubkey) return this.pubkey;
+            let pubkey = await Registry.getProviderPubkey(this.owner);
+            this.pubkey = pubkey;
+            return web3.utils.hexToUtf8(title)
+        }catch(e){
+            console.error("Provider is not initiated")
+            return null;
+        }
     }
 
     /**
@@ -105,12 +126,12 @@ class Provider {
     async getProviderCurve({endpoint}) {
         if(this.curve) return this.curve;
         try {
-            let curve = await Registry.getProviderCurve(
-                this.owner, web3.utils.utf8ToHex(endpoint)).call();
+            let curve = await Registry.getProviderCurve(this.owner, endpoint);
+            this.curve = curve;
             return curve
         } catch (err) {
             console.error(err)
-            return null
+            return null;
         }
     }
 
@@ -121,7 +142,7 @@ class Provider {
      */
     async getZapBound({endpoint}) {
         assert(endpoint, "endpoint required");
-        let zapBound = await Bondage.getZapBound(this.owner, web3.utils.utf8ToHex(endpoint)).call();
+        let zapBound = await Bondage.getZapBound(this.owner, endpoint);
         return zapBound;
     }
 
@@ -171,11 +192,9 @@ class Provider {
             }
         };
 
-        let event = Arbiter.events.DataPurchaseEvent(
-            {provider: this.owner, subscriber},
-            {fromBlock: fromBlock, toBlock: 'latest'});
-        event.watch(callback);
-        return event;
+        Arbiter.listenSubscriptionStart(
+            {provider: this.owner, subscriber,fromBlock:fromBlock},
+            callback);
     }
 
     /**
@@ -186,10 +205,6 @@ class Provider {
      * @returns {Promise<void>}
      */
     async listenUnsubscribes({subscriber, terminator, fromBlock}) {
-        if (!this.arbiter) throw new Error('ZapArbiter class must be specified!');
-
-        const contract = await this.arbiter.contractInstance();
-
         let callback = (error, result) => {
             if (error) {
                 console.log(error);
@@ -202,11 +217,9 @@ class Provider {
             }
         };
 
-        let event = Arbiter.listenSubscriptionEnd(
-            {provider: this.owner, subscriber, terminator},
-            {fromBlock: fromBlock, toBlock: 'latest'});
-        event.watch(callback);
-        return event;
+        Arbiter.listenSubscriptionEnd(
+            {provider: this.owner, subscriber, terminator,fromBlock},
+            callback);
     }
 
     /**
@@ -235,17 +248,17 @@ class Provider {
             callback);
     }
 
+    /**
+     *
+     * @param queryId
+     * @param responseParams
+     * @param dynamic
+     * @returns {Promise<void>}
+     */
     async respond({queryId,responseParams,dynamic}){
         await Dispatch.respond({queryId,responseParams,dynamic,from:this.owner})
     }
 
-    get handler() {
-        return this._handler;
-    }
-
-    set handler(handler) {
-        this._handler = handler;
-    }
 }
 
 module.exports = Provider;

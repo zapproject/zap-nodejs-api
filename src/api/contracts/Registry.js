@@ -18,7 +18,7 @@ class ZapRegistry extends Base {
                 endpoint_params,
                 {
                     from: from,
-                    gas: gas ? gas : 400000
+                    gas: gas || this.DEFAULT_GAS
                 }
             );
         } catch (err) {
@@ -35,7 +35,7 @@ class ZapRegistry extends Base {
                 curve.dividers,
                 {
                     'from': from,
-                    'gas': gas ? gas : 400000
+                    'gas': gas || this.DEFAULT_GAS
                 }
             );
         } catch (err) {
@@ -43,7 +43,6 @@ class ZapRegistry extends Base {
         }
     }
 
-    // bytes32 specifier, bytes32[] endpoint_params
     async setEndpointParams({endpoint, params, from, gas}) {
         try {
             let endpoint_params = [];
@@ -53,7 +52,7 @@ class ZapRegistry extends Base {
                 endpoint_params,
                 {
                     'from': from,
-                    'gas': gas ? gas : 400000
+                    'gas': gas || this.DEFAULT_GAS
                 }
             );
         } catch (err) {
@@ -61,42 +60,30 @@ class ZapRegistry extends Base {
         }
     }
 
-    // get oracle by address
-    async getProvider({address, endpoint}) {
-        try {
-            const provider = new Provider(this);
-            provider.owner = address;
-
-            // Get the provider's public getRouteKeys
-            provider.pubkey = await this.contract.getProviderPublicKey.call(address);
-
-            // // Get the route keys next
-            // getNextEndpointParam address provider, bytes32 specifier, uint256 index
-            let i = 0;
-            let endpoint_params = [];
-            while (true) {
-                try {
-                    if (i >= 50) break;
-                    const result = await this.contract.getNextEndpointParam.call(
-                        address,
-                        endpoint,
-                        i
-                    );
-                    endpoint_params.push(result[1]);
-                    if (!result[0].toNumber()) break;
-                    i++
-                } catch (err) {
-                    console.log(err);
-                    break;
-                }
-            }
-            provider.endpoint_params = endpoint_params;
-            // // Output loaded object
-            return provider;
-        } catch (err) {
-            throw err;
-        }
+    async getProviderPublicKey({provider}){
+        return await this.contract.methods.getProviderPublicKey(provider).call()
     }
+
+    async getProviderTitle({provider}){
+        return await this.contract.methods.getProviderTitle(provider).call()
+    }
+    
+    async getProviderCurve({provider}){
+        return await this.contract.methods.getProviderCurve(provider).call()
+    }
+
+    async getNextProvider({index}){
+        return await this.contract.methods.getNextProvider(index).call();
+    }
+
+    async getNextEndpointParams({provider,endpoint,index}){
+        return this.contract.methods.getNextEndpointParam(
+            provider,
+            this.web3.utils.utf8ToHex(endpoint),
+            this.web3.utils.toBN(index)
+        ).call();
+    }
+
 }
 
 module.exports = ZapRegistry;

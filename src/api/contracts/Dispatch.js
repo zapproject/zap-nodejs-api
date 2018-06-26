@@ -50,7 +50,7 @@ class ZapDispatch extends Base {
         if (isPromise(responseParams)) {
             responseParams = await responseParams;
         }
-        if(dynamicResponse){
+        if(dynamic){
             return this.contract.respondBytes32Array(
                 queryId,
                 responseParams,
