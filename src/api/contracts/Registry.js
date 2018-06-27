@@ -64,18 +64,40 @@ class ZapRegistry extends Base {
         return await this.contract.methods.getProviderPublicKey(provider).call()
     }
 
+    /**
+     *
+     * @param provider
+     * @returns {Promise<any>}
+     */
     async getProviderTitle({provider}){
         return await this.contract.methods.getProviderTitle(provider).call()
     }
-    
+
+    /**
+     *
+     * @param provider address
+     * @returns {Promise<any>}
+     */
     async getProviderCurve({provider}){
         return await this.contract.methods.getProviderCurve(provider).call()
     }
 
+    /**
+     *
+     * @param index
+     * @returns {Promise<any>}
+     */
     async getNextProvider({index}){
         return await this.contract.methods.getNextProvider(index).call();
     }
 
+    /**
+     *
+     * @param provider
+     * @param endpoint
+     * @param index
+     * @returns {Promise<any>}
+     */
     async getNextEndpointParams({provider,endpoint,index}){
         return this.contract.methods.getNextEndpointParam(
             provider,

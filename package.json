@@ -64,6 +64,8 @@
     "babelify": "^8.0.0",
     "brfs": "^1.6.1",
     "browserify": "^16.2.0",
+    "eslint": "^5.0.1",
+    "eslint-config-strongloop": "^2.1.0",
     "http-server": "^0.11.1",
     "uglify-js": "^3.3.22"
   }

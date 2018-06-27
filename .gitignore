@@ -8,3 +8,4 @@ src/.synapsesubscriber
 coverage/
 .idea/
 ZapContracts/node_modules
+node_modules/

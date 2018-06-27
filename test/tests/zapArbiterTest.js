@@ -52,13 +52,17 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
     describe.only('Arbiter', function () {
 
         beforeEach(function(done){
-            delete require.cache[require.resolve('../../config/index')];
-            Config = require('../../config/index');
-            currentNetwork = Config.networks['ganache'];
-            web3 = new Web3(currentNetwork.provider);
-            delete require.cache[require.resolve('../../src/api/contracts/Arbiter')];
-            Arbiter = require('../../src/api/contracts/Arbiter');
-            done();
+            configureEnvironment(async ()=>{
+                delete require.cache[require.resolve('../../config/index')];
+                Config = require('../../config/index');
+                currentNetwork = Config.networks['ganache'];
+                web3 = new Web3(currentNetwork.provider);
+                accounts = await web3.eth.getAccounts();
+                delete require.cache[require.resolve('../../src/api/contracts/Arbiter')];
+                Arbiter = require('../../src/api/contracts/Arbiter');
+                done();
+            })
+
         });
         it('Should get instances of smart contracts, their storages and bind owners', function () {
             try {
@@ -144,24 +148,13 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
                 gas: gasTransaction
             });
         });
-        it('Should initiate listen in zapArbiter', async function (done) {
-            accounts = await web3.eth.getAccounts();
+        it('Should listen to Data purchase in zapArbiter', async function () {
+           // zapArbiterWrapper = new Arbiter();
             zapArbiterWrapper.listen((err,res)=>{
-                expect(err).to.be.null;
-            });
-
-            // await new Promise((resolve) => {
-            //     setTimeout(() => resolve('done'), 500);
-            // });
-
-            await zapArbiterWrapper.initiateSubscription({
-                oracleAddress: accounts[3],
-                endpoint: oracleEndpoint,
-                js_params: params,
-                publicKey: providerPublicKey,
-                dots: 4,
-                from: accounts[0],
-                gas: gasTransaction
+                //console.log("event listen : ", err,res)
+                //expect(err).to.be.null;
+                //expect(res.event).to.be.equal("DataPurchase")
+                return
             });
         });
     });
