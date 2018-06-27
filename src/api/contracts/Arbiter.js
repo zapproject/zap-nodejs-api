@@ -95,4 +95,4 @@ class Arbiter extends Base {
 
 }
 
-module.exports = Arbiter;
+module.exports = new Arbiter();

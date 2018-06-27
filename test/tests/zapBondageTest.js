@@ -43,39 +43,42 @@ describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
         currentCostStorage,
         addressZapBondage,
         zapBondageWrapper,
-        bondageStoreAbi;
+        bondageStoreAbi,
+        Config,
+        currentNetwork,
+        web3;
 
     before(function (done) {
         configureEnvironment(async () => {
             this.timeout(60000);
             await migrateContracts();
-            accounts = await web3.eth.getAccounts();
             done();
         });
     });
 
     describe('Bondage', function () {
+        beforeEach(function(done){
+            configureEnvironment(async ()=>{
+                delete require.cache[require.resolve('../../config/index')];
+                Config = require('../../config/index');
+                currentNetwork = Config.networks['ganache'];
+                web3 = new Web3(currentNetwork.provider);
+                accounts = await web3.eth.getAccounts();
+                delete require.cache[require.resolve('../../src/api/contracts/Arbiter')];
+                Dispatch = require('../../src/api/contracts/Dispatch');
+                done();
+            });
 
         it('Should get new instances of contracts and bind their storages', async () => {
-            bondageAbi = Config.getBondageArtifact();
-            bondageStoreAbi = Config.getBondageStorageArtifact();
-
-            const registryAbi = Config.getRegistryArtifact();
-            const registryStoreAbi = Config.getRegistryStorageArtifact();
-            const tokenAbi = Config.getZapTokenArtifact();
-            const costStorageAbi = Config.getCurrentCostArtifact();
-
             [
                 bondageStorage,
                 registryStorage,
                 zapToken,
-            ] = await Promise.all([
-                getDeployedContract(bondageStoreAbi, currentNetwork, web3.currentProvider),
+            ] = [getDeployedContract(bondageStoreAbi, currentNetwork, web3.currentProvider),
                 getDeployedContract(registryStoreAbi, currentNetwork, web3.currentProvider),
-                getDeployedContract(tokenAbi, currentNetwork, web3.currentProvider),
-            ]);
+                getDeployedContract(tokenAbi, currentNetwork, web3.currentProvider)];
 
-            zapRegistry = await getDeployedContract(registryAbi, currentNetwork, web3.currentProvider);
+            deployedZapRegistry = getDeployedContract(Config.registryArtifact, currentNetwork, web3.currentProvider);
             currentCostStorage = await getDeployedContract(costStorageAbi, currentNetwork, web3.currentProvider);
             zapBondage = await getDeployedContract(bondageAbi, currentNetwork, web3.currentProvider);
 
