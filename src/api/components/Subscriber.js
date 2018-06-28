@@ -1,136 +1,72 @@
 const EventEmitter = require('events');
+const assert = require('assert');
 const Arbiter = require('./../contracts/Arbiter');
 const Registry = require('./../contracts/Registry');
-const Bondage = require("./../contracts/Bondage")
-const Dispatch = require("./../contracts/Dispatch")
+const Bondage = require('./../contracts/Bondage');
+const Dispatch = require('./../contracts/Dispatch');
+const ZapToken = require('./../contracts/ZapToken');
 
 class Subscriber extends EventEmitter {
 
-    constructor(eth, wallet, keypair, registryAddress, arbiterAddress) {
-        super();
+  constructor({owner, handler}) {
+    super();
+    assert(owner, 'owner address is required');
+    this.owner = owner;
+    this.handler = handler || {};
+  }
 
-        this.handlers = {};
-        this.wallet = wallet;
-        this.keypair = keypair;
-        this.eth = wallet.eth;
+  // Add a endpoint handler
+  addHandler(type, handler) {
+    this.handlers[type] = handler;
+  }
 
-        this.registry = new Registry(this.eth, wallet.network, registryAddress);
-        this.arbiter = new Arbiter(this.eth, wallet.network, arbiterAddress);
+
+  async bond({provider, endpoint, zapNum}){
+    assert(provider && endpoint && zapNum,
+      'missing args, require: provider,endpoint,zapNum');
+    assert(this.hasEnoughZap(zapNum), 'Insufficient Balance');
+    let approve = await ZapToken.approve({
+      address: Bondage.contract._address,
+      amount: zapNum, from: this.owner});
+    assert(approve, 'fail to approve to Bondage');
+    let bonded = await Bondage.bond({provider, endpoint, zapNum, from: this.owner});
+    return bonded;
+  }
+
+  async unBond({provider, endpoint, dots}){
+    let boundDots = await Bondage.getBoundDots({subscriber: this.owner, provider, endpoint});
+    assert(boundDots >= dots, 'dots to unbond is less than requested');
+    let unBounded = await Bondage.unbond({provider, endpoint, dots, from: this.owner});
+    return unBounded;
+  }
+
+
+  async subscribe({provider, endpoint, endpointParams, dots}) {
+    try {
+      let providerPubkey = await Registry.getProviderPublicKey({provider});
+      let zapRequired = await Bondage.calcZapForDots({provider, endpoint, dots});
+      let zapBalance = await ZapToken.balanceOf(this.owner);
+      if (zapBalance < zapRequired)
+        throw new Error(`Insufficient balance, require ${zapRequired} Zap for ${dots} dots`);
+      let boundDots = await Bondage.bond({provider, endpoint, numZap: zapRequired, from: this.owner});
+      assert.isEqual(boundDots, dots, 'Bound dots is different to dots requests.');
+      let blocks = dots;
+      let sub = await Arbiter.initiateSubscription(
+        {provider, endpoint, endpointParams,
+          blocks: blocks, publicKey: providerPubkey, from: this.owner});
+      return sub;
+    } catch (e){
+      console.error(e);
+      return null;
     }
+  }
 
-    // Add a endpoint handler
-    addHandler(type, handler) {
-        this.handlers[type] = handler;
-    }
+  // === Helpers ===//
+  async hasEnoughZap(zapRequired){
+    let balance = await ZapToken.balanceOf(this.owner);
+    return balance > zapRequired;
+  }
 
-    // Get the amount of zap necessary for a given amount of dots
-    getZapRequired(oracle, endpoint, dots, callback) {
-        oracle.getCurve(endpoint, (err, curve) => {
-            if ( err ) {
-                callback(err);
-                return;
-            }
-
-            oracle.getZapBound(endpoint, (err, totalBound) => {
-                if ( err ) {
-                    callback(err);
-                    return;
-                }
-
-                let currentDots = 0;            // Current amount of dots
-                let currentBound = totalBound;  // Current total bound
-                let amountNeeded = 0;           // How much zap we need
-
-                while ( currentDots < dots ) {
-                    // Get the price of zap
-                    let price = curve.getPrice(currentBound);
-
-                    // Bond that zap
-                    currentBound += price;
-                    amountNeeded += price;
-
-                    currentDots++;
-                }
-
-                callback(null, amountNeeded);
-            });
-        });
-    }
-
-    subscribe(oracle, endpoint, dots, callback) {
-        if ( endpoint != "smartcontract" ) {
-            if ( !this.handlers[endpoint] ) {
-                callback(new Error("Unable to find a handler for endpoint " + endpoint));
-                return;
-            }
-
-            // Generate parameters for this handler
-            const js_params = this.handlers[endpoint].initiateSubscription(oracle);
-
-            // Do a temporal endpoint
-            // Get the amount of zap needed for given amount of dots
-            this.getZapRequired(oracle, endpoint, dots, (err, amount) => {
-                if ( err ) {
-                    callback(err);
-                    return;
-                }
-
-                // Get the current Zap balance
-                this.wallet.getBalance((err, balance) => {
-                    if ( err ) {
-                        callback(err);
-                        return;
-                    }
-
-                    // Make sure that there is Zap balance for this
-                    if ( balance < amount ) {
-                        callback(new Error("Insufficient balance"));
-                        return;
-                    }
-
-                    // Bond the necessary amount of zap for the given dots
-                    this.wallet.bond(oracle, endpoint, amount, (err, numZap, numDots) => {
-                        if ( err ) {
-                            callback(err);
-                            return;
-                        }
-
-                        // Make sure we succesfully got these dots
-                        if ( numDots != dots ) {
-                            callback(new Error("Failed to get right amount of dots"));
-                            // TODO - unbond these dots or try to bond for more
-                            return;
-                        }
-
-                        this.arbiter.initiateSubscription(
-                            oracle.address,             // Oracle's address
-                            js_params,                  // Unencoded parameters
-                            endpoint,                   // Which endpoint to use
-                            this.keypair.getPublic(),   // Our public key
-                            dots,                       // Amount of dots we're using
-                            () => {
-                                this.pendingSubscriptions[oracle.address] = callback;
-                            }
-                        );
-                    });
-                });
-            });
-        }
-    }
-
-    // Listen for events from the Arbiter class.
-    listen() {
-        // Listen for events
-        this.arbiter.listen((err, event) => {
-            // See if we have any subscriptions pending on this event
-            const callback = this.pendingSubscriptions[event.provider];
-
-            if ( callback ) {
-                this.pendingSubscriptions[event.provider] = null;
-                this.pendingSubscriptions[event.provider](err, event);
-            }
-        });
-    }
 }
 
 module.exports = Subscriber;

@@ -14,11 +14,11 @@ function fixTruffleContractCompatibilityIssue(contract) {
     return contract;
 }
 
-async function getDeployedContract(artifact, { id }, provider) {
+function getDeployedContract(artifact, { id }, provider) {
     let instance = Contract(artifact);
     instance.setProvider(provider);
     instance = fixTruffleContractCompatibilityIssue(instance);
-    return await instance.at(artifact.networks[id].address);
+    return instance.at(artifact.networks[id].address);
 }
 
 

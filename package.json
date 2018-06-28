@@ -46,13 +46,15 @@
     "wrtc": "0.0.65"
   },
   "scripts": {
-    "test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha && nyc report --reporter=text-lcov | coveralls NODE_ENV=test",
+    "test": "NODE_ENV=ganache ./node_modules/.bin/nyc ./node_modules/.bin/mocha && nyc report --reporter=text-lcov | coveralls",
     "test_local": "rm -rf ZapContracts/build/contracts/* && JUNIT_REPORT_PATH=report.xml TEST=1 nyc --reporter=clover ./node_modules/.bin/mocha",
     "local": "JUNIT_REPORT_PATH=report.xml TEST=1 nyc --reporter=clover ./node_modules/.bin/mocha",
     "coverage": "./node_modules/.bin/nyc report clover",
     "bundle": "browserify src/account.js src/api/subscriber.js src/api/sharedcrypto.js src/api/subscription.js -t brfs -o build/bundle.js",
     "bundle-contracts": "browserify src/api/contracts-bundle.js -o dist/api/contracts/bundle.js -t [ babelify --presets [latest] ] -t brfs",
-    "dev:server": "http-server ./ -a 127.0.0.1 -c-1"
+    "dev:server": "http-server ./ -a 127.0.0.1 -c-1",
+    "flow": "flow",
+    "flow:check": "flow check src/api"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -64,6 +66,9 @@
     "babelify": "^8.0.0",
     "brfs": "^1.6.1",
     "browserify": "^16.2.0",
+    "eslint": "^5.0.1",
+    "eslint-config-strongloop": "^2.1.0",
+    "flow-bin": "^0.75.0",
     "http-server": "^0.11.1",
     "uglify-js": "^3.3.22"
   }

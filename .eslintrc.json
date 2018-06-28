@@ -1,36 +1,14 @@
 {
-    "parser": "babel-eslint",
-    "env": {
-        "node": true,
-        "es6": true,
-        "mocha": true
-    },
-    "extends": "eslint:recommended",
-    "rules": {
-        "indent": [
-            "error",
-            4,
-            {"SwitchCase": 1}
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "semi": [
-            "error",
-            "always"
-        ],
-        "no-unused-vars": [
-            "warn",
-            {
-                "vars": "local",
-                "args": "none",
-                "ignoreRestSiblings": false
-            }
-        ],
-        "no-console": ["warn", { "allow": ["log", "warn", "error"] }]
-    },
-    "globals": {
-        "closeServer": true
+  "extends":["strongloop"],
+  "parserOptions": {
+    "ecmaVersion": 8,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
     }
+  },
+  "rules":{
+    "max-len":[2,120,8]
+  }
 }
+
