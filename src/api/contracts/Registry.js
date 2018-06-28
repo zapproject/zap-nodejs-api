@@ -1,11 +1,13 @@
 const Base = require('./Base');
 const Web3 = require('web3');
 const web3 = new Web3();
+const {utf8ToHex, toBN} = require('web3-utils');
+
 
 class ZapRegistry extends Base {
 
-  constructor(){
-    super(Base.getConfig().registryArtifact);
+  constructor({networkId = null, networkProvider = null} = {}){
+    super({contract: 'Registry', networkId, networkProvider});
   }
 
   async initiateProvider({public_key, title, endpoint, endpoint_params, from, gas}) {
@@ -37,7 +39,7 @@ class ZapRegistry extends Base {
         return web3.utils.toHex(item);
       });
       return await this.contract.methods.initiateProviderCurve(
-        this.web3.utils.utf8ToHex(endpoint),
+        utf8ToHex(endpoint),
         convertedConstants,
         convertedParts,
         convertedDividers)
@@ -106,8 +108,8 @@ class ZapRegistry extends Base {
   async getNextEndpointParams({provider, endpoint, index}){
     return this.contract.methods.getNextEndpointParam(
       provider,
-      this.web3.utils.utf8ToHex(endpoint),
-      this.web3.utils.toBN(index)
+      utf8ToHex(endpoint),
+      toBN(index)
     ).call();
   }
 

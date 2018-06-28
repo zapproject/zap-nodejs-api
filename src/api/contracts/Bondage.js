@@ -1,23 +1,26 @@
 const Base = require('./Base');
-const {toBase} = require('./../utils')
+const {toBase} = require('./../utils');
+const {utf8ToHex, toBN} = require('web3-utils');
+
 class Bondage extends Base {
 
 
-  constructor(){
-    super(Base.getConfig().bondageArtifact);
+  constructor({networkId = null, networkProvider = null} = {}){
+    super({contract: 'Bondage', networkId, networkProvider});
   }
+
   // Do a bond to a ZapOracle's endpoint
   async bond({provider, endpoint, zapNum, from, gas}) {
-    try{
+    try {
       let bondResult = await this.contract.bond(
         provider,
-        this.web3.utils.utf8ToHex(endpoint),
+        utf8ToHex(endpoint),
         toBase(zapNum))
         .send({
           from: from,
           gas: gas || this.DEFAULT_GAS});
       return bondResult;
-    }catch(e){
+    } catch (e){
       console.error(e);
       return 0;
     }
@@ -28,8 +31,8 @@ class Bondage extends Base {
   async unbond({oracleAddress, endpoint, dots, from, gas}) {
     return await this.contract.methods.unbond(
       oracleAddress,
-      this.web3.utils.utf8ToHex(endpoint),
-      this.web3.utils.toBN(dots))
+      utf8ToHex(endpoint),
+      toBN(dots))
       .send({
         from: from,
         gas: gas || this.DEFAULT_GAS});
@@ -39,44 +42,44 @@ class Bondage extends Base {
     return await this.contract.methods.getBoundDots(
       subscriber,
       provider,
-      this.web3.utils.utf8ToHex(endpoint),
+      utf8ToHex(endpoint),
     ).call();
   }
 
   async calcZapForDots({provider, endpoint, dots}){
     return await this.contract.methods.calcZapForDots(
       provider,
-      this.web3.utils.utf8ToHex(endpoint),
-      this.web3.utils.toBN(dots)).call();
+      utf8ToHex(endpoint),
+      toBN(dots)).call();
   }
 
   async calcBondRate({provider, endpoint, numZap}){
     return await this.contract.methods.calcBondRate(
       provider,
-      this.web3.utils.utf8ToHex(endpoint),
-      this.web3.utils.toBN(numZap)
+      utf8ToHex(endpoint),
+      toBN(numZap)
     ).call();
   }
 
   async currentCostOfDot({provider, endpoint, totalBound}){
     return this.contract.methods.currentCostOfDot(
       provider,
-      this.web3.utils.utf8ToHex(endpoint),
-      this.web3.utils.toBN(totalBound)
+      utf8ToHex(endpoint),
+      toBN(totalBound)
     ).call();
   }
 
   async getDotsIssued({provider, endpoint}){
     return this.contract.methods.getDotsIssued(
       provider,
-      this.web3.utils.utf8ToHex(endpoint)
+      utf8ToHex(endpoint)
     ).call();
   }
 
   async getZapBound({provider, endpoint}){
     return this.contract.methods.getZapBound(
       provider,
-      this.web3.utils.utf8ToHex(endpoint)
+      utf8ToHex(endpoint)
     ).call();
   }
 

@@ -4,8 +4,7 @@ const Arbiter = require('./../contracts/Arbiter');
 const Dispatch = require('./../contracts/Dispatch');
 const Registry = require('./../contracts/Registry');
 const Bondage = require('./../contracts/Bondage');
-const Web3 = require('web3');
-const web3 = new Web3();
+const {hexToUtf8} = require("web3-utils");
 
 class Provider {
 
@@ -91,7 +90,7 @@ class Provider {
       if (this.title) return this.title;
       let title = await Registry.getProviderTitle(this.owner);
       this.title = title;
-      return web3.utils.hexToUtf8(title);
+      return hexToUtf8(title);
     } catch (e){
       console.error(e);
       return null;
@@ -108,7 +107,7 @@ class Provider {
       if (this.pubkey) return this.pubkey;
       let pubkey = await Registry.getProviderPubkey(this.owner);
       this.pubkey = pubkey;
-      return web3.utils.hexToUtf8(pubkey);
+      return hexToUtf8(pubkey);
     } catch (e){
       console.error('Provider is not initiated');
       return null;

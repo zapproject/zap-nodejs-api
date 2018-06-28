@@ -9,3 +9,6 @@ coverage/
 .idea/
 ZapContracts/node_modules
 node_modules/
+docs/
+test/TestArtifactsModule/contracts/*.json
+/dist/*

@@ -1,7 +1,10 @@
 const Base = require('./Base');
+const {utf8ToHex, toBN} = require('web3-utils');
+
 class Arbiter extends Base {
-  constructor(){
-    super(Base.getConfig().arbiterArtifact);
+
+  constructor({artifactsModule={},networkId = {}, networkProvider = {}}){
+    super({'Arbiter', artifactsModule, networkId, networkProvider});
   }
 
   /**
@@ -23,15 +26,15 @@ class Arbiter extends Base {
         throw endpointParams;
       }
       for (let i in endpointParams){
-        endpointParams[i] = this.web3.utils.utf8ToHex(endpointParams[i]);
+        endpointParams[i] = utf8ToHex(endpointParams[i]);
       }
 
       return await this.contract.methods.initiateSubscription(
         provider,
-        this.web3.utils.utf8ToHex(endpoint),
+        utf8ToHex(endpoint),
         endpointParams,
-        this.web3.utils.toBN(publicKey),
-        this.web3.utils.toBN(blocks)).send({from: from, gas: gas});
+        toBN(publicKey),
+        toBN(blocks)).send({from: from, gas: gas});
     } catch (err) {
       throw err;
     }
@@ -41,7 +44,7 @@ class Arbiter extends Base {
     try {
       return await this.contract.methods.endSubscriptionSubscriber(
         provider,
-        this.web3.utils.utf8ToHex(endpoint))
+        utf8ToHex(endpoint))
         .send({from: from, gas: gas});
     } catch (err) {
       throw err;
@@ -89,7 +92,7 @@ class Arbiter extends Base {
      * @param callback
      */
   listen(callback){
-    this.contract.events.allEvents({fromBlock: 0, toBlock: 'latest'},callback);
+    this.contract.events.allEvents({fromBlock: 0, toBlock: 'latest'}, callback);
   }
 
 

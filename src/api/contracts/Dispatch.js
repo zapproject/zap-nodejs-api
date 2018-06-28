@@ -1,16 +1,17 @@
 const Base = require('./Base');
+const {utf8ToHex, toBN} = require('web3-utils');
 
 class ZapDispatch extends Base {
 
-  constructor(){
-    super(Base.getConfig().dispatchArtifact);
+  constructor({networkId = null, networkProvider = null} = {}){
+    super({contract: 'Dispatch', networkId, networkProvider});
   }
 
   async queryData({provider, query, endpoint, params, onchainProvider, onchainSubscriber}){
     let resultQuery = await this.contract.methods.query(
       provider,
       query,
-      this.web3.utils.utf8ToHex(endpoint),
+      utf8ToHex(endpoint),
       params, // endpoint-specific params
       onchainProvider,
       onchainSubscriber).send({from: this.owner, gas: 6000000});
