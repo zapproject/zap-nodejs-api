@@ -1,11 +1,14 @@
 const migrate = require('../node_modules/truffle-core/lib/commands/migrate');
 const path = require('path');
 const fs = require('fs');
+const Web3 = require('web3');
 const { provider, server } = require('ganache-core');
 const { promisify } = require('util');
 const asyncMigrate = promisify(migrate.run);
 const Config = require('../config');
 const test_contracts_build_directory = path.join(__dirname, 'TestArtifactsModule/contracts');
+const { getDeployedContract } = require('./utils');
+const Sleep = require('sleep');
 
 const ganacheServerOptions = {
   hostname: 'localhost',
@@ -15,6 +18,7 @@ const ganacheServerOptions = {
   total_accounts: 10,
   ws: true,
 };
+
 // initiate and run ganache server;
 const ganacheServer = server(ganacheServerOptions);
 ganacheServer.listen(ganacheServerOptions.port, (err, blockchain) => {
@@ -22,11 +26,13 @@ ganacheServer.listen(ganacheServerOptions.port, (err, blockchain) => {
     throw err;
   }
   if (blockchain) {
-    //  console.log(blockchain);
+    console.log(blockchain);
   }
 });
 console.log('server started on port: ' + ganacheServerOptions.port);
-const testProvider = provider(ganacheServerOptions);
+
+// TODO: ganache provider isn't working
+const testProvider = new Web3.providers.WebsocketProvider('ws://127.0.0.1:7545'); //provider(ganacheServerOptions);
 
 function clearBuild(onlyRemoveNetworks = true) {
   const buildDir = test_contracts_build_directory;
@@ -60,7 +66,7 @@ async function migrateContracts() {
     working_directory: path.join(Config.projectPath, Config.workingDirectory),
     migrations_directory: path.join(Config.projectPath, Config.migrationsDirectory),
     network: 'ganache-gui',
-    network_id: ganacheServerOptions.id,
+    network_id: ganacheServerOptions.network_id,
     provider: testProvider,
     hostname: ganacheServerOptions.hostname,
     port: ganacheServerOptions.port,
@@ -96,7 +102,5 @@ try {
   // require('./tests/zapRegistryTest');
 } catch (e) {
   console.log(e);
-  ganacheServer.close();
-} finally{
   ganacheServer.close();
 }

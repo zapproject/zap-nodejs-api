@@ -1,5 +1,6 @@
 const objectToCreate = { from: '0x627306090abab3a6e1400e9345bc60c78a8bef57', gas: 6000000 };
 const BigNumber = require('bignumber.js');
+const fs = require('fs');
 const Curve = require('../src/api/components/Curve');
 const Contract = require("truffle-contract");
 
@@ -14,11 +15,18 @@ function fixTruffleContractCompatibilityIssue(contract) {
     return contract;
 }
 
-function getDeployedContract(artifact, { id }, provider) {
-    let instance = Contract(artifact);
-    instance.setProvider(provider);
-    instance = fixTruffleContractCompatibilityIssue(instance);
-    return instance.at(artifact.networks[id].address);
+function getDeployedContract(artifactsPath, artifactName, id, provider) {
+    let files = fs.readdirSync(artifactsPath);
+    for (let i = 0; i < files.length; i++) {
+        if (files[i] === artifactName + '.json' || files[i] === artifactName) {
+            let file = artifactsPath + '/' + files[i];
+            let artifact = JSON.parse(fs.readFileSync(file).toString());
+            let instance = Contract(artifact);
+            instance.setProvider(provider);
+            instance = fixTruffleContractCompatibilityIssue(instance);
+            return instance.at(artifact.networks[id].address);
+        }
+    }
 }
 
 

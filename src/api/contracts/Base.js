@@ -4,11 +4,12 @@ const assert = require('assert');
 const Web3 = require('web3');
 const config = require('./../../../config/index');
 const Artifacts = require('./../Artifacts');
+
 class Base {
 
   static getConfig(){ return config; }
 
-  constructor({contractName,_artifactsModule, _networkId, _provider}) {
+  constructor({contractName, _artifactsModule, _networkId, _provider}) {
     try {
       this.artifactsModule = _artifactsModule || Artifacts;
       let artifact = this.artifactsModule[contractName];

@@ -3,8 +3,13 @@ const {utf8ToHex, toBN} = require('web3-utils');
 
 class Arbiter extends Base {
 
-  constructor({artifactsModule={},networkId = {}, networkProvider = {}}){
-    super({'Arbiter', artifactsModule, networkId, networkProvider});
+  constructor({artifactsModule, networkId, networkProvider}) {
+    super({
+        contractName: 'Arbiter',
+        _artifactsModule: artifactsModule,
+        _networkId: networkId,
+        _provider: networkProvider
+    });
   }
 
   /**
@@ -98,4 +103,11 @@ class Arbiter extends Base {
 
 }
 
-module.exports = new Arbiter();
+function getDefaultInstance() {
+    return new Arbiter({});
+}
+
+module.exports = {
+    getDefaultInstance,
+    Arbiter
+};

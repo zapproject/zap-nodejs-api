@@ -19,6 +19,7 @@ const dispatchStorageAbiPath = '/ZapContracts/build/contracts/DispatchStorage.js
 const queryCallerAbiPath = '/ZapContracts/build/contracts/QueryCaller.json';
 const runMigrationTimeOut = 5000;
 const projectPath = path.join(__dirname, '../');
+const testArtifactsDir = path.join(projectPath, '/test/TestArtifactsModule/contracts');
 
 
 const networks = {
@@ -65,6 +66,7 @@ module.exports = {
     migrationsDirectory,
     runMigrationTimeOut,
     projectPath,
+    testArtifactsDir,
 
     dispatchAbi: dispatchAbiPath,
     dispatchStorageAbi: dispatchStorageAbiPath,
