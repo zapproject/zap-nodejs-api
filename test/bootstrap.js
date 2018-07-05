@@ -95,12 +95,12 @@ module.exports = {
 
 
 try {
-  require('./tests/zapArbiterTest');
-  require('./tests/zapBondageTest');
-  //require('./tests/zapDispatchTest');
-  // require('./tests/zapTokenTest');
-  // require('./tests/zapRegistryTest');
+    require('./tests/zapArbiterTest');
+    require('./tests/zapBondageTest');
+    require('./tests/zapDispatchTest');
+    require('./tests/zapTokenTest');
+    require('./tests/zapRegistryTest');
 } catch (e) {
-  console.log(e);
-  ganacheServer.close();
+    console.log(e);
+    ganacheServer.close();
 }

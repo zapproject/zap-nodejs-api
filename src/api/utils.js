@@ -34,7 +34,7 @@ function toBase(num){
 }
 
 function fromBase(num) {
-  return web3.utils.toBN(num).div(web3.utils.toBN(10).pow(web3.utils.toBN(18))).toNumber();
+  return web3.utils.toBN(num).div(web3.utils.toBN(10).pow(web3.utils.toBN(18))).toString();
 }
 
 module.exports = {

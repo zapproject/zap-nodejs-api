@@ -3,8 +3,13 @@ const {utf8ToHex, toBN} = require('web3-utils');
 
 class ZapDispatch extends Base {
 
-  constructor({networkId = null, networkProvider = null} = {}){
-    super({contract: 'Dispatch', networkId, networkProvider});
+  constructor({artifactsPath = null, networkId = null, networkProvider = null} = {}){
+    super({
+        contractName: 'Dispatch',
+        _artifactsPath: artifactsPath,
+        _networkId: networkId,
+        _provider: networkProvider
+    });
   }
 
   async queryData({provider, query, endpoint, params, onchainProvider, onchainSubscriber}){
@@ -83,7 +88,13 @@ class ZapDispatch extends Base {
     this.contract.events.OffchainResponse(filters, callback);
   }
 
-
 }
 
-module.exports = new ZapDispatch();
+function getDefaultInstance() {
+    return new ZapDispatch({});
+}
+
+module.exports = {
+    getDefaultInstance,
+    ZapDispatch
+};

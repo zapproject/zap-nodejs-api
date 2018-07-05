@@ -10,7 +10,8 @@ class Bondage extends Base {
         contractName: 'Bondage',
         _artifactsPath: artifactsPath,
         _networkId: networkId,
-        _provider: networkProvider});
+        _provider: networkProvider
+    });
   }
 
   // Do a bond to a ZapOracle's endpoint

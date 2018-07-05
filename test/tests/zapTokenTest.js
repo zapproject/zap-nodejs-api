@@ -3,16 +3,16 @@ const expect = require('chai')
     .use(require('chai-bignumber'))
     .expect;
 
-const ZapToken = require('../../src/api/contracts/ZapToken');
+const { ZapToken } = require('../../src/api/contracts/ZapToken');
 const BigNumber = require('bignumber.js');
 const Web3 = require('web3');
+const path = require('path');
 
-const { migrateContracts, ganacheServer, clearBuild } = require('../bootstrap');
+const { migrateContracts, ganacheServer, clearBuild, testProvider, testNetworkId } = require('../bootstrap');
 const Config = require('../../config/index');
 const { tokensForOwner, allocateAccount, getDeployedContract } = require('../utils');
 
-const currentNetwork = Config.ganacheNetwork;
-const web3 = new Web3(currentNetwork.provider);
+const testArtifactsModulePath = path.join(Config.projectPath, 'test/TestArtifactsModule/contracts');
 
 async function configureEnvironment(func) {
     await func();
@@ -24,17 +24,16 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
     let deployedZapToken;
     let abiJSON;
     let zapTokenWrapper;
+    let web3;
 
     before(function (done) {
         configureEnvironment(async () => {
             this.timeout(60000);
             await migrateContracts();
-
+            web3 = new Web3(testProvider);
             accounts = await web3.eth.getAccounts();
-            abiJSON = Config.getZapTokenArtifact();
-            addressZapToken = abiJSON.networks[currentNetwork.id].address;
-            deployedZapToken = await getDeployedContract(abiJSON, currentNetwork, web3.currentProvider);
-
+            deployedZapToken = await getDeployedContract(Config.testArtifactsDir, 'ZapToken', testNetworkId, web3.currentProvider);
+            addressZapToken = deployedZapToken.address;
             done();
         });
     });
@@ -48,15 +47,14 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
 
         it('Should initiate wrapper', () => {
             zapTokenWrapper = new ZapToken({
-                provider: web3.currentProvider,
-                address: addressZapToken,
-                artifact: abiJSON
+                artifactsPath: testArtifactsModulePath,
+                networkId: testNetworkId,
+                networkProvider: testProvider
             });
         });
 
         it('Should get zapToken owner', async () => {
-            const c = await zapTokenWrapper.contractInstance();
-            const owner = await c.owner.call();
+            const owner = await deployedZapToken.owner.call();
 
             await expect(owner).to.be.equal(accounts[0].toLowerCase());
         });
@@ -67,10 +65,16 @@ describe('ZapToken, path to "/src/api/contracts/ZapToken"', () => {
         });
 
         it('Should update balance, and get updated balance of zap token', async () => {
-            await zapTokenWrapper.allocate(accounts[0], tokensForOwner, accounts[0]);
+            await zapTokenWrapper.allocate({
+                to: accounts[0],
+                amount: tokensForOwner,
+                from: accounts[0]
+            });
             const balance = await zapTokenWrapper.balanceOf(accounts[0]);
 
-            await expect(balance.valueOf()).to.be.equal(tokensForOwner.toString());
+            let first = web3.utils.toBN(balance.valueOf()).div(web3.utils.toBN(10).pow(web3.utils.toBN(30))).toString();
+            let second = tokensForOwner.div(web3.utils.toBN(10).pow(web3.utils.toBN(30))).toString();
+            await expect(first).to.be.equal(second);
         });
 
         it('Should make transfer to another account', async () => {

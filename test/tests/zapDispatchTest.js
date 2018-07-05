@@ -3,14 +3,14 @@ const expect = require('chai')
     .use(require('chai-bignumber'))
     .expect;
 
-const Dispatch = require('../../src/api/contracts/Dispatch');
 const Web3 = require('web3');
-const { migrateContracts, ganacheServer, clearBuild } = require('../bootstrap');
+const path = require('path');
+const { migrateContracts, ganacheServer, clearBuild, testNetworkId, testProvider } = require('../bootstrap');
 const {
     getDeployedContract,
     providerPublicKey,
     providerTitle,
-    oracleEndpoint,
+    specifier,
     params,
     gasTransaction,
     curve,
@@ -19,9 +19,8 @@ const {
     query
 } = require('../utils');
 const Config = require('../../config/index');
-
-const currentNetwork = Config.ganacheNetwork;
-const web3 = new Web3(currentNetwork.provider);
+const { ZapDispatch } = require('../../src/api/contracts/Dispatch');
+const testArtifactsModulePath = path.join(Config.projectPath, 'test/TestArtifactsModule/contracts');
 
 async function configureEnvironment(func) {
     await func();
@@ -36,32 +35,21 @@ describe('Dispatch, path to "/src/api/contract/Dispatch"', () => {
         deployedZapToken,
         dispatchStorage,
         deployedZapRegistry,
-        currentCostStorage,
         deployedZapBondage,
         deployedZapDispatch,
         deployedZapArbiter,
         addressZapDispatch,
         zapDispatchWrapper,
-        dispatchAbi,
-        tokenAbi,
-        arbiterAbi,
-        registryAbi,
-        bondageAbi,
-        dispatchStorageAbi,
-        arbiterStorageAbi,
-        registryStorageAbi,
-        bondageStorageAbi,
-        currentCostAbi,
-        queryData;
+        queryData,
+        web3;
 
     before(function (done) {
         configureEnvironment(async () => {
             this.timeout(60000);
             await migrateContracts();
-
+            web3 = new Web3(testProvider);
             accounts = await web3.eth.getAccounts();
             subscriber = accounts[8];
-
             done();
         });
     });
@@ -72,12 +60,12 @@ describe('Dispatch, path to "/src/api/contract/Dispatch"', () => {
             await deployedZapRegistry.initiateProvider(
                 providerPublicKey,
                 providerTitle,
-                oracleEndpoint,
+                specifier,
                 params,
                 { from: oracleAddress, gas: gasTransaction } // from provider
             );
             await deployedZapRegistry.initiateProviderCurve(
-                oracleEndpoint,
+                specifier,
                 curve.constants,
                 curve.parts,
                 curve.dividers,
@@ -105,17 +93,18 @@ describe('Dispatch, path to "/src/api/contract/Dispatch"', () => {
             );
             await deployedZapBondage.bond(
                 oracleAddress,
-                oracleEndpoint,
+                specifier,
                 100,
                 { from: subscriber, gas: 1000000 }
             );
-            const contract = await getDeployedContract(dispatchAbi, currentNetwork, web3.currentProvider);
+            const contract = await getDeployedContract(Config.testArtifactsDir, 'Dispatch', testNetworkId, web3.currentProvider);
 
             const queryResult = await contract.query(
                 oracleAddress,
                 query,
-                oracleEndpoint,
+                specifier,
                 params,
+                false,
                 false,
                 { from: subscriber, gas: gasTransaction }
             );
@@ -124,16 +113,6 @@ describe('Dispatch, path to "/src/api/contract/Dispatch"', () => {
         }
 
         async function getNewSmartContracts() {
-            dispatchAbi = Config.getDispatchArtifact();
-            tokenAbi = Config.getZapTokenArtifact();
-            arbiterAbi = Config.getArbiterArtifact();
-            registryAbi = Config.getRegistryArtifact();
-            bondageAbi = Config.getBondageArtifact();
-            dispatchStorageAbi = Config.getDispatchStorageArtifact();
-            arbiterStorageAbi = Config.getArbiterStorageArtifact();
-            registryStorageAbi = Config.getRegistryStorageArtifact();
-            bondageStorageAbi = Config.getBondageStorageArtifact();
-            currentCostAbi = Config.getCurrentCostArtifact();
             [
                 bondageStorage,
                 registryStorage,
@@ -141,17 +120,17 @@ describe('Dispatch, path to "/src/api/contract/Dispatch"', () => {
                 deployedZapToken,
                 dispatchStorage
             ] = await Promise.all([
-                getDeployedContract(bondageStorageAbi, currentNetwork, web3.currentProvider),
-                getDeployedContract(registryStorageAbi, currentNetwork, web3.currentProvider),
-                getDeployedContract(arbiterStorageAbi, currentNetwork, web3.currentProvider),
-                getDeployedContract(tokenAbi, currentNetwork, web3.currentProvider),
-                getDeployedContract(dispatchStorageAbi, currentNetwork, web3.currentProvider)
+                getDeployedContract(Config.testArtifactsDir, 'BondageStorage', testNetworkId, web3.currentProvider),
+                getDeployedContract(Config.testArtifactsDir, 'RegistryStorage', testNetworkId, web3.currentProvider),
+                getDeployedContract(Config.testArtifactsDir, 'ArbiterStorage', testNetworkId, web3.currentProvider),
+                getDeployedContract(Config.testArtifactsDir, 'ZapToken', testNetworkId, web3.currentProvider),
+                getDeployedContract(Config.testArtifactsDir, 'DispatchStorage', testNetworkId, web3.currentProvider)
             ]);
-            deployedZapRegistry = await getDeployedContract(registryAbi, currentNetwork, web3.currentProvider);
-            currentCostStorage = await getDeployedContract(currentCostAbi, currentNetwork, web3.currentProvider);
-            deployedZapBondage = await getDeployedContract(bondageAbi, currentNetwork, web3.currentProvider);
-            deployedZapDispatch = await getDeployedContract(dispatchAbi, currentNetwork, web3.currentProvider);
-            deployedZapArbiter = await getDeployedContract(arbiterAbi, currentNetwork, web3.currentProvider);
+
+            deployedZapRegistry = await getDeployedContract(Config.testArtifactsDir, 'Registry', testNetworkId, web3.currentProvider);
+            deployedZapBondage = await getDeployedContract(Config.testArtifactsDir, 'Bondage', testNetworkId, web3.currentProvider);
+            deployedZapDispatch = await getDeployedContract(Config.testArtifactsDir, 'Dispatch', testNetworkId, web3.currentProvider);
+            deployedZapArbiter = await getDeployedContract(Config.testArtifactsDir, 'Arbiter', testNetworkId, web3.currentProvider);
 
             addressZapDispatch = deployedZapDispatch.address;
 
@@ -173,10 +152,10 @@ describe('Dispatch, path to "/src/api/contract/Dispatch"', () => {
         });
 
         it('Should get instance of Zap Dispatch smart contract throw wrapper', () => {
-            zapDispatchWrapper = new Dispatch({
-                provider: web3.currentProvider,
-                address: addressZapDispatch,
-                artifact: dispatchAbi
+            zapDispatchWrapper = new ZapDispatch({
+                artifactsPath: testArtifactsModulePath,
+                networkId: testNetworkId,
+                networkProvider: testProvider
             });
         });
 

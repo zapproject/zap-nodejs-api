@@ -3,8 +3,13 @@ const {toBase, fromBase} = require('./../utils');
 
 class ZapToken extends Base {
 
-  constructor({networkId = null, networkProvider = null} = {}){
-    super({contract: 'ZapToken', networkId, networkProvider});
+  constructor({artifactsPath = null, networkId = null, networkProvider = null} = {}){
+    super({
+        contractName: 'ZapToken',
+        _artifactsPath: artifactsPath,
+        _networkId: networkId,
+        _provider: networkProvider
+    });
   }
 
   async balanceOf(address) {
@@ -32,4 +37,11 @@ class ZapToken extends Base {
   }
 }
 
-module.exports = new ZapToken();
+function getDefaultInstance() {
+    return new ZapToken({});
+}
+
+module.exports = {
+    getDefaultInstance,
+    ZapToken
+};

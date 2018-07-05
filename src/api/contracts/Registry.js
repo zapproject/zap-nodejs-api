@@ -1,27 +1,32 @@
 const Base = require('./Base');
 const Web3 = require('web3');
 const web3 = new Web3();
-const {utf8ToHex, toBN} = require('web3-utils');
+const {utf8ToHex, toBN, toHex} = require('web3-utils');
 
 
 class ZapRegistry extends Base {
 
-  constructor({networkId = null, networkProvider = null} = {}){
-    super({contract: 'Registry', networkId, networkProvider});
+  constructor({artifactsPath = null, networkId = null, networkProvider = null} = {}){
+      super({
+          contractName: 'Registry',
+          _artifactsPath: artifactsPath,
+          _networkId: networkId,
+          _provider: networkProvider
+      });
   }
 
   async initiateProvider({public_key, title, endpoint, endpoint_params, from, gas}) {
     try {
       return await this.contract.methods.initiateProvider(
         public_key,
-        title,
-        endpoint,
-        endpoint_params)
-        .send({
-          from: from,
-          gas: gas || this.DEFAULT_GAS,
-        }
-        );
+        utf8ToHex(title),
+        utf8ToHex(endpoint),
+        utf8ArrayToHex(endpoint_params)
+      )
+      .send({
+        from: from,
+        gas: gas || this.DEFAULT_GAS
+      });
     } catch (err) {
       throw err;
     }
@@ -54,11 +59,9 @@ class ZapRegistry extends Base {
 
   async setEndpointParams({endpoint, params, from, gas}) {
     try {
-      let endpoint_params = [];
-      params.forEach(el => endpoint_params.push(web3.utils.utf8ToHex(el)));
       return await this.contract.methods.setEndpointParams(
-        endpoint,
-        endpoint_params).send({
+        utf8ToHex(endpoint),
+        utf8ArrayToHex(params)).send({
         from: from,
         gas: gas || this.DEFAULT_GAS,
       });
@@ -127,6 +130,27 @@ class ZapRegistry extends Base {
     this.contract.events.NewCurve(provider, callback);
   }
 
+
 }
 
-module.exports = new ZapRegistry();
+function utf8ArrayToHex(arr) {
+    if (!arr) return [];
+    if (arr.length <= 0) return arr;
+
+    let newArr = [];
+    for (let i = 0; i < arr.length; i++) {
+        newArr[i] = utf8ToHex(arr[i]);
+    }
+
+    return newArr;
+}
+
+function getDefaultInstance() {
+    return new ZapRegistry({});
+}
+
+module.exports = {
+    getDefaultInstance,
+    ZapRegistry
+};
+

@@ -3,10 +3,11 @@ const expect = require('chai')
     .use(require('chai-bignumber'))
     .expect;
 
-const Registry = require('../../src/api/contracts/Registry');
+const { ZapRegistry } = require('../../src/api/contracts/Registry');
 const Web3 = require('web3');
+const path = require('path');
 const { getDeployedContract } = require("../utils");
-const { migrateContracts, clearBuild, ganacheServer } = require('../bootstrap');
+const { migrateContracts, clearBuild, ganacheServer, testNetworkId, testProvider } = require('../bootstrap');
 const Config = require('../../config/index');
 
 const {
@@ -16,9 +17,7 @@ const {
     params,
     curve
 } = require('../utils');
-
-const currentNetwork = Config.ganacheNetwork;
-const web3 = new Web3(currentNetwork.provider);
+const testArtifactsModulePath = path.join(Config.projectPath, 'test/TestArtifactsModule/contracts');
 
 
 async function configureEnvironment(func) {
@@ -28,27 +27,26 @@ async function configureEnvironment(func) {
 describe('Registry, path to "/src/api/contracts/Registry"', () => {
     let accounts = [];
     let addressRegistry;
-    let abiJSON;
     let registryWrapper;
+    let deployedRegistry;
     let deployedStorage;
-    let abiJSONStorage;
+    let web3;
 
     before(function (done) {
         configureEnvironment(async () => {
-            this.timeout(60000);
+            this.timeout(120000);
             await migrateContracts();
-
+            web3 = new Web3(testProvider);
             accounts = await web3.eth.getAccounts();
-            abiJSON = Config.getRegistryArtifact();
-            abiJSONStorage = Config.getRegistryStorageArtifact();
-            addressRegistry = abiJSON.networks[currentNetwork.id].address;
 
-            deployedStorage = await getDeployedContract(abiJSONStorage, currentNetwork, web3.currentProvider);
+            deployedStorage = await getDeployedContract(Config.testArtifactsDir, 'RegistryStorage', testNetworkId, web3.currentProvider);
+            deployedRegistry = await getDeployedContract(Config.testArtifactsDir, 'Registry', testNetworkId, web3.currentProvider);
+            addressRegistry = deployedRegistry.address;
 
-            registryWrapper = new Registry({
-                provider: web3.currentProvider,
-                address: addressRegistry,
-                artifact: abiJSON
+            registryWrapper = new ZapRegistry({
+                artifactsPath: testArtifactsModulePath,
+                networkId: testNetworkId,
+                networkProvider: testProvider
             });
 
             done();
@@ -71,8 +69,7 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
                 from: accounts[0],
                 gas: 600000
             });
-            let registryInstance = await registryWrapper.contractInstance();
-            const title = web3.utils.hexToUtf8(await registryInstance.getProviderTitle(accounts[0]));
+            const title = web3.utils.hexToUtf8(await deployedRegistry.getProviderTitle(accounts[0]));
 
             await expect(title).to.be.equal(providerTitle);
         });
@@ -84,8 +81,7 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
                 from: accounts[0],
                 gas: 3000000
             });
-            let registryInstance = await registryWrapper.contractInstance();
-            const c = await registryInstance.getProviderCurve(accounts[0], specifier);
+            const c = await deployedRegistry.getProviderCurve(accounts[0], specifier);
 
             let resultConstants = c[0].map((val) => { return val.toNumber() });
             let resultParts = c[1].map((val) => { return val.toNumber() });
@@ -106,16 +102,6 @@ describe('Registry, path to "/src/api/contracts/Registry"', () => {
             const endpointsSize = await deployedStorage.getEndpointIndexSize.call(accounts[0], specifier, { from: accounts[0] });
 
             await expect(endpointsSize.valueOf()).to.be.equal(params.length.toString());
-        });
-
-        it('Should get oracle in zap registry contract', async () => {
-            const oracle = await registryWrapper.getOracle({
-                address: accounts[0],
-                endpoint: specifier.valueOf()
-            });
-
-            await expect(oracle.public_key.toNumber()).to.be.equal(providerPublicKey);
-            await expect(oracle.endpoint_params.length).to.be.equal(params.length);
         });
 
         after(function () {
