@@ -33,7 +33,7 @@ function getDeployedContract(artifactsPath, artifactName, id, provider) {
 const providerTitle = "test";
 const providerPublicKey = 111;
 const params = ["p1", "p2"];
-const specifier = "test-linear-specifier";
+const specifier = "endpoint";
 const oracleEndpoint = specifier.valueOf();
 const gasTransaction = new BigNumber(3000000);
 const tokensForOwner = new BigNumber("1e30");

@@ -3,10 +3,10 @@ const {utf8ToHex, toBN} = require('web3-utils');
 
 class Arbiter extends Base {
 
-  constructor({artifactsModule, networkId, networkProvider}) {
+  constructor({artifactsPath, networkId, networkProvider}) {
     super({
         contractName: 'Arbiter',
-        _artifactsModule: artifactsModule,
+        _artifactsPath: artifactsPath,
         _networkId: networkId,
         _provider: networkProvider
     });

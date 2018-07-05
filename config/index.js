@@ -57,6 +57,16 @@ function getArtifact(artifactPath) {
     }
 }
 
+function findArtifact(artifactsPath, artifactName) {
+    let files = fs.readdirSync(artifactsPath);
+    for (let i = 0; i < files.length; i++) {
+        if (files[i] === artifactName + '.json' || files[i] === artifactName) {
+            let file = artifactsPath + '/' + files[i];
+            return JSON.parse(fs.readFileSync(file).toString());
+        }
+    }
+}
+
 
 
 module.exports = {
@@ -83,6 +93,7 @@ module.exports = {
     networks,
 
     getArtifact,
+    findArtifact,
     arbiterArtifact: getArtifact(arbiterAbiPath),
     registryArtifact: getArtifact(registryAbiPath),
     bondageArtifact: getArtifact(bondageAbiPath),

@@ -4,6 +4,8 @@ const expect = require('chai')
     .expect;
 
 const Web3 = require('web3');
+const Config = require('../../config/index');
+const path = require('path');
 const {migrateContracts, testProvider, testNetworkId, ganacheServer, clearBuild} = require('../bootstrap');
 const {
     getDeployedContract,
@@ -17,15 +19,10 @@ const {
     tokensForOwner,
     gasTransaction,
 } = require('../utils');
-const testArtifactsModulePath = '../TestArtifactsModule';
+const testArtifactsModulePath = path.join(Config.projectPath, 'test/TestArtifactsModule/contracts');
 
 async function configureEnvironment(func) {
     await func();
-}
-
-function updateModule(modulePath) {
-    delete require.cache[require.resolve(modulePath)];
-    return require(modulePath);
 }
 
 describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
@@ -35,10 +32,8 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
     let deployedZapRegistry;
     let deployedZapBondage;
     let zapArbiterWrapper;
-    let Config;
     let web3;
     let Arbiter;
-    let ArtifactsModule;
 
     before(function (done) {
         configureEnvironment(async () => {
@@ -49,14 +44,12 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
         });
     });
 
-    describe.only('Arbiter', function () {
+    describe('Arbiter', function () {
 
         beforeEach(function (done) {
             configureEnvironment(async () => {
-                Config = require('../../config/index');
                 accounts = await web3.eth.getAccounts();
                 Arbiter = require('../../src/api/contracts/Arbiter').Arbiter;
-                ArtifactsModule = updateModule(testArtifactsModulePath);
                 done();
             });
 
@@ -75,7 +68,7 @@ describe('Arbiter, path to "/src/api/contracts/ZapArbiter"', () => {
 
         it('Should initiate zapArbiter wrapper', async function () {
             zapArbiterWrapper = new Arbiter({
-                artifactsModule: ArtifactsModule,
+                artifactsPath: testArtifactsModulePath,
                 networkId: testNetworkId,
                 networkProvider: testProvider
             });

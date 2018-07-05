@@ -5,17 +5,21 @@ const {utf8ToHex, toBN} = require('web3-utils');
 class Bondage extends Base {
 
 
-  constructor({networkId = null, networkProvider = null} = {}){
-    super({contract: 'Bondage', networkId, networkProvider});
+  constructor({artifactsPath = null, networkId = null, networkProvider = null} = {}){
+    super({
+        contractName: 'Bondage',
+        _artifactsPath: artifactsPath,
+        _networkId: networkId,
+        _provider: networkProvider});
   }
 
   // Do a bond to a ZapOracle's endpoint
   async bond({provider, endpoint, zapNum, from, gas}) {
     try {
-      let bondResult = await this.contract.bond(
+      let bondResult = await this.contract.methods.bond(
         provider,
         utf8ToHex(endpoint),
-        toBase(zapNum))
+        toBN(zapNum))
         .send({
           from: from,
           gas: gas || this.DEFAULT_GAS});
@@ -24,9 +28,7 @@ class Bondage extends Base {
       console.error(e);
       return 0;
     }
-
   }
-
 
   async unbond({oracleAddress, endpoint, dots, from, gas}) {
     return await this.contract.methods.unbond(
@@ -42,7 +44,7 @@ class Bondage extends Base {
     return await this.contract.methods.getBoundDots(
       subscriber,
       provider,
-      utf8ToHex(endpoint),
+      utf8ToHex(endpoint)
     ).call();
   }
 
@@ -105,4 +107,11 @@ class Bondage extends Base {
 
 }
 
-module.exports = new Bondage();
+function getDefaultInstance() {
+    return new Bondage({});
+}
+
+module.exports = {
+  getDefaultInstance,
+  Bondage
+};

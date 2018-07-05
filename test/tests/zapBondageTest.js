@@ -3,11 +3,12 @@ const expect = require('chai')
     .use(require('chai-bignumber'))
     .expect;
 
-const Config = require('../../config/index');
-const Bondage = require('../../src/api/contracts/Bondage');
+const { Bondage } = require('../../src/api/contracts/Bondage');
 const Web3 = require('web3');
+const Config = require('../../config/index');
+const path = require('path');
 
-const { migrateContracts, clearBuild, ganacheServer } = require('../bootstrap');
+const { migrateContracts, clearBuild, ganacheServer, testProvider, testNetworkId } = require('../bootstrap');
 
 const {
     getDeployedContract,
@@ -21,17 +22,13 @@ const {
     tokensForOwner,
     gasTransaction
 } = require('../utils');
-
-const currentNetwork = Config.ganacheNetwork;
-const web3 = new Web3(currentNetwork.provider);
+const testArtifactsModulePath = path.join(Config.projectPath, 'test/TestArtifactsModule/contracts');
 
 async function configureEnvironment(func) {
     await func();
 }
 
-
 describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
-
     let
         accounts,
         bondageAbi,
@@ -40,47 +37,39 @@ describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
         zapToken,
         zapRegistry,
         zapBondage,
-        currentCostStorage,
         addressZapBondage,
         zapBondageWrapper,
         bondageStoreAbi,
-        Config,
-        currentNetwork,
         web3;
 
     before(function (done) {
         configureEnvironment(async () => {
-            this.timeout(60000);
+            this.timeout(120000);
+            web3 = new Web3(testProvider);
             await migrateContracts();
             done();
         });
     });
 
     describe('Bondage', function () {
-        beforeEach(function(done){
-            configureEnvironment(async ()=>{
-                delete require.cache[require.resolve('../../config/index')];
-                Config = require('../../config/index');
-                currentNetwork = Config.networks['ganache'];
-                web3 = new Web3(currentNetwork.provider);
+        beforeEach(function(done) {
+            configureEnvironment(async () => {
                 accounts = await web3.eth.getAccounts();
-                delete require.cache[require.resolve('../../src/api/contracts/Arbiter')];
-                Dispatch = require('../../src/api/contracts/Dispatch');
                 done();
             });
+        });
 
         it('Should get new instances of contracts and bind their storages', async () => {
             [
                 bondageStorage,
                 registryStorage,
                 zapToken,
-            ] = [getDeployedContract(bondageStoreAbi, currentNetwork, web3.currentProvider),
-                getDeployedContract(registryStoreAbi, currentNetwork, web3.currentProvider),
-                getDeployedContract(tokenAbi, currentNetwork, web3.currentProvider)];
+            ] = [await getDeployedContract(Config.testArtifactsDir, 'BondageStorage', testNetworkId, web3.currentProvider),
+                 await getDeployedContract(Config.testArtifactsDir, 'RegistryStorage', testNetworkId, web3.currentProvider),
+                 await getDeployedContract(Config.testArtifactsDir, 'ZapToken', testNetworkId, web3.currentProvider)];
 
-            deployedZapRegistry = getDeployedContract(Config.registryArtifact, currentNetwork, web3.currentProvider);
-            currentCostStorage = await getDeployedContract(costStorageAbi, currentNetwork, web3.currentProvider);
-            zapBondage = await getDeployedContract(bondageAbi, currentNetwork, web3.currentProvider);
+            zapBondage = await getDeployedContract(Config.testArtifactsDir, 'Bondage', testNetworkId, web3.currentProvider);
+            zapRegistry = await getDeployedContract(Config.testArtifactsDir, 'Registry', testNetworkId, web3.currentProvider);
 
             addressZapBondage = zapBondage.address;
 
@@ -93,9 +82,9 @@ describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
 
         it('Should get instance of smart contract throw wrapper', () => {
             zapBondageWrapper = new Bondage({
-                provider: web3.currentProvider,
-                address: addressZapBondage,
-                artifact: bondageAbi
+                artifactsPath: testArtifactsModulePath,
+                networkId: testNetworkId,
+                networkProvider: testProvider
             });
         });
 
@@ -103,13 +92,13 @@ describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
             await zapRegistry.initiateProvider(
                 providerPublicKey,
                 providerTitle,
-                oracleEndpoint,
+                specifier,
                 params,
                 { from: accounts[2], gas: gasTransaction }
             );
 
             await zapRegistry.initiateProviderCurve(
-                oracleEndpoint,
+                specifier,
                 curve.constants,
                 curve.parts,
                 curve.dividers,
@@ -134,21 +123,27 @@ describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
                 { from: accounts[0], gas: gasTransaction }
             );
 
-            await zapBondageWrapper.bond({
-                oracleAddress: accounts[2],
+            //console.log(zapBondageWrapper.)
+
+            const res = await zapBondageWrapper.bond({
+                provider: accounts[2],
                 endpoint: specifier,
-                amountOfZap: 100,
+                zapNum: 100,
                 from: accounts[0],
                 gas: gasTransaction
             });
+            console.log('\n');
+            console.log(res.events.Bound.returnValues);
+            console.log('bondage wrapper address = ' + zapBondageWrapper.contract.address);
+            console.log('bondage truffle address = ' + zapBondage.address);
         });
 
         it('Should get price of dots', async () => {
             //const data =  { numDots }
-            await zapBondageWrapper.estimateBond({
-                oracleAddress: accounts[2],
-                endpoint: specifier.valueOf(),
-                amountOfZap: 10,
+            await zapBondageWrapper.calcZapForDots({
+                provider: accounts[2],
+                endpoint: specifier,
+                dots: 10,
                 from: accounts[0],
                 gas: gasTransaction
             });
@@ -157,15 +152,15 @@ describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
         it('Should call unbond function of zapBondage Wrapper', async () => {
             const amount = 2;
             const dots = await zapBondage.getBoundDots(
-                accounts[0],
-                accounts[2],
-                oracleEndpoint
+                 accounts[0],
+                 accounts[2],
+                 specifier
             );
 
             await zapBondageWrapper.unbond({
                 oracleAddress: accounts[2],
-                endpoint: specifier.valueOf(),
-                amountOfDots: amount,
+                endpoint: specifier,
+                dots: amount,
                 from: accounts[0],
                 gas: gasTransaction
             });
@@ -173,7 +168,7 @@ describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
             const newDots = await zapBondage.getBoundDots(
                 accounts[0],
                 accounts[2],
-                oracleEndpoint
+                specifier
             );
 
             await expect(dots.toNumber() - amount).to.be.equal(newDots.toNumber());
@@ -181,12 +176,14 @@ describe('Bondage, path to "/src/api/contracts/Bondage"', () => {
 
         it('Should call getDots function of zapBondage Wrapper', async () => {
             const dots = await zapBondageWrapper.getBoundDots({
-                holderAddress: accounts[0],
-                oracleAddress: accounts[2],
-                specifier: specifier
+                subscriber: accounts[0],
+                provider: accounts[2],
+                endpoint: specifier
             });
 
-            await expect(dots.toNumber()).to.be.equal(dots.toNumber());
+            console.log(dots.valueOf());
+
+            await expect(dots.valueOf()).to.be.equal(dots.valueOf());
         });
     });
 });

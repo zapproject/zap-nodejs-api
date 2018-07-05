@@ -3,16 +3,16 @@ const { fixTruffleContractCompatibilityIssue } = require('../utils');
 const assert = require('assert');
 const Web3 = require('web3');
 const config = require('./../../../config/index');
-const Artifacts = require('./../Artifacts');
+const Artifacts = config.projectPath + 'src/api/Artifacts/contracts';
 
 class Base {
 
   static getConfig(){ return config; }
 
-  constructor({contractName, _artifactsModule, _networkId, _provider}) {
+  constructor({contractName, _artifactsPath, _networkId, _provider}) {
     try {
-      this.artifactsModule = _artifactsModule || Artifacts;
-      let artifact = this.artifactsModule[contractName];
+      this.artifactsPath = _artifactsPath || Artifacts;
+      let artifact = config.findArtifact(this.artifactsPath, contractName);
       assert(artifact, `No artifact for contract ${contractName} found`);
       this.provider = _provider ||
             new Web3.providers.WebsocketProvider('ws://127.0.0.1:8545');

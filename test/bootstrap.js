@@ -66,10 +66,10 @@ async function migrateContracts() {
     working_directory: path.join(Config.projectPath, Config.workingDirectory),
     migrations_directory: path.join(Config.projectPath, Config.migrationsDirectory),
     network: 'ganache-gui',
-    network_id: ganacheServerOptions.network_id,
+    network_id: 5777,//ganacheServerOptions.network_id,
     provider: testProvider,
-    hostname: ganacheServerOptions.hostname,
-    port: ganacheServerOptions.port,
+    hostname: 'localhost',//ganacheServerOptions.hostname,
+    port: 7545, //ganacheServerOptions.port,
     gas: '6721975',
     gasPrice: '10000000',
   };
@@ -96,8 +96,8 @@ module.exports = {
 
 try {
   require('./tests/zapArbiterTest');
-  // require('./tests/zapBondageTest');
-  // require('./tests/zapDispatchTest');
+  require('./tests/zapBondageTest');
+  //require('./tests/zapDispatchTest');
   // require('./tests/zapTokenTest');
   // require('./tests/zapRegistryTest');
 } catch (e) {
